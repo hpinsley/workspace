@@ -2,14 +2,9 @@ module Main exposing (..)
 
 import Browser
 import Html exposing (..)
-import Html.Events exposing (onClick)
 import Models exposing (..)
 import Views
 import State
-
-
-import State
-
 
 -- main : Program () Model Msg
 -- main =
