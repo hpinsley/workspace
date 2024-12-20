@@ -10,7 +10,7 @@ RUN mv elm /usr/local/bin/
 
 USER vscode
 
-# RUN python -m pip install aider-install
-# WORKDIR /home/vscode/.local/bin
-# ENV PATH /home/vscode/.local/bin:$PATH
-# RUN aider-install
+RUN python -m pip install aider-install
+WORKDIR /home/vscode/.local/bin
+ENV PATH /home/vscode/.local/bin:$PATH
+RUN aider-install
