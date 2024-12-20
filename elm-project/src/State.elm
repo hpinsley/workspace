@@ -7,6 +7,10 @@ update msg model =
         Increment ->
             (increment model, Cmd.none)
 
+increment : Model -> Model
+increment model =
+    { model | count = model.count + 1 }
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
