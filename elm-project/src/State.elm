@@ -1,23 +1,28 @@
 module State exposing (..)
+
 import Models exposing (..)
 
-update : Msg -> Model -> (Model, Cmd Msg)
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Increment ->
-            (increment model, Cmd.none)
+            ( increment model, Cmd.none )
+
         Decrement ->
-            (decrement model, Cmd.none)
+            ( decrement model, Cmd.none )
+
 
 increment : Model -> Model
 increment model =
     { model | count = model.count + 1 }
 
+
 decrement : Model -> Model
 decrement model =
     { model | count = model.count - 1 }
 
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
-    

@@ -3,8 +3,9 @@ module Main exposing (..)
 import Browser
 import Html exposing (..)
 import Models exposing (..)
-import Views
 import State
+import Views
+
 
 main : Program () Model Msg
 main =
