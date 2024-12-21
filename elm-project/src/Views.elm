@@ -32,7 +32,7 @@ getFormattedTime timeInfo =
 view : Model -> Html Msg
 view model =
     div
-        [ style "color" "red"
+        [ style "color" "blue"
         , style "display" "flex"
         , style "border-width" "20px"
         , style "border-style" "solid"
