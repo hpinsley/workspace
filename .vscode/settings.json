@@ -1,3 +1,4 @@
 {
-    "files.autoSave": "afterDelay"
+    "files.autoSave": "afterDelay",
+    "elmLS.elmFormatPath": "/workspace/node_modules/.bin/elm-format"
 }
