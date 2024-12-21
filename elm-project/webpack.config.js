@@ -31,8 +31,9 @@ module.exports = {
     ]
   },
   devServer: {
-    contentBase: path.join(__dirname, '/workspace/elm-project/index.html'),
-    port: 8080
+    contentBase: 'src',
+    host: '0.0.0.0',
+    port: 8080,
   }
 
   // devServer: {

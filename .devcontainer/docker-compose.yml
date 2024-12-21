@@ -6,7 +6,9 @@ services:
       dockerfile: Dockerfile
 
     ports:
+      - 8000:8000
       - 8080:8080
+      - 3000:3000
 
     volumes:
       - ..:/workspace:cached      
