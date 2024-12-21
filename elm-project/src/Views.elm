@@ -5,7 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Time
 import Models exposing (..)
-
+import Iso8601
 
 
 -- centeredStyle : Attribute msg
@@ -27,7 +27,7 @@ getFormattedTime: Maybe Time.Posix -> String
 getFormattedTime timeInfo =
     case timeInfo of
         Nothing -> "No time"
-        Just posixTime -> posixTime |> Time.posixToMillis |> String.fromInt
+        Just posixTime -> Iso8601.fromTime posixTime
 
 view : Model -> Html Msg
 view model =
