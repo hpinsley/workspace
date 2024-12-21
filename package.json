@@ -2,7 +2,7 @@
   "name": "elm-project",
   "version": "1.0.0",
   "scripts": {
-    "start": "cd /workspace/elm-project && webpack serve"
+    "start": "cd /workspace/elm-project && webpack serve --liveReload"
   },
   "devDependencies": {
     "elm": "^0.19.1",
