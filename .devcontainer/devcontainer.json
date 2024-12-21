@@ -4,6 +4,7 @@
 	"service": "devcontainer",
 	"workspaceFolder": "/workspace",
 
+	"postCreateCommand": "bash -c 'npm install elm-format'",
 	"customizations": {
 		"vscode": {
 			"extensions": [
