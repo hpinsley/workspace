@@ -31,7 +31,7 @@ module.exports = {
     ]
   },
   devServer: {
-    contentBase: 'src',
+    contentBase: '/workspace/elm-project',
     host: '0.0.0.0',
     port: 8080,
   }
