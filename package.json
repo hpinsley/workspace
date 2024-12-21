@@ -2,8 +2,8 @@
   "name": "elm-project",
   "version": "1.0.0",
   "scripts": {
-    "start": "webpack serve --mode development",
-    "build": "webpack --mode production"
+    "start": "cd elm-project && elm make src/Main.elm --output=../dist/index.html && webpack serve --mode development"
+    "build": "cd elm-project && elm make src/Main.elm --output=../dist/index.html && webpack --mode production"
   },
   "devDependencies": {
     "elm": "^0.19.1",
