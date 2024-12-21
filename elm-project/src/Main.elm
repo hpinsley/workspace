@@ -6,13 +6,14 @@ import Models exposing (..)
 import Views
 import State
 
--- main : Program () Model Msg
--- main =
---     Html.program
---         { init = Models.init
---         , view = Views.view
---         , update = State.update
---         }
+centeredStyle : Attribute msg
+centeredStyle =
+    style
+        [ ("display", "flex")
+        , ("justify-content", "center")
+        , ("align-items", "center")
+        , ("height", "100vh")
+        ]
 
 main : Program () Model Msg
 main =
@@ -22,3 +23,11 @@ main =
         , subscriptions = State.subscriptions
         , view = Views.view
         }
+
+view : Model -> Html Msg
+view model =
+    div [ centeredStyle ]
+        [ button [ onClick Increment ] [ text "+" ]
+        , div [] [ text (String.fromInt model.count) ]
+        , button [ onClick Decrement ] [ text "-" ]
+        ]
