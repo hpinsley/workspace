@@ -3,6 +3,9 @@
 // Require index.html so it gets copied to dist
 // let html = require('./index.html');
 import htmlString from './index.html';
+import styles from './index.scss';
+console.log('styles:', styles);
+
 const parser = new DOMParser();
 const root = parser.parseFromString(htmlString, 'text/html');
 document.documentElement.replaceWith(root.documentElement);

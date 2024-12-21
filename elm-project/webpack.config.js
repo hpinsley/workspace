@@ -19,12 +19,21 @@ module.exports = {
     rules: [
       {
         test: /\.scss$/,
-        loader: "sass-loader"
+        use: [
+          // Creates `style` nodes from JS strings
+          "style-loader",
+          // Translates CSS into CommonJS
+          {
+            loader: "css-loader",
+            options: {
+              modules: true,
+            }
+          },
+          
+          // Compiles Sass to CSS
+          "sass-loader",
+        ],
       },
-      // {
-      //   test: /\.css$/,
-      //   loader: 'css-loader'
-      // },
       {
         test: /\.html$/i,
         loader: "html-loader",
