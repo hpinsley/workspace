@@ -3,6 +3,7 @@ module Views exposing (view)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Time
 import Models exposing (..)
 
 
@@ -22,6 +23,11 @@ import Models exposing (..)
 --         , div [] [ text (String.fromInt model.count) ]
 --         ]
 
+getFormattedTime: Maybe Time.Posix -> String
+getFormattedTime timeInfo =
+    case timeInfo of
+        Nothing -> "No time"
+        Just posixTime -> posixTime |> Time.posixToMillis |> String.fromInt
 
 view : Model -> Html Msg
 view model =
@@ -38,4 +44,7 @@ view model =
         [ button [ onClick Increment ] [ text "+" ]
         , div [] [ text (String.fromInt model.count) ]
         , button [ onClick Decrement ] [ text "-" ]
+        , div [][
+            getFormattedTime model.currentTime |> text
+        ]
         ]

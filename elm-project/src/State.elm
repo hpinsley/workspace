@@ -1,7 +1,8 @@
 module State exposing (..)
 
 import Models exposing (..)
-
+import Task
+import Time exposing (..)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -12,6 +13,13 @@ update msg model =
         Decrement ->
             ( decrement model, Cmd.none )
 
+        Tick currentTime ->
+            ( tickModel model currentTime, Cmd.none)
+
+
+tickModel: Model -> Time.Posix -> Model 
+tickModel model theTime = 
+    { model | currentTime = Just theTime }
 
 increment : Model -> Model
 increment model =
@@ -24,5 +32,5 @@ decrement model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
+subscriptions _ =
+        every 1000.0 Tick
