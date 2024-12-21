@@ -1,12 +1,20 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'development',
-  entry: '/workspace/elm-project/index.html',
+  entry: {
+    app: [
+      './src/index.js'
+    ]
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js'
+    filename: 'index.js'
   },
+  // plugins: [new HtmlWebpackPlugin({
+  //   template: "template.html",
+  // })],
   module: {
     rules: [
       {
@@ -21,7 +29,7 @@ module.exports = {
           options: {
           },
           options: {
-            files: ['Main.elm'],
+            // files: ['Main.elm'],
             cwd: '.',
             optimize: false,
             debug: true
@@ -31,7 +39,7 @@ module.exports = {
     ]
   },
   devServer: {
-    contentBase: '/workspace/elm-project',
+    // contentBase: '/workspace/elm-project',
     host: '0.0.0.0',
     port: 8080,
   }
