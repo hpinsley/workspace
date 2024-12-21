@@ -15,4 +15,5 @@ WORKDIR /home/vscode/.local/bin
 ENV PATH /home/vscode/.local/bin:$PATH
 RUN aider-install
 
-WORKDIR /workspace/elm-project
+WORKDIR /workspace
+
