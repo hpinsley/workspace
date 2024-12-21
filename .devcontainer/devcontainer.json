@@ -6,7 +6,7 @@
 	"forwardPorts": [
 		3000,8000,8080
 	],
-	"postCreateCommand": "bash -c 'npm install elm-format html-loader'",
+	"postCreateCommand": "bash -c 'npm install elm-format html-loader style-loader sass sass-loader css-loader'",
 	"customizations": {
 		"vscode": {
 			"extensions": [
