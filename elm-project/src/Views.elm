@@ -28,9 +28,12 @@ view model =
     div
         [ style "color" "red"
         , style "display" "flex"
+        , style "border-width" "20px"
+        , style "border-style" "solid"
         , style "justify-content" "center"
         , style "align-items" "center"
-        , style "height" "100vh"
+        , style "width" "50vw"
+        , style "height" "50vh"
         ]
         [ button [ onClick Increment ] [ text "+" ]
         , div [] [ text (String.fromInt model.count) ]
