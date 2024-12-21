@@ -2,3 +2,4 @@
 .env
 elm-project/elm-stuff
 node_modules
+dist/

@@ -2,10 +2,11 @@ const path = require('path');
 
 module.exports = {
   mode: 'development',
-  entry: './src/index.js',
+  target: 'web',
+  entry: '/workspace/elm-project',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js'
+    filename: 'index.js'
   },
   module: {
     rules: [
@@ -22,7 +23,7 @@ module.exports = {
     ]
   },
   devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    port: 9000
+    contentBase: path.join(__dirname, '/workspace/elm-project/index.html'),
+    port: 8080
   }
 };
