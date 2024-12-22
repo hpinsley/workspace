@@ -32,15 +32,7 @@ getFormattedTime timeInfo =
 view : Model -> Html Msg
 view model =
     div
-        [ style "color" "red"
-        , style "display" "flex"
-        , style "border-width" "20px"
-        , style "border-style" "solid"
-        , style "justify-content" "center"
-        , style "align-items" "center"
-        , style "width" "50vw"
-        , style "height" "50vh"
-        ]
+        [ ]
         [ button [ 
               id "mybutton"
             , onClick Increment             

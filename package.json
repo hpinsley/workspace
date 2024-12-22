@@ -2,7 +2,7 @@
   "name": "elm-project",
   "version": "1.0.0",
   "scripts": {
-    "start": "cd /workspace/elm-project && webpack serve --liveReload"
+    "start": "cd /workspace/elm-project && webpack serve"
   },
   "devDependencies": {
     "elm": "^0.19.1",
@@ -11,7 +11,7 @@
     "html-webpack-plugin": "^5.6.3",
     "webpack": "^5.0.0",
     "webpack-cli": "^4.0.0",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^4.15.2"
   },
   "dependencies": {
     "css-loader": "^7.1.2",

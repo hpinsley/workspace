@@ -1,5 +1,5 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+// const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -54,12 +54,10 @@ module.exports = {
     ]
   },
   devServer: {
-    // contentBase: '/workspace/elm-project',
     host: '0.0.0.0',
-    port: 8080
+    port: 8080,
+    // client: {
+    //   logging: 'verbose',
+    // }
   }
-
-  // devServer: {
-  //   contentBase: './dist'
-  // }
 };
