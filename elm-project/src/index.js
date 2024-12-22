@@ -4,11 +4,32 @@
 // let html = require('./index.html');
 import htmlString from './index.html';
 import styles from './index.scss';
+
 console.log('styles:', styles);
 
 const parser = new DOMParser();
 const root = parser.parseFromString(htmlString, 'text/html');
 document.documentElement.replaceWith(root.documentElement);
+
+function addInlineCSS(cssContent) {
+    const style = document.createElement('style');
+    style.textContent = cssContent;
+
+    // Append the style element to the <head> or <documentElement>
+    document.documentElement.appendChild(style);
+}
+
+// Example usage
+addInlineCSS(`
+    body {
+        background-color: lightblue;
+    }
+    h1 {
+        color: darkblue;
+    }
+`);
+
+addInlineCSS();
 
 document.addEventListener('DOMContentLoaded', function () {
     var Elm = require('./Main.elm');
