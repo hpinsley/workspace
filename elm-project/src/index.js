@@ -19,17 +19,9 @@ function addInlineCSS(cssContent) {
     document.documentElement.appendChild(style);
 }
 
-// Example usage
-addInlineCSS(`
-    body {
-        background-color: lightblue;
-    }
-    h1 {
-        color: darkblue;
-    }
-`);
-
-addInlineCSS();
+const cssContent = styles[0][1];
+console.log(cssContent);
+addInlineCSS(cssContent)
 
 document.addEventListener('DOMContentLoaded', function () {
     var Elm = require('./Main.elm');
