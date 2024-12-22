@@ -1,0 +1,57 @@
+button.command {
+
+    $backgroundColor: rgb(211, 211, 211);
+    $fontSize: 40pt;
+    $borderRadius: 3px; //Fix this to px
+    $width: 100px;
+    $narrowWidth: 52px;
+    $margin: 2px;
+    $hoverBorderColor: black;
+
+    background-color: $backgroundColor;
+    font-size: $fontSize;
+    border-radius: $borderRadius;
+    width: $width;
+    white-space: nowrap;
+    margin-left: $margin;
+
+    &.narrow {
+        width: $narrowWidth;
+    }
+
+    &.style1 {
+        background-color: #000077;
+        color: white;
+    }
+
+    &.style2 {
+        background-color:gold;
+        color: black;
+    }
+
+    &.style3 {
+        background-color: #770000;
+        color: white;
+    }
+
+    &.style4 {
+        background-color: #007700;
+        color: white;
+    }
+
+    &.style5 {
+        background-color: #003322;
+        color: white;
+    }
+
+    &.style6 {
+        background-color: lightcyan;
+        color: black;
+    }
+    
+    &:hover {
+        cursor: pointer;
+        font-style: italic;
+        border: 1px solid $hoverBorderColor;
+    }
+}

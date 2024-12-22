@@ -16,7 +16,7 @@ function addInlineCSS(cssContent) {
     style.textContent = cssContent;
 
     // Append the style element to the <head> or <documentElement>
-    document.documentElement.appendChild(style);
+    document.head.appendChild(style);
 }
 
 const cssContent = styles[0][1];

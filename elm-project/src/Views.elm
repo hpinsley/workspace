@@ -41,7 +41,11 @@ view model =
         , style "width" "50vw"
         , style "height" "50vh"
         ]
-        [ button [ onClick Increment ] [ text "+" ]
+        [ button [ 
+              id "mybutton"
+            , onClick Increment             
+            , class "command"
+        ] [ text "+" ]
         , div [] [ text (String.fromInt model.count) ]
         , button [ onClick Decrement ] [ text "-" ]
         , div [][
