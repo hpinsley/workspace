@@ -25,6 +25,7 @@ view model =
         [ h1 [] [ text "Computations" ]
         , label [] [ text "Expression" ]
         , input [ onInput UpdateExpression ] []
+        , button [ class "command", onClick ParseExpression ] [ text "Parse" ] // Added Parse button with onClick event
         , button [ class "command" ] [ text "Update Expression" ]
         , button
             [ id "plus-button"
