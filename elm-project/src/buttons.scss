@@ -7,6 +7,7 @@ button.command {
     $narrowWidth: 52px;
     $margin: 2px;
     $hoverBorderColor: black;
+    $padding: 8px; // Increased padding to 8px
 
     background-color: $backgroundColor;
     font-size: $fontSize;
@@ -14,6 +15,7 @@ button.command {
     width: $width;
     white-space: nowrap;
     margin-left: $margin;
+    padding: $padding; // Added padding property
 
     &.narrow {
         width: $narrowWidth;
