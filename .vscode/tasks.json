@@ -12,6 +12,17 @@
 			"type": "shell",
 			"label": "Force Elm Rebuild",
 			"command": "touch /workspace/elm-project/src/Main.elm",
+			"problemMatcher": [],
+			"presentation": {
+   			   "reveal": "silent",
+      			"revealProblems": "onProblem",
+      			"close": true
+  			}
+		},
+		{
+			"type": "shell",
+			"label": "Aider",
+			"command": "cd /workspace/elm-project && aider --35-turbo",
 			"problemMatcher": []
 		}
 	]
