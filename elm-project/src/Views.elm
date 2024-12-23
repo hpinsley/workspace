@@ -35,7 +35,7 @@ view model =
         [ id "adder" ]
         [ h1 [] [text "Computations"] ,
         label [] [text "Expression"],
-        input [] [],
+        input [ onInput UpdateExpression ] [],
         button [ class "command"] [ text "Update Expression"],
                 button [ 
               id "plus-button"

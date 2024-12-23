@@ -16,6 +16,9 @@ update msg model =
         Tick currentTime ->
             ( tickModel model currentTime, Cmd.none)
 
+        UpdateExpression expr ->
+            ( { model | expression = Just expr }, Cmd.none)
+
 
 tickModel: Model -> Time.Posix -> Model 
 tickModel model theTime = 
@@ -33,4 +36,5 @@ decrement model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-        every 1000.0 Tick
+        Sub.none
+        -- 1every 1000.0 Tick
