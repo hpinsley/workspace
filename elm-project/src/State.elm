@@ -17,6 +17,7 @@ update msg model =
         ParseExpression ->
             ( model, Cmd.none )
 
+
 tickModel : Model -> Time.Posix -> Model
 tickModel model theTime =
     { model | currentTime = Just theTime }

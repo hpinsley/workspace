@@ -28,9 +28,12 @@ type Expression
 type alias Model =
     { currentTime : Maybe Time.Posix
     , expression : Maybe String
+    , parsedExpression: Maybe Expression
     }
 
 
 init : flags -> ( Model, Cmd Msg )
 init _ =
-    ( { currentTime = Nothing, expression = Nothing }, Cmd.none )
+    let 
+        inital_model = { currentTime = Nothing, expression = Nothing, parsedExpression = Nothing    }
+    in (inital_model, Cmd.none)
