@@ -1,8 +1,15 @@
 const path = require('path');
 // const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+// console.log(path.resolve(__dirname, "src"));
+
 module.exports = {
   mode: 'development',
+  stats: {
+    errors: true,
+    errorStack: true,
+    errorDetails: true, // --display-error-details
+  },
   watchOptions: {
     ignored: '**/node_modules',
     poll: 1000, // Check for changes every second
@@ -44,16 +51,23 @@ module.exports = {
       },
       {
         test: /\.elm$/,
+          // "include" is commonly used to match the directories
+        include: [
+          path.resolve(__dirname, "src"),
+          // path.resolve(__dirname, "test")
+        ],
         exclude: [/elm-stuff/, /node_modules/],
-        use: {
+        use: [
+          { loader: 'elm-hot-webpack-loader' },
+          {
           loader: 'elm-webpack-loader',
           options: {
             // files: ['Main.elm'],
-            cwd: '.',
+            cwd: __dirname,
             optimize: false,
             debug: true
           }
-        }
+        }]
       }
     ]
   },

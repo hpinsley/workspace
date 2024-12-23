@@ -5,7 +5,7 @@
 import htmlString from './index.html';
 import styles from './index.scss';
 
-console.log('styles', styles);
+console.log('styles!', styles);
 
 const parser = new DOMParser();
 const root = parser.parseFromString(htmlString, 'text/html');

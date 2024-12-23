@@ -2,10 +2,11 @@
   "name": "elm-project",
   "version": "1.0.0",
   "scripts": {
-    "start": "cd /workspace/elm-project && webpack serve"
+    "start": "cd /workspace/elm-project && webpack serve --progress"
   },
   "devDependencies": {
     "elm": "^0.19.1",
+    "elm-hot-webpack-loader": "^1.1.8",
     "elm-webpack-loader": "^7.0.0",
     "html-loader": "^5.1.0",
     "html-webpack-plugin": "^5.6.3",
