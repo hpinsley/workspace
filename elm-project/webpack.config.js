@@ -3,6 +3,10 @@ const path = require('path');
 
 module.exports = {
   mode: 'development',
+  watchOptions: {
+    ignored: '**/node_modules',
+    poll: 1000, // Check for changes every second
+  },
   entry: {
     app: [
       './src/index.js'
@@ -55,9 +59,10 @@ module.exports = {
   },
   devServer: {
     host: '0.0.0.0',
+    hot: true,
     port: 8080,
-    // client: {
-    //   logging: 'verbose',
-    // }
+    client: {
+      logging: 'verbose',
+    }
   }
 };
