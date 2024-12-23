@@ -1,6 +1,16 @@
 @use 'buttons';
 $backgroundColor: #f5e8e8;
+$defaultPadding: 10px;
 
 body {
-    background-color: $backgroundColor;
+    background-color: default;
+}
+
+div#adder {
+    border: solid; 
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: $defaultPadding;
+    background-color: greenyellow;
 }

@@ -32,15 +32,19 @@ getFormattedTime timeInfo =
 view : Model -> Html Msg
 view model =
     div
-        [ ]
-        [ button [ 
-              id "mybutton"
+        [ id "adder" ]
+        [ h1 [] [text "Computations"] ,
+        label [] [text "Expression"],
+        input [] [],
+        button [ class "command"] [ text "Update Expression"],
+                button [ 
+              id "plus-button"
             , onClick Increment             
             , class "command"
         ] [ text "+" ]
         , div [] [ text (String.fromInt model.count) ]
         , button [ onClick Decrement ] [ text "-" ]
-        , div [][
+        , div [id "time"][
             getFormattedTime model.currentTime |> text
         ]
         ]
