@@ -1,9 +1,14 @@
 @use 'buttons';
 $backgroundColor: #f5e8e8;
 $defaultPadding: 10px;
+$labelRightPadding: 10px;
 
 body {
     background-color: default;
+}
+
+label {
+    padding-right: $labelRightPadding;
 }
 
 div#adder {

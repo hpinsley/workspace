@@ -23,18 +23,9 @@ view model =
     div
         [ id "adder" ]
         [ h1 [] [ text "Computations" ]
-        , label [] [ text "Expression" ]
+        , label [] [ text "Expression:" ]
         , input [ onInput UpdateExpression ] []
-        , button [ class "command", onClick ParseExpression ] [ text "Parse" ] // Added Parse button with onClick event
-        , button [ class "command" ] [ text "Update Expression" ]
-        , button
-            [ id "plus-button"
-            , onClick Increment
-            , class "command"
-            ]
-            [ text "+" ]
-        , div [] [ text (String.fromInt model.count) ]
-        , button [ onClick Decrement ] [ text "-" ]
+        , button [ class "command", onClick ParseExpression ] [ text "Parse" ]
         , div [ id "time" ]
             [ getFormattedTime model.currentTime |> text
             ]

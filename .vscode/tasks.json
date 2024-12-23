@@ -28,7 +28,7 @@
 		{
 			"type": "shell",
 			"label": "Aider",
-			"command": "cd /workspace/elm-project && aider --35-turbo",
+			"command": "cd /workspace/elm-project && aider --35-turbo src/**",
 			"problemMatcher": []
 		}
 	]

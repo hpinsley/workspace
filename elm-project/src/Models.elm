@@ -4,19 +4,33 @@ import Time
 
 
 type Msg
-    = Increment
-    | Decrement
-    | Tick Time.Posix
+    = Tick Time.Posix
     | UpdateExpression String
+    | ParseExpression
 
+type MulOp
+    = Times
+    | Divide
+
+type AddOp
+    = Plus
+    | Minus
+
+type Factor
+    = IntFactor Int
+    | FloatFactor Float
+    | BinaryFactor MulOp Factor Factor
+
+type Expression
+    = BinaryExpression Factor AddOp Factor
+    | Factor
 
 type alias Model =
-    { count : Int
-    , currentTime : Maybe Time.Posix
+    { currentTime : Maybe Time.Posix
     , expression : Maybe String
     }
 
 
 init : flags -> ( Model, Cmd Msg )
 init _ =
-    ( { count = 0, currentTime = Nothing, expression = Nothing }, Cmd.none )
+    ( { currentTime = Nothing, expression = Nothing }, Cmd.none )
