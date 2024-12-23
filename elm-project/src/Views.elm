@@ -37,7 +37,7 @@ view model =
               id "mybutton"
             , onClick Increment             
             , class "command"
-        ] [ text "++" ]
+        ] [ text "+" ]
         , div [] [ text (String.fromInt model.count) ]
         , button [ onClick Decrement ] [ text "-" ]
         , div [][

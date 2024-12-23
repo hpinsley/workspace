@@ -1,0 +1,18 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "start",
+			"problemMatcher": [],
+			"label": "npm: start",
+			"detail": "cd /workspace/elm-project && webpack serve --progress"
+		},
+		{
+			"type": "shell",
+			"label": "Force Elm Rebuild",
+			"command": "touch /workspace/elm-project/src/Main.elm",
+			"problemMatcher": []
+		}
+	]
+}
