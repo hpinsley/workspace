@@ -37,4 +37,5 @@ view model =
         , div [ id "time" ]
             [ getFormattedTime model.currentTime |> text
             ]
+        , div [] [ text (String.fromInt (String.length (Maybe.withDefault "" model.expression))) ]
         ]
