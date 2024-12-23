@@ -2,6 +2,7 @@ module Models exposing (..)
 
 import Time
 
+
 type Msg
     = Increment
     | Decrement
@@ -9,11 +10,10 @@ type Msg
     | UpdateExpression String
 
 
-
 type alias Model =
     { count : Int
-    , currentTime: Maybe Time.Posix
-    , expression: Maybe String
+    , currentTime : Maybe Time.Posix
+    , expression : Maybe String
     }
 
 
