@@ -45,8 +45,13 @@ parseModelExpression model =
 parseExpression : String -> Result String Expression
 parseExpression expression =
     -- Debug.log ("Parsing " ++ expression)
-    case run Parser.int expression of
+    case run factorParser expression of
         Ok value ->
-            value |> IntFactor |> UnaryExpression |> Ok
+            value |> UnaryExpression |> Ok
         Err deadEnds ->
             deadEnds |> deadEndsToString |> Err
+
+factorParser: Parser Factor
+factorParser =
+    succeed IntFactor
+        |= int
