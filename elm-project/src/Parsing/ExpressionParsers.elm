@@ -2,6 +2,8 @@ module Parsing.ExpressionParsers exposing (..)
 
 import Parsing.ExpressionModels exposing (..)
 import Parser exposing (..)
+import Char
+import Set
 
 problemToString : Problem -> String
 problemToString problem =
@@ -95,14 +97,37 @@ addOpParser =
         ]
 
 
+variableParser : Parser String
+variableParser =
+  variable
+    { start = Char.isAlphaNum
+    , inner = \c -> Char.isAlphaNum c || c == '_'
+    , reserved = Set.fromList [ ]
+    }
+
+function1Parser: Parser Function1
+function1Parser =
+    Parser.oneOf
+        [ 
+            succeed Sin 
+                |. symbol "sin"
+                |. symbol "("
+                |= variableParser
+                |. symbol ")"
+        ]
+
 factorParser : Parser Factor
 factorParser =
     Parser.oneOf
         [ succeed BinaryFactor
             |= unaryfactorParser
             |= mulOpParser
-            |= unaryfactorParser
+            |= lazy (\_ -> factorParser)
             |> backtrackable
+        , succeed SingleArgumentFunction
+            |= function1Parser
+            |> backtrackable
+
         , unaryfactorParser
         ]
 
