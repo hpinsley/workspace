@@ -1,7 +1,7 @@
 @use 'buttons';
 $backgroundColor: #f5e8e8;
 $defaultPadding: 10px;
-$labelRightPadding: 10px;
+$labelRightPadding: 5px;
 
 body {
     background-color: default;
@@ -12,14 +12,38 @@ label {
 }
 
 div#adder {
-    border: solid; 
     width: 800px;
     margin-left: auto;
     margin-right: auto;
     padding: $defaultPadding;
-    background-color: lightgray; // Changed background color to light gray
+    background-color: backgroundColor; // Changed background color to light gray
+}
+
+input#expression-input {
+    width: 500px;
 }
 
 div#parseErrors {
     color: red;
+}
+
+div#variables {
+    width: 500px;
+    margin-top: 50px;
+    margin-bottom:50px;
+    margin-left: auto;
+    margin-right: auto;
+    table {
+        border-collapse: true;
+        thead {
+            tr {
+                text-decoration: underline;
+            }
+        }
+        tbody {
+            td {
+                border: 1px solid black;
+            }
+        }
+    }
 }
