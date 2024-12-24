@@ -1,5 +1,6 @@
 module Models exposing (..)
 
+import Parsing.ExpressionModels exposing (Expression)
 import Time
 
 
@@ -7,27 +8,6 @@ type Msg
     = Tick Time.Posix
     | UpdateExpression String
     | ParseExpression
-
-
-type MulOp
-    = Times
-    | Divide
-
-
-type AddOp
-    = Plus
-    | Minus
-
-
-type Factor
-    = IntFactor Int
-    | FloatFactor Float
-    | BinaryFactor Factor MulOp Factor
-
-
-type Expression
-    = BinaryExpression Factor AddOp Expression
-    | UnaryExpression Factor
 
 
 type alias Model =

@@ -30,6 +30,12 @@
 			"label": "Aider",
 			"command": "cd /workspace/elm-project && aider --35-turbo src/**",
 			"problemMatcher": []
+		},
+		{
+			"type": "shell",
+			"label": "Elm Reactor",
+			"command": "cd /workspace/elm-project && elm reactor",
+			"problemMatcher": []
 		}
 	]
 }
