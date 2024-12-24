@@ -26,7 +26,7 @@ type Factor
 
 
 type Expression
-    = BinaryExpression Factor AddOp Factor
+    = BinaryExpression Factor AddOp Expression
     | UnaryExpression Factor
 
 

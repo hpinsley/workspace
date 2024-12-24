@@ -132,7 +132,7 @@ expressionParser =
         succeed BinaryExpression 
             |= factorParser 
             |= addOpParser
-            |= factorParser
+            |= lazy (\_ -> expressionParser)
             |> backtrackable
         
         , succeed UnaryExpression
