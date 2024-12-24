@@ -1,9 +1,10 @@
 module Parsing.ExpressionParsers exposing (..)
 
-import Parsing.ExpressionModels exposing (..)
-import Parser exposing (..)
 import Char
+import Parser exposing (..)
+import Parsing.ExpressionModels exposing (..)
 import Set
+
 
 problemToString : Problem -> String
 problemToString problem =
@@ -69,6 +70,7 @@ parseExpression expression =
         Err deadEnds ->
             deadEnds |> extractParserErrors |> Err
 
+
 numberParser : Parser Factor
 numberParser =
     number
@@ -79,48 +81,51 @@ numberParser =
         , float = Just FloatFactor
         }
 
+
 variableParser : Parser Factor
 variableParser =
     succeed VariableFactor
         |= variable
             { start = Char.isAlphaNum
             , inner = \c -> Char.isAlphaNum c || c == '_'
-            , reserved = Set.fromList [ ]
+            , reserved = Set.fromList []
             }
 
-function1Parser: Parser Function1
+
+function1Parser : Parser Function1
 function1Parser =
     Parser.oneOf
-        [ 
-              succeed Sin 
-                |. symbol "sin"
-                |. symbol "("
-                |= lazy (\_ -> expressionParser)
-                |. symbol ")"
-                |> Parser.backtrackable
-            , succeed Cos
-                |. symbol "cos"
-                |. symbol "("
-                |= lazy (\_ -> expressionParser)
-                |. symbol ")"
-                |> Parser.backtrackable
-            , succeed Tan
-                |. symbol "tan"
-                |. symbol "("
-                |= lazy (\_ -> expressionParser)
-                |. symbol ")"
-                |> Parser.backtrackable
+        [ succeed Sin
+            |. symbol "sin"
+            |. symbol "("
+            |= lazy (\_ -> expressionParser)
+            |. symbol ")"
+            |> Parser.backtrackable
+        , succeed Cos
+            |. symbol "cos"
+            |. symbol "("
+            |= lazy (\_ -> expressionParser)
+            |. symbol ")"
+            |> Parser.backtrackable
+        , succeed Tan
+            |. symbol "tan"
+            |. symbol "("
+            |= lazy (\_ -> expressionParser)
+            |. symbol ")"
+            |> Parser.backtrackable
         ]
+
 
 unaryfactorParser : Parser Factor
 unaryfactorParser =
-    oneOf [
-          numberParser |> Parser.backtrackable
+    oneOf
+        [ numberParser |> Parser.backtrackable
         , succeed SingleArgumentFunction
-            |= function1Parser |> Parser.backtrackable
+            |= function1Parser
+            |> Parser.backtrackable
         , variableParser
+        ]
 
-    ]
 
 mulOpParser : Parser MulOp
 mulOpParser =
@@ -146,7 +151,6 @@ factorParser =
             |= mulOpParser
             |= lazy (\_ -> factorParser)
             |> backtrackable
-
         , unaryfactorParser
         ]
 
@@ -163,7 +167,8 @@ expressionParser =
             |= factorParser
         ]
 
-singleLineExpressionParser: Parser Expression
+
+singleLineExpressionParser : Parser Expression
 singleLineExpressionParser =
     expressionParser
-    |. end
+        |. end

@@ -1,8 +1,8 @@
 module Models exposing (..)
 
+import Dict exposing (..)
 import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
-import Dict exposing (..)
 
 
 type Msg
@@ -16,7 +16,7 @@ type alias Model =
     , expression : Maybe String
     , parsedExpression : Maybe Expression
     , parseErrors : String
-    , variables: Dict String Variable
+    , variables : Dict String Variable
     }
 
 
