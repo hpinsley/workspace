@@ -3,7 +3,9 @@ module State exposing (..)
 import Models exposing (..)
 import Parsing.ExpressionModels exposing (..)
 import Parsing.ExpressionParsers as ExpressionParsers
+import Parsing.VariableExtraction exposing (extractVariablesFromExpression)
 import Task
+import Dict
 import Time exposing (..)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -46,9 +48,13 @@ parseModelExpression model =
             in
             case parsedExpression of
                 Ok goodExpression ->
-                    ( { model | parsedExpression = Just goodExpression, parseErrors = "" }, Cmd.none )
+                    ( { model | 
+                            parsedExpression = Just goodExpression
+                            , variables = extractVariablesFromExpression goodExpression
+                            , parseErrors = "" }
+                        , Cmd.none )
 
                 Err errmsg ->
-                    ( { model | parseErrors = errmsg }, Cmd.none )
+                    ( { model | parseErrors = errmsg, variables = Dict.empty }, Cmd.none )
 
 
