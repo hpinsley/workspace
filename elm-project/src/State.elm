@@ -90,11 +90,31 @@ parseExpression expression =
         Err deadEnds ->
             deadEnds |> extractParserErrors |> Err
 
+unaryfactorParser: Parser Factor
+unaryfactorParser =
+    number {
+        int = Just IntFactor,
+        hex = Nothing,
+        octal = Nothing,
+        binary = Nothing,
+        float = Just FloatFactor
+    }
+
+mulOpParser: Parser MulOp
+mulOpParser =
+    Parser.oneOf [
+        succeed Times |. symbol "*"
+        , succeed Divide |. symbol "/"
+    ]
+
 factorParser: Parser Factor
 factorParser =
-    oneOf [
-          succeed IntFactor
-            |= int
-        , succeed FloatFactor
-            |= float
+    Parser.oneOf [
+        succeed BinaryFactor 
+            |= unaryfactorParser 
+            |= mulOpParser
+            |= unaryfactorParser
+            |> backtrackable
+        
+        , unaryfactorParser
     ]

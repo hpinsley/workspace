@@ -22,7 +22,7 @@ type AddOp
 type Factor
     = IntFactor Int
     | FloatFactor Float
-    | BinaryFactor MulOp Factor Factor
+    | BinaryFactor Factor MulOp Factor
 
 
 type Expression
