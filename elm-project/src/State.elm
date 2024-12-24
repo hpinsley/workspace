@@ -84,9 +84,9 @@ extractParserErrors deadEnds =
 parseExpression : String -> Result String Expression
 parseExpression expression =
     -- Debug.log ("Parsing " ++ expression)
-    case run factorParser expression of
+    case run expressionParser expression of
         Ok value ->
-            value |> UnaryExpression |> Ok
+            Ok value
         Err deadEnds ->
             deadEnds |> extractParserErrors |> Err
 
@@ -107,6 +107,13 @@ mulOpParser =
         , succeed Divide |. symbol "/"
     ]
 
+addOpParser: Parser AddOp
+addOpParser =
+    Parser.oneOf [
+        succeed Plus |. symbol "+"
+        , succeed Minus |. symbol "-"
+    ]
+
 factorParser: Parser Factor
 factorParser =
     Parser.oneOf [
@@ -117,4 +124,17 @@ factorParser =
             |> backtrackable
         
         , unaryfactorParser
+    ]
+
+expressionParser: Parser Expression
+expressionParser =
+    Parser.oneOf [
+        succeed BinaryExpression 
+            |= factorParser 
+            |= addOpParser
+            |= factorParser
+            |> backtrackable
+        
+        , succeed UnaryExpression
+            |= factorParser
     ]
