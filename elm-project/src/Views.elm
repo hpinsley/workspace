@@ -21,7 +21,7 @@ showVariableList : Model -> Html Msg
 showVariableList model =
     let
         variables = Dict.values model.variables
-        trs = variables |> List.map (\v -> tr [] [td [][text v], td [][text "0"]])
+        trs = variables |> List.map (\v -> tr [] [td [class "variable-name"][text v], td [][text "0"]])
     in
         div [id "variables"][
             table [][

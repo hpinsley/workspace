@@ -2,6 +2,7 @@
 $backgroundColor: #f5e8e8;
 $defaultPadding: 10px;
 $labelRightPadding: 5px;
+$tableHeaderColor: darkblue;
 
 body {
     background-color: default;
@@ -34,15 +35,21 @@ div#variables {
     margin-left: auto;
     margin-right: auto;
     table {
-        border-collapse: true;
+        border-collapse: collapse;
         thead {
             tr {
-                text-decoration: underline;
+                color: $tableHeaderColor;
+                th {
+                    width: 100px;
+                }
             }
         }
         tbody {
             td {
                 border: 1px solid black;
+                &.variable-name {
+                    font-weight: bold;
+                }
             }
         }
     }
