@@ -3,7 +3,7 @@ module State exposing (..)
 import Models exposing (..)
 import Task
 import Time exposing (..)
-
+import Parser exposing (..)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -44,4 +44,9 @@ parseModelExpression model =
 
 parseExpression : String -> Result String Expression
 parseExpression expression =
-    IntFactor 1 |> UnaryExpression |> Ok
+    -- Debug.log ("Parsing " ++ expression)
+    case run Parser.int expression of
+        Ok value ->
+            value |> IntFactor |> UnaryExpression |> Ok
+        Err deadEnds ->
+            deadEnds |> deadEndsToString |> Err
