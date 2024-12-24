@@ -19,3 +19,7 @@ div#adder {
     padding: $defaultPadding;
     background-color: lightgray; // Changed background color to light gray
 }
+
+div#parseErrors {
+    color: red;
+}
