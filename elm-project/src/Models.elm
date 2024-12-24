@@ -34,7 +34,7 @@ type alias Model =
     { currentTime : Maybe Time.Posix
     , expression : Maybe String
     , parsedExpression : Maybe Expression
-    , parseErrors: String
+    , parseErrors : String
     }
 
 

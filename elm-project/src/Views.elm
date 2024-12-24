@@ -30,5 +30,5 @@ view model =
             [ getFormattedTime model.currentTime |> text
             ]
         , div [] [ text (String.fromInt (String.length (Maybe.withDefault "" model.expression))) ]
-        , div [id "parseErrors"] [ text model.parseErrors ]
+        , div [ id "parseErrors" ] [ text model.parseErrors ]
         ]
