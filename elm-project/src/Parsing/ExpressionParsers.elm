@@ -79,13 +79,14 @@ numberParser =
         , float = Just FloatFactor
         }
 
-variableParser : Parser String
+variableParser : Parser Factor
 variableParser =
-  variable
-    { start = Char.isAlphaNum
-    , inner = \c -> Char.isAlphaNum c || c == '_'
-    , reserved = Set.fromList [ ]
-    }
+    succeed VariableFactor
+        |= variable
+            { start = Char.isAlphaNum
+            , inner = \c -> Char.isAlphaNum c || c == '_'
+            , reserved = Set.fromList [ ]
+            }
 
 function1Parser: Parser Function1
 function1Parser =
@@ -94,7 +95,7 @@ function1Parser =
             succeed Sin 
                 |. symbol "sin"
                 |. symbol "("
-                |= variableParser
+                |= lazy (\_ -> expressionParser)
                 |. symbol ")"
         ]
 
@@ -103,7 +104,9 @@ unaryfactorParser =
     oneOf [
           numberParser |> Parser.backtrackable
         , succeed SingleArgumentFunction
-            |= function1Parser
+            |= function1Parser |> Parser.backtrackable
+        , variableParser
+
     ]
 
 mulOpParser : Parser MulOp

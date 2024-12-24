@@ -8,17 +8,18 @@ type AddOp
     = Plus
     | Minus
 
-type alias Argument = String
+type alias Variable = String
 
 type Function1
-    = Sin Argument
-    | Cos Argument
-    | Tan Argument
+    = Sin Expression
+    | Cos Expression
+    | Tan Expression
 
 type Factor
     = IntFactor Int
     | FloatFactor Float
     | SingleArgumentFunction Function1
+    | VariableFactor Variable
     | BinaryFactor Factor MulOp Factor
 
 type Expression
