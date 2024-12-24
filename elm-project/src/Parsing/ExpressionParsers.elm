@@ -62,16 +62,15 @@ extractParserErrors deadEnds =
 parseExpression : String -> Result String Expression
 parseExpression expression =
     -- Debug.log ("Parsing " ++ expression)
-    case run expressionParser expression of
+    case run singleLineExpressionParser expression of
         Ok value ->
             Ok value
 
         Err deadEnds ->
             deadEnds |> extractParserErrors |> Err
 
-
-unaryfactorParser : Parser Factor
-unaryfactorParser =
+numberParser : Parser Factor
+numberParser =
     number
         { int = Just IntFactor
         , hex = Nothing
@@ -79,23 +78,6 @@ unaryfactorParser =
         , binary = Nothing
         , float = Just FloatFactor
         }
-
-
-mulOpParser : Parser MulOp
-mulOpParser =
-    Parser.oneOf
-        [ succeed Times |. symbol "*"
-        , succeed Divide |. symbol "/"
-        ]
-
-
-addOpParser : Parser AddOp
-addOpParser =
-    Parser.oneOf
-        [ succeed Plus |. symbol "+"
-        , succeed Minus |. symbol "-"
-        ]
-
 
 variableParser : Parser String
 variableParser =
@@ -116,6 +98,30 @@ function1Parser =
                 |. symbol ")"
         ]
 
+unaryfactorParser : Parser Factor
+unaryfactorParser =
+    oneOf [
+          numberParser |> Parser.backtrackable
+        , succeed SingleArgumentFunction
+            |= function1Parser
+    ]
+
+mulOpParser : Parser MulOp
+mulOpParser =
+    Parser.oneOf
+        [ succeed Times |. symbol "*"
+        , succeed Divide |. symbol "/"
+        ]
+
+
+addOpParser : Parser AddOp
+addOpParser =
+    Parser.oneOf
+        [ succeed Plus |. symbol "+"
+        , succeed Minus |. symbol "-"
+        ]
+
+
 factorParser : Parser Factor
 factorParser =
     Parser.oneOf
@@ -123,9 +129,6 @@ factorParser =
             |= unaryfactorParser
             |= mulOpParser
             |= lazy (\_ -> factorParser)
-            |> backtrackable
-        , succeed SingleArgumentFunction
-            |= function1Parser
             |> backtrackable
 
         , unaryfactorParser
@@ -143,3 +146,8 @@ expressionParser =
         , succeed UnaryExpression
             |= factorParser
         ]
+
+singleLineExpressionParser: Parser Expression
+singleLineExpressionParser =
+    expressionParser
+    |. end
