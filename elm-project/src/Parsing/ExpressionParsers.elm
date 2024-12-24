@@ -92,11 +92,24 @@ function1Parser: Parser Function1
 function1Parser =
     Parser.oneOf
         [ 
-            succeed Sin 
+              succeed Sin 
                 |. symbol "sin"
                 |. symbol "("
                 |= lazy (\_ -> expressionParser)
                 |. symbol ")"
+                |> Parser.backtrackable
+            , succeed Cos
+                |. symbol "cos"
+                |. symbol "("
+                |= lazy (\_ -> expressionParser)
+                |. symbol ")"
+                |> Parser.backtrackable
+            , succeed Tan
+                |. symbol "tan"
+                |. symbol "("
+                |= lazy (\_ -> expressionParser)
+                |. symbol ")"
+                |> Parser.backtrackable
         ]
 
 unaryfactorParser : Parser Factor
