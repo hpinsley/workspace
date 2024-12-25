@@ -47,7 +47,7 @@ addCurrentExpressionToPanel model =
                     , variables = model.variables
                     }
             in
-                { model | panelEntries = newPanelEntry :: model.panelEntries }
+                { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
 
 tickModel : Model -> Time.Posix -> Model
 tickModel model theTime =
