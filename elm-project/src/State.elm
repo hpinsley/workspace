@@ -30,6 +30,9 @@ update msg model =
             in
             ( m, Cmd.none )
 
+        DeleteExpression expr ->
+            ( { model | panelEntries = List.filter (\pe -> pe.expression /= expr) model.panelEntries }, Cmd.none )
+
 
 addCurrentExpressionToPanel : Model -> Model
 addCurrentExpressionToPanel model =

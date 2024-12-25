@@ -4,7 +4,7 @@ import Dict
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Models exposing (Msg, PanelEntry)
+import Models exposing (..)
 
 
 viewPanelEntry : PanelEntry -> Html Msg
@@ -14,6 +14,7 @@ viewPanelEntry panelEntry =
         , div [ id "panel-entry-variables" ]
             [ showVariableList panelEntry
             ]
+        , button [ class "command", onClick (DeleteExpression panelEntry.expression) ] [ text "Delete" ]
         ]
 
 

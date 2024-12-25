@@ -9,6 +9,7 @@ type Msg
     = Tick Time.Posix
     | UpdateExpression String
     | AddToPanel
+    | DeleteExpression String
 
 
 type alias PanelEntry =
