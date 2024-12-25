@@ -10,11 +10,13 @@ type Msg
     | UpdateExpression String
     | AddToPanel
 
+
 type alias PanelEntry =
-    { expression: String
+    { expression : String
     , parsedExpression : Expression
-    , variables: Dict String Variable
+    , variables : Dict String Variable
     }
+
 
 type alias Model =
     { currentTime : Maybe Time.Posix

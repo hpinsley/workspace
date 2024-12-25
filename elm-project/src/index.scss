@@ -1,8 +1,9 @@
 @use 'buttons';
-$backgroundColor: #f5e8e8;
+$backgroundColor: white;
 $defaultPadding: 10px;
 $labelRightPadding: 5px;
 $tableHeaderColor: darkblue;
+$equationColor: darkgreen;
 
 body {
     background-color: default;
@@ -12,12 +13,10 @@ label {
     padding-right: $labelRightPadding;
 }
 
-div#adder {
-    width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+div#computations {
+    font-family: consolas;
     padding: $defaultPadding;
-    background-color: backgroundColor; // Changed background color to light gray
+    background-color: $backgroundColor; // Changed background color to light gray
 }
 
 input#expression-input {
@@ -29,20 +28,27 @@ div#parseErrors {
 }
 
 div#panel {
-    border: 2px solid teal;
-    width: 800px;
-    margin-left: auto;
-    margin-right: auto;
     padding: $defaultPadding;
     background-color: backgroundColor; // Changed background color to light gray
+    border: 1px solid black;
+    width: auto;
+}
+
+div.panel-entry {
+    margin-top: 10px;
+    padding: $defaultPadding;
+
+    div#expression {
+        font-weight: bold;
+        color: $equationColor;
+    }
 }
 
 div#variables {
     width: 500px;
-    margin-top: 50px;
-    margin-bottom:50px;
-    margin-left: auto;
-    margin-right: auto;
+    margin-top: 10px;
+    font-size: 8pt;
+
     table {
         border-collapse: collapse;
         thead {

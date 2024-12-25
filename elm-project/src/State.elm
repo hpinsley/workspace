@@ -18,15 +18,18 @@ update msg model =
         UpdateExpression expr ->
             -- ( { model | expression = Just expr }, Cmd.none )
             let
-                m = {model | expression = Just expr }
+                m =
+                    { model | expression = Just expr }
             in
-                parseModelExpression m
+            parseModelExpression m
 
         AddToPanel ->
             let
-                m = addCurrentExpressionToPanel model
+                m =
+                    addCurrentExpressionToPanel model
             in
-                ( m, Cmd.none )
+            ( m, Cmd.none )
+
 
 addCurrentExpressionToPanel : Model -> Model
 addCurrentExpressionToPanel model =
@@ -37,17 +40,19 @@ addCurrentExpressionToPanel model =
         Just parsedExpression ->
             let
                 newPanelEntry =
-                    { expression = case model.expression of
-                        Nothing ->
-                            ""
+                    { expression =
+                        case model.expression of
+                            Nothing ->
+                                ""
 
-                        Just expr ->
-                            expr
+                            Just expr ->
+                                expr
                     , parsedExpression = parsedExpression
                     , variables = model.variables
                     }
             in
-                { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
+            { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
+
 
 tickModel : Model -> Time.Posix -> Model
 tickModel model theTime =
