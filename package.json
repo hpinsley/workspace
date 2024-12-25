@@ -17,6 +17,7 @@
   "dependencies": {
     "css-loader": "^7.1.2",
     "elm-format": "^0.8.7",
+    "material-components-web-elm": "^9.1.0",
     "sass": "^1.83.0",
     "sass-loader": "^16.0.4",
     "style-loader": "^4.0.0"

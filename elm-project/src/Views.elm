@@ -8,7 +8,8 @@ import Iso8601
 import Models exposing (..)
 import PanelView exposing (viewPanel)
 import Time
-
+import Material.Tab
+import Material.Button as Button
 
 getFormattedTime : Maybe Time.Posix -> String
 getFormattedTime timeInfo =
@@ -37,7 +38,8 @@ view model =
         [ h1 [] [ text "Computations" ]
         , label [] [ text "Expression:" ]
         , input [ id "expression-input", onInput UpdateExpression, value (Maybe.withDefault "" model.expression) ] []
-        , button [ disabled (isValidExpression model |> not), class "command", onClick AddToPanel ] [ text "Add to Panel" ]
+        , Button.text (Button.config |> Button.setOnClick AddToPanel |> Button.setDisabled (isValidExpression model |> not))
+        "Add to Panel"
         , div [ id "parseErrors" ] [ text model.parseErrors ]
         , viewPanel model
         , div [ id "time" ]
