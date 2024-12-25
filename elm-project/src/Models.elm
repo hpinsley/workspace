@@ -8,8 +8,13 @@ import Time
 type Msg
     = Tick Time.Posix
     | UpdateExpression String
-    | ParseExpression
+    | AddToPanel
 
+type alias PanelEntry =
+    { expression: String
+    , parsedExpression : Expression
+    , variables: Dict String Variable
+    }
 
 type alias Model =
     { currentTime : Maybe Time.Posix
@@ -17,6 +22,7 @@ type alias Model =
     , parsedExpression : Maybe Expression
     , parseErrors : String
     , variables : Dict String Variable
+    , panelEntries : List PanelEntry
     }
 
 
@@ -24,6 +30,6 @@ init : flags -> ( Model, Cmd Msg )
 init _ =
     let
         inital_model =
-            { currentTime = Nothing, expression = Nothing, parsedExpression = Nothing, parseErrors = "", variables = Dict.empty }
+            { currentTime = Nothing, expression = Nothing, parsedExpression = Nothing, parseErrors = "", variables = Dict.empty, panelEntries = [] }
     in
     ( inital_model, Cmd.none )

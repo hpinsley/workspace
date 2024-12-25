@@ -7,6 +7,7 @@ import Iso8601
 import Models exposing (..)
 import Time
 import Dict
+import PanelView exposing (viewPanel)
 
 getFormattedTime : Maybe Time.Posix -> String
 getFormattedTime timeInfo =
@@ -35,6 +36,15 @@ showVariableList model =
             ]
         ]
 
+isValidExpression : Model -> Bool
+isValidExpression model =
+    case model.parsedExpression of
+        Nothing ->
+            False
+
+        Just _ ->
+            True
+
 view : Model -> Html Msg
 view model =
     div
@@ -42,9 +52,10 @@ view model =
         [ h1 [] [ text "Computations" ]
         , label [] [ text "Expression:" ]
         , input [ id "expression-input", onInput UpdateExpression ] []
-        , button [ class "command", onClick ParseExpression ] [ text "Parse" ]
+        , button [ disabled (isValidExpression model |> not), class "command", onClick AddToPanel ] [ text "Add to Panel" ]
         , showVariableList model
         , div [ id "parseErrors" ] [ text model.parseErrors ]
+        , viewPanel model
         , div [ id "time" ]
             [ getFormattedTime model.currentTime |> text
             ]

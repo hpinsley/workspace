@@ -28,6 +28,15 @@ div#parseErrors {
     color: red;
 }
 
+div#panel {
+    border: 2px solid teal;
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: $defaultPadding;
+    background-color: backgroundColor; // Changed background color to light gray
+}
+
 div#variables {
     width: 500px;
     margin-top: 50px;

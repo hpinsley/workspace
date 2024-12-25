@@ -22,9 +22,32 @@ update msg model =
             in
                 parseModelExpression m
 
-        ParseExpression ->
-            parseModelExpression model
+        AddToPanel ->
+            let
+                m = addCurrentExpressionToPanel model
+            in
+                ( m, Cmd.none )
 
+addCurrentExpressionToPanel : Model -> Model
+addCurrentExpressionToPanel model =
+    case model.parsedExpression of
+        Nothing ->
+            model
+
+        Just parsedExpression ->
+            let
+                newPanelEntry =
+                    { expression = case model.expression of
+                        Nothing ->
+                            ""
+
+                        Just expr ->
+                            expr
+                    , parsedExpression = parsedExpression
+                    , variables = model.variables
+                    }
+            in
+                { model | panelEntries = newPanelEntry :: model.panelEntries }
 
 tickModel : Model -> Time.Posix -> Model
 tickModel model theTime =
@@ -62,4 +85,4 @@ parseModelExpression model =
                     )
 
                 Err errmsg ->
-                    ( { model | parseErrors = errmsg, variables = Dict.empty }, Cmd.none )
+                    ( { model | parseErrors = errmsg, variables = Dict.empty, parsedExpression = Nothing }, Cmd.none )
