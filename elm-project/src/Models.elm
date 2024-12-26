@@ -11,11 +11,16 @@ type Msg
     | AddToPanel
     | DeleteExpression String
 
+type alias SymbolTableEnry = 
+    {
+        variable: Variable,
+        variableValue: Float
+    }
 
 type alias PanelEntry =
     { expression : String
     , parsedExpression : Expression
-    , variables : Dict String Variable
+    , variables : Dict String SymbolTableEnry
     }
 
 

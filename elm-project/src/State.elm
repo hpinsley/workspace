@@ -50,7 +50,7 @@ addCurrentExpressionToPanel model =
                             Just expr ->
                                 expr
                     , parsedExpression = parsedExpression
-                    , variables = model.variables
+                    , variables = model.variables |> Dict.map (\k -> \v -> { variable = v, variableValue = 0.0 })
                     }
             in
             { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }

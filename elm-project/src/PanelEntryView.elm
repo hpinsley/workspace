@@ -26,7 +26,7 @@ showVariableList panelEntry =
             Dict.values panelEntry.variables
 
         trs =
-            variables |> List.map (\v -> tr [] [ td [ class "variable-name" ] [ text v ], td [] [ text "0" ] ])
+            variables |> List.map (\v -> tr [] [ td [ class "variable-name" ] [ text v.variable ], td [] [ v.variableValue |> String.fromFloat |> text ] ])
     in
     div [ id "variables" ]
         [ table []
