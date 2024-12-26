@@ -12,6 +12,7 @@ type Msg
     | DeleteExpression String
     | UpdateVarValueBuffer PanelEntry SymbolTableEntry String
     | UpdateVarValue PanelEntry SymbolTableEntry
+    | TogglePanelEntry PanelEntry
 
 
 type alias SymbolTableEntry =
@@ -26,6 +27,7 @@ type alias PanelEntry =
     { expression : String
     , parsedExpression : Expression
     , variables : Dict String SymbolTableEntry
+    , isCollapsed : Bool
     }
 
 

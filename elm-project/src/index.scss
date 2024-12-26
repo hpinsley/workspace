@@ -4,6 +4,7 @@ $defaultPadding: 10px;
 $labelRightPadding: 5px;
 $tableHeaderColor: darkblue;
 $equationColor: darkgreen;
+$insetColor: tan;
 
 body {
     background-color: default;
@@ -28,10 +29,16 @@ div#parseErrors {
 }
 
 div#panel {
+    $backgroundColor: rgb(241, 238, 232);
+    font-size: 20pt;
     padding: $defaultPadding;
-    background-color: backgroundColor; // Changed background color to light gray
-    border: 1px solid black;
+    background-color: $backgroundColor; // Changed background color to light gray
+    border: 5px inset $insetColor;
     width: auto;
+
+    input {
+        background-color: $backgroundColor;
+    }
 }
 
 div.panel-entry {
@@ -47,7 +54,7 @@ div.panel-entry {
 div#variables {
     width: 500px;
     margin-top: 10px;
-    font-size: 8pt;
+    font-size: 12pt;
 
     table {
         border-collapse: collapse;

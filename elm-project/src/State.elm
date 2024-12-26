@@ -42,7 +42,13 @@ update msg model =
             let
                 m = updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryValue model
             in
-                ( m , Cmd.none )   
+                ( m , Cmd.none )
+        
+        TogglePanelEntry panelEntry ->
+            let
+                m = updatePanelEntry panelEntry.expression (\pe -> { pe | isCollapsed = not pe.isCollapsed }) model
+            in
+                ( m , Cmd.none )
 
 
 -- This function updates a specific PanelEntry in the model's panelEntries list.
@@ -108,6 +114,7 @@ addCurrentExpressionToPanel model =
                                 expr
                     , parsedExpression = parsedExpression
                     , variables = model.variables |> Dict.map (\_ -> \v -> { variable = v, variableValue = 0.0, errMsg = Nothing, textInput = "" })
+                    , isCollapsed = False
                     }
             in
             { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
