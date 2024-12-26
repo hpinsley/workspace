@@ -34,22 +34,9 @@ update msg model =
 
         UpdateVarValueBuffer panelEntry symbolTableEntry value ->
             let
-                panelEntries =
-                    model.panelEntries
-                        |> List.map
-                            (\pe ->
-                                if pe.expression == panelEntry.expression then
-                                    { pe | variables = Dict.map ( 
-                                        \k -> \v ->
-                                            if k == symbolTableEntry.variable
-                                                then { v | textInput = value }
-                                                else v
-                                        ) pe.variables }
-                                else
-                                    pe
-                            )
+                m = updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | textInput = value}) model
             in
-                ( { model | panelEntries = panelEntries }, Cmd.none )   
+                ( m , Cmd.none )   
 
         UpdateVarValue panelEntry symbolTableEntry ->
             let
