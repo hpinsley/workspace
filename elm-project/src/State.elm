@@ -16,7 +16,6 @@ update msg model =
             ( tickModel model currentTime, Cmd.none )
 
         UpdateExpression expr ->
-            -- ( { model | expression = Just expr }, Cmd.none )
             let
                 m =
                     { model | expression = Just expr }

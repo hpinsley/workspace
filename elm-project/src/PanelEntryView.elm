@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Models exposing (..)
+import Material.Button as Button
 
 
 viewPanelEntry : PanelEntry -> Html Msg
@@ -14,7 +15,7 @@ viewPanelEntry panelEntry =
         , div [ id "panel-entry-variables" ]
             [ showVariableList panelEntry
             ]
-        , button [ class "command", onClick (DeleteExpression panelEntry.expression) ] [ text "Delete" ]
+         , Button.text (Button.config |> Button.setOnClick (DeleteExpression panelEntry.expression)) "Delete"
         ]
 
 
