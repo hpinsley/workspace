@@ -19,7 +19,7 @@ viewPanelEntry panelEntry =
         ]
 
 
-showSymbolTableEntry : PanelEntry -> SymbolTableEnry -> Html Msg
+showSymbolTableEntry : PanelEntry -> SymbolTableEntry -> Html Msg
 showSymbolTableEntry panelEntry symbolTableEntry =
     tr []
         [ td [] [ text symbolTableEntry.variable ]
@@ -27,7 +27,7 @@ showSymbolTableEntry panelEntry symbolTableEntry =
         , td []
             [ div []
                 [ input [ onInput (UpdateVarValueBuffer panelEntry symbolTableEntry), value symbolTableEntry.textInput ] []
-                , button [] [ text "Update" ]
+                , button [ onClick (UpdateVarValue panelEntry symbolTableEntry)] [ text "Update" ]
                 ]
             ]
         , td [] [ symbolTableEntry.errMsg |> Maybe.withDefault "" |> text ]

@@ -51,7 +51,34 @@ update msg model =
             in
                 ( { model | panelEntries = panelEntries }, Cmd.none )   
 
+        UpdateVarValue panelEntry symbolTableEntry ->
+            let
+                panelEntries =
+                    model.panelEntries
+                        |> List.map
+                            (\pe ->
+                                if pe.expression == panelEntry.expression then
+                                    { pe | variables = Dict.map ( 
+                                        \k -> \v ->
+                                            if k == symbolTableEntry.variable
+                                                then updateSymbolTableEntryValue v
+                                                else v
+                                        ) pe.variables }
+                                else
+                                    pe
+                            )
+            in
+                ( { model | panelEntries = panelEntries }, Cmd.none )   
 
+
+updateSymbolTableEntryValue : SymbolTableEntry -> SymbolTableEntry
+updateSymbolTableEntryValue entry =
+    case String.toFloat entry.textInput of
+        Just value ->
+            { entry | variableValue = value, errMsg = Nothing, textInput = "" }
+
+        Nothing ->
+            { entry | errMsg = Just "Invalid value." }
 
 addCurrentExpressionToPanel : Model -> Model
 addCurrentExpressionToPanel model =
