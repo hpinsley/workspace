@@ -19,23 +19,26 @@ viewPanelEntry panelEntry =
         ]
 
 
+showSymbolTableEntry : SymbolTableEnry -> Html Msg
+showSymbolTableEntry symbolTableEntry =
+    tr [ ]
+        [ td [ ] [ text symbolTableEntry.variable ]
+        , td [ ] [ text (String.fromFloat symbolTableEntry.variableValue) ]
+        ]
+
 showVariableList : PanelEntry -> Html Msg
 showVariableList panelEntry =
     let
-        variables =
-            Dict.values panelEntry.variables
-
-        trs =
-            variables |> List.map (\v -> tr [] [ td [ class "variable-name" ] [ text v.variable ], td [] [ v.variableValue |> String.fromFloat |> text ] ])
+        variables = Dict.values panelEntry.variables
     in
-    div [ id "variables" ]
-        [ table []
-            [ thead []
-                [ tr []
-                    [ th [] [ text "Variable" ]
-                    , th [] [ text "Value" ]
+        div [ id "variables" ]
+            [ table []
+                [ thead []
+                    [ tr []
+                        [ th [] [ text "Variable" ]
+                        , th [] [ text "Value" ]
+                        ]
                     ]
+                , tbody [] (variables |> List.map showSymbolTableEntry)
                 ]
-            , tbody [] trs
             ]
-        ]
