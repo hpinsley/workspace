@@ -53,22 +53,45 @@ update msg model =
 
         UpdateVarValue panelEntry symbolTableEntry ->
             let
-                panelEntries =
-                    model.panelEntries
-                        |> List.map
-                            (\pe ->
-                                if pe.expression == panelEntry.expression then
-                                    { pe | variables = Dict.map ( 
-                                        \k -> \v ->
-                                            if k == symbolTableEntry.variable
-                                                then updateSymbolTableEntryValue v
-                                                else v
-                                        ) pe.variables }
-                                else
-                                    pe
-                            )
+                m = updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryValue model
             in
-                ( { model | panelEntries = panelEntries }, Cmd.none )   
+                ( m , Cmd.none )   
+
+
+-- This function updates a specific PanelEntry in the model's panelEntries list.
+-- It takes three arguments:
+-- 1. expressionToMatch: A String representing the expression to match.
+-- 2. mapFunc: A function that takes a PanelEntry and returns an updated PanelEntry.
+-- 3. model: The current state of the model.
+-- The function returns a new model with the updated panelEntries list.
+updatePanelEntry : String -> (PanelEntry -> PanelEntry) -> Model -> Model
+updatePanelEntry expressionToMatch mapFunc model =
+    let
+        panelEntries =
+            model.panelEntries
+                |> List.map
+                    (\pe ->
+                        if pe.expression == expressionToMatch then
+                            mapFunc pe
+                        else
+                            pe
+                    )
+    in
+        { model | panelEntries = panelEntries }
+
+updateSymbolTableEntry : String -> Variable -> (SymbolTableEntry -> SymbolTableEntry) -> Model -> Model
+updateSymbolTableEntry expressionToMatch variableToMatch mapFunc model =
+    let
+        mapper = \pe -> { 
+                            pe | variables = Dict.map (\k -> \v ->
+                            if k == variableToMatch
+                                then mapFunc v
+                                else v
+                        ) pe.variables 
+                        }
+        m = updatePanelEntry expressionToMatch mapper model
+    in
+        m
 
 
 updateSymbolTableEntryValue : SymbolTableEntry -> SymbolTableEntry
