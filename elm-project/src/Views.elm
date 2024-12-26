@@ -37,17 +37,16 @@ view : Model -> Html Msg
 view model =
     div
         [ id "computations" ]
-        [
-        -- [ TextField.outlined
-        --     (TextField.config
-        --         -- |> TextField.setAttributes [ Html.Attributes.id "expression" ]  -- Not working.  Maybe see: https://github.com/aforemny/material-components-web-elm/pull/109
-        --         |> TextField.setAttributes [ Html.Attributes.style "width" "100%" ]
-        --         |> TextField.setLabel (Just "Expression")
-        --         -- |> TextField.setValue model.expression
-        --         |> TextField.setValue (Just "inital-value")
-        --         |> TextField.setOnInput UpdateExpression
-        --     )
-        -- 
+        [ -- [ TextField.outlined
+          --     (TextField.config
+          --         -- |> TextField.setAttributes [ Html.Attributes.id "expression" ]  -- Not working.  Maybe see: https://github.com/aforemny/material-components-web-elm/pull/109
+          --         |> TextField.setAttributes [ Html.Attributes.style "width" "100%" ]
+          --         |> TextField.setLabel (Just "Expression")
+          --         -- |> TextField.setValue model.expression
+          --         |> TextField.setValue (Just "inital-value")
+          --         |> TextField.setOnInput UpdateExpression
+          --     )
+          --
           label [] [ text "Expression" ]
         , input [ id "expression-input", title "Expression", onInput UpdateExpression, value (Maybe.withDefault "" model.expression) ] []
         , Button.text (Button.config |> Button.setOnClick AddToPanel |> Button.setDisabled (isValidExpression model |> not)) "Add to Panel"

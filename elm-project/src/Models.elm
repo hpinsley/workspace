@@ -10,12 +10,16 @@ type Msg
     | UpdateExpression String
     | AddToPanel
     | DeleteExpression String
+    | UpdateVarValueBuffer PanelEntry SymbolTableEnry String
 
-type alias SymbolTableEnry = 
-    {
-        variable: Variable,
-        variableValue: Float
+
+type alias SymbolTableEnry =
+    { variable : Variable
+    , variableValue : Float
+    , textInput : String
+    , errMsg : Maybe String
     }
+
 
 type alias PanelEntry =
     { expression : String

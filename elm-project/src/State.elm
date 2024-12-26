@@ -32,6 +32,26 @@ update msg model =
         DeleteExpression expr ->
             ( { model | panelEntries = List.filter (\pe -> pe.expression /= expr) model.panelEntries }, Cmd.none )
 
+        UpdateVarValueBuffer panelEntry symbolTableEntry value ->
+            let
+                panelEntries =
+                    model.panelEntries
+                        |> List.map
+                            (\pe ->
+                                if pe.expression == panelEntry.expression then
+                                    { pe | variables = Dict.map ( 
+                                        \k -> \v ->
+                                            if k == symbolTableEntry.variable
+                                                then { v | textInput = value }
+                                                else v
+                                        ) pe.variables }
+                                else
+                                    pe
+                            )
+            in
+                ( { model | panelEntries = panelEntries }, Cmd.none )   
+
+
 
 addCurrentExpressionToPanel : Model -> Model
 addCurrentExpressionToPanel model =
@@ -50,7 +70,7 @@ addCurrentExpressionToPanel model =
                             Just expr ->
                                 expr
                     , parsedExpression = parsedExpression
-                    , variables = model.variables |> Dict.map (\k -> \v -> { variable = v, variableValue = 0.0 })
+                    , variables = model.variables |> Dict.map (\_ -> \v -> { variable = v, variableValue = 0.0, errMsg = Nothing, textInput = "" })
                     }
             in
             { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
