@@ -4,6 +4,7 @@ import Dict exposing (..)
 import Parsing.ExpressionModels exposing (..)
 import Models exposing (..)
 
+
 evaluateExpression: Expression -> Dict String SymbolTableEntry -> Result String Float
 evaluateExpression expression symbolTable =
     case expression of
@@ -26,7 +27,14 @@ evaluateFactor factor symbolTable =
         FloatFactor float ->
             Ok float
         SingleArgumentFunction function1 ->
-            Ok 1.0
+            case function1 of
+                Sin expr ->
+                    evaluateExpression expr symbolTable |> Result.map sin
+                Cos expr ->
+                    evaluateExpression expr symbolTable |> Result.map cos
+                Tan expr ->
+                    evaluateExpression expr symbolTable |> Result.map tan
+
         VariableFactor variable ->
             case Dict.get variable symbolTable of
                 Just entry ->
