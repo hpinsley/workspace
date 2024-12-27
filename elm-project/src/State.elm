@@ -3,6 +3,7 @@ module State exposing (..)
 import Dict
 import Models exposing (..)
 import Parsing.ExpressionModels exposing (..)
+import Evaluation.Engine exposing (..)
 import Parsing.ExpressionParsers as ExpressionParsers
 import Parsing.VariableExtraction exposing (extractVariablesFromExpression)
 import Task
@@ -32,6 +33,12 @@ update msg model =
         DeleteExpression expr ->
             ( { model | panelEntries = List.filter (\pe -> pe.expression /= expr) model.panelEntries }, Cmd.none )
 
+        EvaluateExpression expr ->
+            let
+                m = updatePanelEntry expr evaluatePanel model
+            in
+                ( m , Cmd.none )
+
         UpdateVarValueBuffer panelEntry symbolTableEntry value ->
             let
                 m = updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | textInput = value}) model
@@ -50,6 +57,17 @@ update msg model =
             in
                 ( m , Cmd.none )
 
+evaluatePanel : PanelEntry -> PanelEntry
+evaluatePanel panelEntry =
+    let
+        result = evaluateExpression panelEntry.parsedExpression panelEntry.variables
+    in
+        case result of
+            Ok value ->
+                { panelEntry | evaluation = Just value }
+
+            Err _ ->
+                panelEntry
 
 -- This function updates a specific PanelEntry in the model's panelEntries list.
 -- It takes three arguments:
@@ -115,6 +133,7 @@ addCurrentExpressionToPanel model =
                     , parsedExpression = parsedExpression
                     , variables = model.variables |> Dict.map (\_ -> \v -> { variable = v, variableValue = 0.0, errMsg = Nothing, textInput = "" })
                     , isCollapsed = False
+                    , evaluation = Nothing
                     }
             in
             { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }

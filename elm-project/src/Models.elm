@@ -10,6 +10,7 @@ type Msg
     | UpdateExpression String
     | AddToPanel
     | DeleteExpression String
+    | EvaluateExpression String
     | UpdateVarValueBuffer PanelEntry SymbolTableEntry String
     | UpdateVarValue PanelEntry SymbolTableEntry
     | TogglePanelEntry PanelEntry
@@ -28,6 +29,7 @@ type alias PanelEntry =
     , parsedExpression : Expression
     , variables : Dict String SymbolTableEntry
     , isCollapsed : Bool
+    , evaluation: Maybe Float
     }
 
 

@@ -6,7 +6,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Material.Button as Button
 import Models exposing (..)
-import Material.IconToggle as IconToggle
 import Material.Checkbox as Checkbox
 
 viewPanelEntry : PanelEntry -> Html Msg
@@ -29,7 +28,9 @@ viewPanelEntry panelEntry =
             , div [ id "panel-entry-variables" ]
             [ showVariableList panelEntry
             ]
+        , Button.text (Button.config |> Button.setOnClick (EvaluateExpression panelEntry.expression)) "Evaluate"
         , Button.text (Button.config |> Button.setOnClick (DeleteExpression panelEntry.expression)) "Delete"
+        , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         ]
 
 
