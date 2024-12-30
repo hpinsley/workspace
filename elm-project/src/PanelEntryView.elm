@@ -2,6 +2,8 @@ module PanelEntryView exposing (..)
 
 import Dict
 import Html exposing (..)
+import Html.Events.Extra
+
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Material.Button as Button
@@ -42,9 +44,9 @@ showSymbolTableEntry panelEntry symbolTableEntry =
         , td []
             [ div []
                 [ 
-                    input [ onInput (UpdateVarValueBuffer panelEntry symbolTableEntry), value symbolTableEntry.textInput ] []
-                , Button.text (Button.config |> Button.setOnClick (UpdateVarValue panelEntry symbolTableEntry)) "Update"
-
+                    input [ 
+                          Html.Events.Extra.onChange (UpdateVarValue panelEntry symbolTableEntry)
+                        , onInput (UpdateVarValueBuffer panelEntry symbolTableEntry), value symbolTableEntry.textInput ] []
                 ]
             ]
         , td [] [ symbolTableEntry.errMsg |> Maybe.withDefault "" |> text ]

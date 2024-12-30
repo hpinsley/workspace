@@ -12,7 +12,7 @@ type Msg
     | DeleteExpression String
     | EvaluateExpression String
     | UpdateVarValueBuffer PanelEntry SymbolTableEntry String
-    | UpdateVarValue PanelEntry SymbolTableEntry
+    | UpdateVarValue PanelEntry SymbolTableEntry String
     | TogglePanelEntry PanelEntry
 
 

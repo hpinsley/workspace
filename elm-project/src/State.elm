@@ -45,7 +45,7 @@ update msg model =
             in
                 ( m , Cmd.none )   
 
-        UpdateVarValue panelEntry symbolTableEntry ->
+        UpdateVarValue panelEntry symbolTableEntry _ ->
             let
                 m = updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryValue model
             in
