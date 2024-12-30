@@ -46,25 +46,43 @@ viewPanelEntry panelEntry =
         ]
 
 
-showVariableInput : PanelEntry -> SymbolTableEntry -> Html Msg
-showVariableInput panelEntry symbolTableEntry =
-    div []
-        [ input
-            [ Html.Events.Extra.onChange (UpdateVarValue panelEntry symbolTableEntry)
-            , onInput (UpdateVarValueBuffer panelEntry symbolTableEntry)
-            , value symbolTableEntry.textInput
-            ]
-            []
-        ]
-
-
 showSymbolTableEntry : PanelEntry -> SymbolTableEntry -> Html Msg
 showSymbolTableEntry panelEntry symbolTableEntry =
     tr []
         [ td [] [ text symbolTableEntry.variable ]
         , td []
             [ div []
-                [ showVariableInput panelEntry symbolTableEntry
+                [ symbolTableEntry.currentValue |> String.fromFloat |> text ]
+            ]
+                    , td []
+            [ div []
+                [ input
+                    [ Html.Events.Extra.onChange (UpdateVarValue panelEntry symbolTableEntry)
+                    , onInput (UpdateVarValueBuffer panelEntry symbolTableEntry)
+                    , value symbolTableEntry.startValueBuffer
+                    ]
+                    []
+                ]
+            ]
+
+        , td []
+            [ div []
+                [ input
+                    [ Html.Events.Extra.onChange (UpdateVarValue panelEntry symbolTableEntry)
+                    , onInput (UpdateVarValueBuffer panelEntry symbolTableEntry)
+                    , value symbolTableEntry.startValueBuffer
+                    ]
+                    []
+                ]
+            ]
+        , td []
+            [ div []
+                [ input
+                    [ Html.Events.Extra.onChange (UpdateVarValue panelEntry symbolTableEntry)
+                    , onInput (UpdateVarValueBuffer panelEntry symbolTableEntry)
+                    , value symbolTableEntry.startValueBuffer
+                    ]
+                    []
                 ]
             ]
         , td [] [ symbolTableEntry.errMsg |> Maybe.withDefault "" |> text ]
@@ -87,6 +105,9 @@ showVariableList panelEntry =
                     [ tr []
                         [ th [] [ text "Variable" ]
                         , th [] [ text "Value" ]
+                        , th [] [ text "Start" ]
+                        , th [] [ text "End" ]
+                        , th [] [ text "Increment" ]
                         , th [] [ text "Errors" ]
                         ]
                     ]

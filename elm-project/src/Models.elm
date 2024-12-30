@@ -18,8 +18,13 @@ type Msg
 
 type alias SymbolTableEntry =
     { variable : Variable
-    , variableValue : Float
-    , textInput : String
+    , currentValue : Float
+    , startValue : Float
+    , startValueBuffer : String
+    , endValue : Float
+    , endValueBuffer : String
+    , incrementValue : Float
+    , incrementValueBuffer : String
     , errMsg : Maybe String
     }
 

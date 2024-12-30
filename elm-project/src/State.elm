@@ -43,7 +43,7 @@ update msg model =
         UpdateVarValueBuffer panelEntry symbolTableEntry value ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | textInput = value }) model
+                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | startValueBuffer = value }) model
             in
             ( m, Cmd.none )
 
@@ -129,9 +129,9 @@ updateSymbolTableEntry expressionToMatch variableToMatch mapFunc model =
 
 updateSymbolTableEntryValue : SymbolTableEntry -> SymbolTableEntry
 updateSymbolTableEntryValue entry =
-    case String.toFloat entry.textInput of
+    case String.toFloat entry.startValueBuffer of
         Just value ->
-            { entry | variableValue = value, errMsg = Nothing }
+            { entry | startValue = value, currentValue = value, errMsg = Nothing }
 
         Nothing ->
             { entry | errMsg = Just "Invalid value." }
@@ -154,7 +154,22 @@ addCurrentExpressionToPanel model =
                             Just expr ->
                                 expr
                     , parsedExpression = parsedExpression
-                    , variables = model.variables |> Dict.map (\_ -> \v -> { variable = v, variableValue = 0.0, errMsg = Nothing, textInput = "" })
+                    , variables =
+                        model.variables
+                            |> Dict.map
+                                (\_ ->
+                                    \v ->
+                                        { variable = v
+                                        , errMsg = Nothing
+                                        , currentValue = 0.0
+                                        , startValue = 0.0
+                                        , startValueBuffer = ""
+                                        , endValue = 0.0
+                                        , endValueBuffer = ""
+                                        , incrementValue = 0.0
+                                        , incrementValueBuffer = ""
+                                        }
+                                )
                     , isCollapsed = False
                     , evaluation = Nothing
                     }

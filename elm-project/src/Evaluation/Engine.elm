@@ -48,7 +48,7 @@ evaluateFactor factor symbolTable =
         VariableFactor variable ->
             case Dict.get variable symbolTable of
                 Just entry ->
-                    Ok entry.variableValue
+                    Ok entry.currentValue
 
                 Nothing ->
                     Err ("Variable " ++ variable ++ " not found")
