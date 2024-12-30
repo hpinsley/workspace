@@ -29,7 +29,7 @@ type alias PanelEntry =
     , parsedExpression : Expression
     , variables : Dict String SymbolTableEntry
     , isCollapsed : Bool
-    , evaluation: Maybe Float
+    , evaluation : Maybe Float
     }
 
 
