@@ -57,8 +57,8 @@ showSymbolTableEntry panelEntry symbolTableEntry =
                     , td []
             [ div []
                 [ input
-                    [ Html.Events.Extra.onChange (UpdateVarValue panelEntry symbolTableEntry)
-                    , onInput (UpdateVarValueBuffer panelEntry symbolTableEntry)
+                    [ Html.Events.Extra.onChange (UpdateVarStartValue panelEntry symbolTableEntry)
+                    , onInput (UpdateVarStartValueBuffer panelEntry symbolTableEntry)
                     , value symbolTableEntry.startValueBuffer
                     ]
                     []
@@ -68,9 +68,9 @@ showSymbolTableEntry panelEntry symbolTableEntry =
         , td []
             [ div []
                 [ input
-                    [ Html.Events.Extra.onChange (UpdateVarValue panelEntry symbolTableEntry)
-                    , onInput (UpdateVarValueBuffer panelEntry symbolTableEntry)
-                    , value symbolTableEntry.startValueBuffer
+                    [ Html.Events.Extra.onChange (UpdateVarEndValue panelEntry symbolTableEntry)
+                    , onInput (UpdateVarEndValueBuffer panelEntry symbolTableEntry)
+                    , value symbolTableEntry.endValueBuffer
                     ]
                     []
                 ]
@@ -78,9 +78,9 @@ showSymbolTableEntry panelEntry symbolTableEntry =
         , td []
             [ div []
                 [ input
-                    [ Html.Events.Extra.onChange (UpdateVarValue panelEntry symbolTableEntry)
-                    , onInput (UpdateVarValueBuffer panelEntry symbolTableEntry)
-                    , value symbolTableEntry.startValueBuffer
+                    [ Html.Events.Extra.onChange (UpdateVarIncrementValue panelEntry symbolTableEntry)
+                    , onInput (UpdateVarIncrementValueBuffer panelEntry symbolTableEntry)
+                    , value symbolTableEntry.incrementValueBuffer
                     ]
                     []
                 ]

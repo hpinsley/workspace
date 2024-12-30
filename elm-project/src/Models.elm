@@ -11,8 +11,15 @@ type Msg
     | AddToPanel
     | DeleteExpression String
     | EvaluateExpression String
-    | UpdateVarValueBuffer PanelEntry SymbolTableEntry String
-    | UpdateVarValue PanelEntry SymbolTableEntry String
+
+    | UpdateVarStartValueBuffer PanelEntry SymbolTableEntry String
+    | UpdateVarEndValueBuffer PanelEntry SymbolTableEntry String
+    | UpdateVarIncrementValueBuffer PanelEntry SymbolTableEntry String
+
+    | UpdateVarStartValue PanelEntry SymbolTableEntry String
+    | UpdateVarEndValue PanelEntry SymbolTableEntry String
+    | UpdateVarIncrementValue PanelEntry SymbolTableEntry String
+
     | TogglePanelEntry PanelEntry
 
 

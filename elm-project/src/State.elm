@@ -40,20 +40,6 @@ update msg model =
             in
             ( m, Cmd.none )
 
-        UpdateVarValueBuffer panelEntry symbolTableEntry value ->
-            let
-                m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | startValueBuffer = value }) model
-            in
-            ( m, Cmd.none )
-
-        UpdateVarValue panelEntry symbolTableEntry _ ->
-            let
-                m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryValue model
-            in
-            ( m, Cmd.none )
-
         TogglePanelEntry panelEntry ->
             let
                 m =
@@ -61,6 +47,48 @@ update msg model =
             in
             ( m, Cmd.none )
 
+        UpdateVarStartValueBuffer panelEntry symbolTableEntry value ->
+            let
+                m =
+                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | startValueBuffer = value }) model
+            in
+            ( m, Cmd.none )
+
+        UpdateVarStartValue panelEntry symbolTableEntry _ ->
+            let
+                m =
+                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryStartValue model
+            in
+            ( m, Cmd.none )
+
+
+        UpdateVarEndValueBuffer panelEntry symbolTableEntry value ->
+            let
+                m =
+                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | endValueBuffer = value }) model
+            in
+            ( m, Cmd.none )
+
+        UpdateVarEndValue panelEntry symbolTableEntry _ ->
+            let
+                m =
+                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryEndValue model
+            in
+            ( m, Cmd.none )
+
+        UpdateVarIncrementValueBuffer panelEntry symbolTableEntry value ->
+            let
+                m =
+                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | incrementValueBuffer = value }) model
+            in
+            ( m, Cmd.none )
+
+        UpdateVarIncrementValue panelEntry symbolTableEntry _ ->
+            let
+                m =
+                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryIncrementValue model
+            in
+            ( m, Cmd.none )
 
 evaluatePanel : PanelEntry -> PanelEntry
 evaluatePanel panelEntry =
@@ -127,8 +155,8 @@ updateSymbolTableEntry expressionToMatch variableToMatch mapFunc model =
     m
 
 
-updateSymbolTableEntryValue : SymbolTableEntry -> SymbolTableEntry
-updateSymbolTableEntryValue entry =
+updateSymbolTableEntryStartValue : SymbolTableEntry -> SymbolTableEntry
+updateSymbolTableEntryStartValue entry =
     case String.toFloat entry.startValueBuffer of
         Just value ->
             { entry | startValue = value, currentValue = value, errMsg = Nothing }
@@ -136,6 +164,23 @@ updateSymbolTableEntryValue entry =
         Nothing ->
             { entry | errMsg = Just "Invalid value." }
 
+updateSymbolTableEntryEndValue : SymbolTableEntry -> SymbolTableEntry
+updateSymbolTableEntryEndValue entry =
+    case String.toFloat entry.endValueBuffer of
+        Just value ->
+            { entry | endValue = value, errMsg = Nothing }
+
+        Nothing ->
+            { entry | errMsg = Just "Invalid value." }
+
+updateSymbolTableEntryIncrementValue : SymbolTableEntry -> SymbolTableEntry
+updateSymbolTableEntryIncrementValue entry =
+    case String.toFloat entry.startValueBuffer of
+        Just value ->
+            { entry | incrementValue = value, errMsg = Nothing }
+
+        Nothing ->
+            { entry | errMsg = Just "Invalid value." }
 
 addCurrentExpressionToPanel : Model -> Model
 addCurrentExpressionToPanel model =
