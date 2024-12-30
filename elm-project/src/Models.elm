@@ -21,6 +21,7 @@ type Msg
     | UpdateVarIncrementValue PanelEntry SymbolTableEntry String
 
     | TogglePanelEntry PanelEntry
+    | Plot
 
 
 type alias SymbolTableEntry =

@@ -90,6 +90,9 @@ update msg model =
             in
             ( m, Cmd.none )
 
+        Plot ->
+            ( model, Cmd.none )
+
 evaluatePanel : PanelEntry -> PanelEntry
 evaluatePanel panelEntry =
     let

@@ -5,9 +5,14 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Models exposing (..)
 import PanelEntryView exposing (viewPanelEntry)
+import Material.Button as Button
 
 
 viewPanel : Model -> Html Msg
 viewPanel model =
     div [ id "panel" ]
-        (model.panelEntries |> List.map viewPanelEntry)
+        [
+            div [ id "panel-entries"] (model.panelEntries |> List.map viewPanelEntry)
+            , Button.text (Button.config |> Button.setOnClick Plot) "Plot"
+
+        ]
