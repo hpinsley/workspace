@@ -5,16 +5,16 @@ import Models exposing (..)
 import Parsing.ExpressionModels exposing (..)
 
 
-evaluateExpression : Expression -> Dict String SymbolTableEntry -> Result String Float
-evaluateExpression expression symbolTable =
+evaluateExpression : Expression -> (String -> Result String Float) -> Result String Float
+evaluateExpression expression symbolLookup =
     case expression of
         BinaryExpression factor addop expression2 ->
             let
                 result1 =
-                    evaluateFactor factor symbolTable
+                    evaluateFactor factor symbolLookup
 
                 result2 =
-                    evaluateExpression expression2 symbolTable
+                    evaluateExpression expression2 symbolLookup
 
                 final =
                     Result.map2 (applyAddOp addop) result1 result2
@@ -22,11 +22,11 @@ evaluateExpression expression symbolTable =
             final
 
         UnaryExpression factor ->
-            evaluateFactor factor symbolTable
+            evaluateFactor factor symbolLookup
 
 
-evaluateFactor : Factor -> Dict String SymbolTableEntry -> Result String Float
-evaluateFactor factor symbolTable =
+evaluateFactor : Factor -> (String -> Result String Float) -> Result String Float
+evaluateFactor factor symbolLookup =
     case factor of
         IntFactor int ->
             Ok (toFloat int)
@@ -37,29 +37,24 @@ evaluateFactor factor symbolTable =
         SingleArgumentFunction function1 ->
             case function1 of
                 Sin expr ->
-                    evaluateExpression expr symbolTable |> Result.map sin
+                    evaluateExpression expr symbolLookup |> Result.map sin
 
                 Cos expr ->
-                    evaluateExpression expr symbolTable |> Result.map cos
+                    evaluateExpression expr symbolLookup |> Result.map cos
 
                 Tan expr ->
-                    evaluateExpression expr symbolTable |> Result.map tan
+                    evaluateExpression expr symbolLookup |> Result.map tan
 
         VariableFactor variable ->
-            case Dict.get variable symbolTable of
-                Just entry ->
-                    Ok entry.currentValue
-
-                Nothing ->
-                    Err ("Variable " ++ variable ++ " not found")
+            symbolLookup variable
 
         BinaryFactor factor1 mulop factor2 ->
             let
                 result1 =
-                    evaluateFactor factor1 symbolTable
+                    evaluateFactor factor1 symbolLookup
 
                 result2 =
-                    evaluateFactor factor2 symbolTable
+                    evaluateFactor factor2 symbolLookup
 
                 final =
                     Result.map2 (applyMulOp mulop) result1 result2

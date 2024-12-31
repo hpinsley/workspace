@@ -11,17 +11,14 @@ type Msg
     | AddToPanel
     | DeleteExpression String
     | EvaluateExpression String
-
     | UpdateVarStartValueBuffer PanelEntry SymbolTableEntry String
     | UpdateVarEndValueBuffer PanelEntry SymbolTableEntry String
     | UpdateVarIncrementValueBuffer PanelEntry SymbolTableEntry String
-
     | UpdateVarStartValue PanelEntry SymbolTableEntry String
     | UpdateVarEndValue PanelEntry SymbolTableEntry String
     | UpdateVarIncrementValue PanelEntry SymbolTableEntry String
-
     | TogglePanelEntry PanelEntry
-    | Plot
+    | Plot PanelEntry
 
 
 type alias SymbolTableEntry =
@@ -44,6 +41,7 @@ type alias PanelEntry =
     , isCollapsed : Bool
     , evaluation : Maybe Float
     , plotValues : List (Dict String Float)
+    , evaluatedPlotValues: List ( Dict.Dict String Float, Result String Float )
     }
 
 

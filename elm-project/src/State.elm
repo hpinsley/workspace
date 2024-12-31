@@ -1,17 +1,17 @@
 module State exposing (..)
 
+import Debug exposing (toString)
 import Dict
 import Evaluation.Engine exposing (..)
+import List exposing (reverse)
+import List.Cartesian
 import Models exposing (..)
+import Parser exposing (float)
 import Parsing.ExpressionModels exposing (..)
 import Parsing.ExpressionParsers as ExpressionParsers
 import Parsing.VariableExtraction exposing (extractVariablesFromExpression)
 import Task
 import Time exposing (..)
-import Parser exposing (float)
-import Debug exposing (toString)
-import List.Cartesian
-import List exposing (reverse)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -65,7 +65,6 @@ update msg model =
             in
             ( m, Cmd.none )
 
-
         UpdateVarEndValueBuffer panelEntry symbolTableEntry value ->
             let
                 m =
@@ -94,57 +93,94 @@ update msg model =
             in
             ( m, Cmd.none )
 
-        Plot ->
-            ( plotModel model, Cmd.none )
+        Plot panelEntry ->
+            ( updatePanelEntry panelEntry.expression plotPanelEntry model, Cmd.none )
 
-plotModel : Model -> Model
-plotModel model =
-    let
-        panelEntries = model.panelEntries |> List.map plotPanelEntry
-    in
-        { model | panelEntries = panelEntries }
 
 plotPanelEntry : PanelEntry -> PanelEntry
 plotPanelEntry panelEntry =
     let
-        named = iterateSymbolTable panelEntry
+        named =
+            iterateSymbolTable panelEntry
+
+        evalutated =
+            List.map
+                (\dict ->
+                    (dict, evaluateExpression panelEntry.parsedExpression
+                        (\variable ->
+                            case Dict.get variable dict of
+                                Just v ->
+                                    Ok v
+
+                                Nothing ->
+                                    Err "Variable not found." 
+                        )
+                ))
+                named
     in
-        { panelEntry | plotValues = named }
+        { panelEntry | plotValues = named, evaluatedPlotValues = evalutated }
+
 
 iterateSymbolTable : PanelEntry -> List (Dict.Dict String Float)
 iterateSymbolTable panelEntry =
     let
-        varialbeNames = panelEntry.variables |> Dict.values |> List.map .variable
-        values = iterateVariables [[]] (Dict.values panelEntry.variables) 
-                    |> List.map reverse
-        
-        named = (values |> List.map (\vArray -> List.map2 (\n v -> (n, v)) varialbeNames vArray |> Dict.fromList))
-    in
-        named
+        varialbeNames =
+            panelEntry.variables |> Dict.values |> List.map .variable
 
-iterateVariables : List(List Float) -> List SymbolTableEntry -> List(List Float)
+        values =
+            iterateVariables [ [] ] (Dict.values panelEntry.variables)
+                |> List.map reverse
+
+        named =
+            values |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varialbeNames vArray |> Dict.fromList)
+    in
+    named
+
+
+iterateVariables : List (List Float) -> List SymbolTableEntry -> List (List Float)
 iterateVariables sofar variables =
-        case variables of
-            [] -> sofar
-            variable :: rest ->
-                let
-                    width = variable.endValue - variable.startValue
-                    steps = width / (variable.incrementValue) |> ceiling
-                    
-                    multipliers = List.range 0 steps |> List.map toFloat
-                    values = List.map (\m -> variable.startValue + (m * variable.incrementValue)) multipliers
-                    permuated = 
-                        case sofar of 
-                            [] -> [[]]
-                            _ -> List.Cartesian.map2 (::) values sofar 
-                in
-                    iterateVariables permuated rest
+    case variables of
+        [] ->
+            sofar
+
+        variable :: rest ->
+            let
+                width =
+                    variable.endValue - variable.startValue
+
+                steps =
+                    width / variable.incrementValue |> ceiling
+
+                multipliers =
+                    List.range 0 steps |> List.map toFloat
+
+                values =
+                    List.map (\m -> variable.startValue + (m * variable.incrementValue)) multipliers
+
+                permuated =
+                    case sofar of
+                        [] ->
+                            [ [] ]
+
+                        _ ->
+                            List.Cartesian.map2 (::) values sofar
+            in
+            iterateVariables permuated rest
+
 
 evaluatePanel : PanelEntry -> PanelEntry
 evaluatePanel panelEntry =
     let
         result =
-            evaluateExpression panelEntry.parsedExpression panelEntry.variables
+            evaluateExpression panelEntry.parsedExpression
+                (\variable ->
+                    case Dict.get variable panelEntry.variables of
+                        Just v ->
+                            Ok v.currentValue
+
+                        Nothing ->
+                            Err "Variable not found."
+                )
     in
     case result of
         Ok value ->
@@ -202,7 +238,7 @@ updateSymbolTableEntry expressionToMatch variableToMatch mapFunc model =
         m =
             updatePanelEntry expressionToMatch mapper model
     in
-        m
+    m
 
 
 updateSymbolTableEntryStartValue : SymbolTableEntry -> SymbolTableEntry
@@ -214,6 +250,7 @@ updateSymbolTableEntryStartValue entry =
         Nothing ->
             { entry | errMsg = Just "Invalid value." }
 
+
 updateSymbolTableEntryEndValue : SymbolTableEntry -> SymbolTableEntry
 updateSymbolTableEntryEndValue entry =
     case String.toFloat entry.endValueBuffer of
@@ -223,6 +260,7 @@ updateSymbolTableEntryEndValue entry =
         Nothing ->
             { entry | errMsg = Just "Invalid value." }
 
+
 updateSymbolTableEntryIncrementValue : SymbolTableEntry -> SymbolTableEntry
 updateSymbolTableEntryIncrementValue entry =
     case String.toFloat entry.incrementValueBuffer of
@@ -231,6 +269,7 @@ updateSymbolTableEntryIncrementValue entry =
 
         Nothing ->
             { entry | errMsg = Just "Invalid value." }
+
 
 addCurrentExpressionToPanel : Model -> Model
 addCurrentExpressionToPanel model =
@@ -268,6 +307,7 @@ addCurrentExpressionToPanel model =
                     , isCollapsed = False
                     , evaluation = Nothing
                     , plotValues = []
+                    , evaluatedPlotValues = []
                     }
             in
             { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
