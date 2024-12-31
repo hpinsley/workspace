@@ -105,19 +105,28 @@ plotModel model =
 plotPanelEntry : PanelEntry -> PanelEntry
 plotPanelEntry panelEntry =
     let
+        named = iterateSymbolTable panelEntry
+    in
+        -- Debug.log debugString
+        { panelEntry | plotValues = named }
+
+iterateSymbolTable : PanelEntry -> List (Dict.Dict String Float)
+iterateSymbolTable panelEntry =
+    let
+        varialbeNames = panelEntry.variables |> Dict.values |> List.map .variable
         values = panelEntry.variables |> Dict.values |> iterateVariables
                     |> Debug.log "Values: "
         
-        varialbeNames = panelEntry.variables |> Dict.values |> List.map .variable
-        named = values |> List.map (\vArray -> List.map2 (\n v -> (n, v)) varialbeNames vArray)
-            |> Debug.log "Named: "
+        named = (values |> List.map (\vArray -> List.map2 (\n v -> (n, v)) varialbeNames vArray |> Dict.fromList))
+                    |> Debug.log "Named: "    
     in
         -- Debug.log debugString
-        panelEntry
-
+        named
+            
 iterateVariables : List SymbolTableEntry -> List (List Float)
 iterateVariables variables =
     let
+
         result = case variables of
             [] -> [[]]
             variable :: rest ->
@@ -260,6 +269,7 @@ addCurrentExpressionToPanel model =
                                 )
                     , isCollapsed = False
                     , evaluation = Nothing
+                    , plotValues = []
                     }
             in
             { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }

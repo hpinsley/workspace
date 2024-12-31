@@ -43,6 +43,7 @@ type alias PanelEntry =
     , variables : Dict String SymbolTableEntry
     , isCollapsed : Bool
     , evaluation : Maybe Float
+    , plotValues : List (Dict String Float)
     }
 
 
