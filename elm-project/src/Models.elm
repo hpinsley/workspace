@@ -53,6 +53,7 @@ type alias Model =
     , parseErrors : String
     , variables : Dict String Variable
     , panelEntries : List PanelEntry
+    , activePlotEntry : Maybe PanelEntry
     }
 
 
@@ -60,6 +61,13 @@ init : flags -> ( Model, Cmd Msg )
 init _ =
     let
         inital_model =
-            { currentTime = Nothing, expression = Nothing, parsedExpression = Nothing, parseErrors = "", variables = Dict.empty, panelEntries = [] }
+            { currentTime = Nothing
+            , expression = Nothing
+            , parsedExpression = Nothing
+            , parseErrors = ""
+            , variables = Dict.empty
+            , panelEntries = []
+            , activePlotEntry = Nothing
+            }
     in
     ( inital_model, Cmd.none )

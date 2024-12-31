@@ -47,16 +47,23 @@ leftSide model =
             ]
         ]
 
+
 rightSide : Model -> Html Msg
 rightSide model =
-    div [id "right-side"]
-    [
-        text "Right side"
-    ]
+    div [ id "right-side" ]
+        [ h1 [] [ case model.activePlotEntry of
+                    Just activePanelEntry ->
+                        text activePanelEntry.expression
+
+                    Nothing ->
+                        text "No active expression"
+                ]
+        ]
+
 
 view : Model -> Html Msg
 view model =
-    div [id "screen" ]
+    div [ id "screen" ]
         [ leftSide model
         , rightSide model
         ]

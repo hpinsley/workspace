@@ -12,9 +12,21 @@ import Models exposing (..)
 import Parser exposing (symbol)
 
 
-viewPanelEntry : PanelEntry -> Html Msg
-viewPanelEntry panelEntry =
-    div [ class "panel-entry" ]
+viewPanelEntry : Model -> PanelEntry -> Html Msg
+viewPanelEntry model panelEntry =
+    div [ class "panel-entry" 
+        , class (case model.activePlotEntry of
+                Just activePanelEntry ->
+                    if activePanelEntry == panelEntry then
+                        "active"
+
+                    else
+                        "inactive"
+
+                Nothing ->
+                    "inactive"
+            )
+        ]
         [ div [ id "expression" ] [ text panelEntry.expression ]
 
         -- , IconToggle.iconToggle

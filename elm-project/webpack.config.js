@@ -3,6 +3,8 @@ const path = require('path');
 
 // console.log(path.resolve(__dirname, "src"));
 
+USE_ELM_DEBUGGER = true;
+
 module.exports = {
   mode: 'development',
   stats: {
@@ -65,7 +67,7 @@ module.exports = {
             // files: ['Main.elm'],
             cwd: __dirname,
             optimize: false,
-            debug: false
+            debug: USE_ELM_DEBUGGER,
           }
         }]
       }

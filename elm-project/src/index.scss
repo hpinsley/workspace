@@ -75,6 +75,9 @@ div.panel-entry {
         margin: 10px;
         color: red;
     }
+    &.active {
+        background-color: lightblue;
+    }
 }
 
 div#variables {
