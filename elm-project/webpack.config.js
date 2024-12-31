@@ -65,7 +65,7 @@ module.exports = {
             // files: ['Main.elm'],
             cwd: __dirname,
             optimize: false,
-            debug: true
+            debug: false
           }
         }]
       }

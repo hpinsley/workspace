@@ -107,36 +107,29 @@ plotModel model =
 plotPanelEntry : PanelEntry -> PanelEntry
 plotPanelEntry panelEntry =
     let
-        -- named = iterateSymbolTable panelEntry
-        values = iterateTwo [[]] (Dict.values panelEntry.variables) 
-                    |> List.map reverse
-                    |> Debug.log "Values: "
-                    -- |> List.reverse |> List.tail |> Maybe.withDefault [] |> Debug.log "Values: "
+        named = iterateSymbolTable panelEntry
     in
-        -- Debug.log debugString
-        -- { panelEntry | plotValues = named }
-        panelEntry
+        { panelEntry | plotValues = named }
+
 iterateSymbolTable : PanelEntry -> List (Dict.Dict String Float)
 iterateSymbolTable panelEntry =
     let
         varialbeNames = panelEntry.variables |> Dict.values |> List.map .variable
-        values = panelEntry.variables |> Dict.values |> (iterateVariables [[]])
-                    |> Debug.log "Values: "
+        values = iterateVariables [[]] (Dict.values panelEntry.variables) 
+                    |> List.map reverse
         
         named = (values |> List.map (\vArray -> List.map2 (\n v -> (n, v)) varialbeNames vArray |> Dict.fromList))
-                    |> Debug.log "Named: "    
     in
-        -- Debug.log debugString
         named
 
-iterateTwo : List(List Float) -> List SymbolTableEntry -> List(List Float)
-iterateTwo sofar variables =
+iterateVariables : List(List Float) -> List SymbolTableEntry -> List(List Float)
+iterateVariables sofar variables =
         case variables of
             [] -> sofar
             variable :: rest ->
                 let
-                    width = variable.endValue - variable.startValue |> Debug.log "Width:"
-                    steps = width / (variable.incrementValue |> Debug.log "Increment: ") |> ceiling
+                    width = variable.endValue - variable.startValue
+                    steps = width / (variable.incrementValue) |> ceiling
                     
                     multipliers = List.range 0 steps |> List.map toFloat
                     values = List.map (\m -> variable.startValue + (m * variable.incrementValue)) multipliers
@@ -145,22 +138,7 @@ iterateTwo sofar variables =
                             [] -> [[]]
                             _ -> List.Cartesian.map2 (::) values sofar 
                 in
-                    iterateTwo permuated rest
-
-
-iterateVariables : List (List Float) -> List SymbolTableEntry -> List (List Float)
-iterateVariables listSoFar variables  =
-        case variables of
-            [] -> listSoFar
-            variable :: rest ->
-                let
-                    width = variable.endValue - variable.startValue |> Debug.log "Width:"
-                    steps = width / (variable.incrementValue |> Debug.log "Increment: ") |> ceiling
-                    
-                    multipliers = List.range 0 steps |> List.map toFloat
-                    values = List.map (\m -> variable.startValue + (m * variable.incrementValue)) multipliers
-                in
-                    values |> List.map (\v -> List.map (\cv -> v :: cv) (iterateVariables listSoFar rest)) |> List.concat
+                    iterateVariables permuated rest
 
 evaluatePanel : PanelEntry -> PanelEntry
 evaluatePanel panelEntry =

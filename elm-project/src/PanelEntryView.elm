@@ -9,6 +9,7 @@ import Material.Button as Button
 import Material.Checkbox as Checkbox
 import Models exposing (..)
 import Parser exposing (symbol)
+import Debug exposing (toString)
 
 
 viewPanelEntry : PanelEntry -> Html Msg
@@ -43,8 +44,30 @@ viewPanelEntry panelEntry =
         , Button.text (Button.config |> Button.setOnClick (EvaluateExpression panelEntry.expression)) "Evaluate"
         , Button.text (Button.config |> Button.setOnClick (DeleteExpression panelEntry.expression)) "Delete"
         , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
+        , div [ id "plot-values"] [ displayPlotValues panelEntry ]
         ]
 
+displayPlotValues : PanelEntry -> Html Msg
+displayPlotValues panelEntry =
+    div [] [
+        div [] [ "Value Count: " ++ (panelEntry.plotValues |> List.length |> toString) |> text]
+        , case panelEntry.plotValues of
+            [] ->
+                div [] [ text "No plot values" ]
+
+            head :: tail ->
+                case tail of 
+                    [] ->
+                        div [] [ showPlotValue head ]
+                    _ -> case List.reverse tail |> List.head of
+                        Just lastEntry ->
+                            div [] [ showPlotValue head, showPlotValue lastEntry ]
+                        Nothing ->
+                            div [] [ showPlotValue head ]
+        ]
+showPlotValue : Dict.Dict String Float -> Html Msg
+showPlotValue plotValue =
+    div [] [toString plotValue |> text]
 
 showSymbolTableEntry : PanelEntry -> SymbolTableEntry -> Html Msg
 showSymbolTableEntry panelEntry symbolTableEntry =
