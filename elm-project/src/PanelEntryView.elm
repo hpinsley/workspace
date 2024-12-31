@@ -80,7 +80,7 @@ showPlotValue plotValue =
 showSymbolTableEntry : PanelEntry -> SymbolTableEntry -> Html Msg
 showSymbolTableEntry panelEntry symbolTableEntry =
     tr []
-        [ td [] [ text symbolTableEntry.variable ]
+        [ td [class "variable-name"] [ text symbolTableEntry.variable ]
         , td []
             [ div []
                 [ symbolTableEntry.currentValue |> String.fromFloat |> text ]
@@ -88,7 +88,8 @@ showSymbolTableEntry panelEntry symbolTableEntry =
         , td []
             [ div []
                 [ input
-                    [ Html.Events.Extra.onChange (UpdateVarStartValue panelEntry symbolTableEntry)
+                    [ class "var-input"
+                    , Html.Events.Extra.onChange (UpdateVarStartValue panelEntry symbolTableEntry)
                     , onInput (UpdateVarStartValueBuffer panelEntry symbolTableEntry)
                     , value symbolTableEntry.startValueBuffer
                     ]
@@ -98,7 +99,8 @@ showSymbolTableEntry panelEntry symbolTableEntry =
         , td []
             [ div []
                 [ input
-                    [ Html.Events.Extra.onChange (UpdateVarEndValue panelEntry symbolTableEntry)
+                    [ class "var-input"
+                    , Html.Events.Extra.onChange (UpdateVarEndValue panelEntry symbolTableEntry)
                     , onInput (UpdateVarEndValueBuffer panelEntry symbolTableEntry)
                     , value symbolTableEntry.endValueBuffer
                     ]
@@ -108,7 +110,8 @@ showSymbolTableEntry panelEntry symbolTableEntry =
         , td []
             [ div []
                 [ input
-                    [ Html.Events.Extra.onChange (UpdateVarIncrementValue panelEntry symbolTableEntry)
+                    [ class "var-input"
+                    , Html.Events.Extra.onChange (UpdateVarIncrementValue panelEntry symbolTableEntry)
                     , onInput (UpdateVarIncrementValueBuffer panelEntry symbolTableEntry)
                     , value symbolTableEntry.incrementValueBuffer
                     ]

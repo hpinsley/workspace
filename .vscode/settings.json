@@ -1,4 +1,5 @@
 {
     "files.autoSave": "afterDelay",
-    "elmLS.elmFormatPath": "/workspace/node_modules/.bin/elm-format"
+    "elmLS.elmFormatPath": "/workspace/node_modules/.bin/elm-format",
+    "breadcrumbs.symbolSortOrder": "name"
 }

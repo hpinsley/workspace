@@ -30,15 +30,16 @@ div#parseErrors {
 
 div#panel {
     $backgroundColor: rgb(241, 238, 232);
-    font-size: 20pt;
+    font-size: 12pt;
     padding: $defaultPadding;
     background-color: $backgroundColor; // Changed background color to light gray
     border: 5px inset $insetColor;
-    width: auto;
+    width: 20vw;
 
     input {
         background-color: $backgroundColor;
     }
+
     div#plot-values {
         font-size: 10pt;
     }
@@ -57,26 +58,37 @@ div.panel-entry {
 div#variables {
     width: 500px;
     margin-top: 10px;
-    font-size: 12pt;
+    font-size: 8pt;
 
     table {
         border-collapse: collapse;
+
         thead {
             tr {
                 color: $tableHeaderColor;
-                th {
-                    width: 100px;
-                }
+
+                // th {
+                //     width: 80%;
+                // }
             }
         }
+
         tbody {
             td {
                 border: 1px solid black;
+
                 &.variable-name {
                     font-weight: bold;
+                }
+
+                input.var-input {
+                    width: 50px;
+                }
+
+                &.variable-name {
+                    width: 50px;
                 }
             }
         }
     }
 }
-
