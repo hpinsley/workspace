@@ -8,6 +8,8 @@ import Parsing.ExpressionParsers as ExpressionParsers
 import Parsing.VariableExtraction exposing (extractVariablesFromExpression)
 import Task
 import Time exposing (..)
+import Parser exposing (float)
+import Debug exposing (toString)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -91,7 +93,45 @@ update msg model =
             ( m, Cmd.none )
 
         Plot ->
-            ( model, Cmd.none )
+            ( plotModel model, Cmd.none )
+
+plotModel : Model -> Model
+plotModel model =
+    let
+        panelEntries = model.panelEntries |> List.map plotPanelEntry
+    in
+        { model | panelEntries = panelEntries }
+
+plotPanelEntry : PanelEntry -> PanelEntry
+plotPanelEntry panelEntry =
+    let
+        values = panelEntry.variables |> Dict.values |> iterateVariables
+                    |> Debug.log "Values: "
+        
+        varialbeNames = panelEntry.variables |> Dict.values |> List.map .variable
+        named = values |> List.map (\vArray -> List.map2 (\n v -> (n, v)) varialbeNames vArray)
+            |> Debug.log "Named: "
+    in
+        -- Debug.log debugString
+        panelEntry
+
+iterateVariables : List SymbolTableEntry -> List (List Float)
+iterateVariables variables =
+    let
+        result = case variables of
+            [] -> [[]]
+            variable :: rest ->
+                let
+                    width = variable.endValue - variable.startValue |> Debug.log "Width:"
+                    steps = width / (variable.incrementValue |> Debug.log "Increment: ") |> ceiling
+                    
+                    multipliers = List.range 0 steps |> List.map toFloat
+                    values = List.map (\m -> variable.startValue + (m * variable.incrementValue)) multipliers
+                    childValues = iterateVariables rest
+                in
+                    values |> List.map (\v -> List.map (\cv -> v :: cv) childValues) |> List.concat
+    in
+        result
 
 evaluatePanel : PanelEntry -> PanelEntry
 evaluatePanel panelEntry =
@@ -155,7 +195,7 @@ updateSymbolTableEntry expressionToMatch variableToMatch mapFunc model =
         m =
             updatePanelEntry expressionToMatch mapper model
     in
-    m
+        m
 
 
 updateSymbolTableEntryStartValue : SymbolTableEntry -> SymbolTableEntry
@@ -178,7 +218,7 @@ updateSymbolTableEntryEndValue entry =
 
 updateSymbolTableEntryIncrementValue : SymbolTableEntry -> SymbolTableEntry
 updateSymbolTableEntryIncrementValue entry =
-    case String.toFloat entry.startValueBuffer of
+    case String.toFloat entry.incrementValueBuffer of
         Just value ->
             { entry | incrementValue = value, errMsg = Nothing }
 
