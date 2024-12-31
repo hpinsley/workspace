@@ -42,6 +42,7 @@ type alias PanelEntry =
     , evaluation : Maybe Float
     , plotValues : List (Dict String Float)
     , evaluatedPlotValues: List ( Dict.Dict String Float, Result String Float )
+    , panelError: Maybe String
     }
 
 

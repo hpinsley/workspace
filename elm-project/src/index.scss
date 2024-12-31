@@ -53,6 +53,10 @@ div.panel-entry {
         font-weight: bold;
         color: $equationColor;
     }
+    div#panel-errors {
+        margin: 10px;
+        color: red;
+    }
 }
 
 div#variables {

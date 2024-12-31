@@ -99,26 +99,30 @@ update msg model =
 
 plotPanelEntry : PanelEntry -> PanelEntry
 plotPanelEntry panelEntry =
-    let
-        named =
-            iterateSymbolTable panelEntry
+    if (Dict.size panelEntry.variables) > 2 then
+        { panelEntry | panelError = Just "At most two variables can be plotted." }
 
-        evalutated =
-            List.map
-                (\dict ->
-                    (dict, evaluateExpression panelEntry.parsedExpression
-                        (\variable ->
-                            case Dict.get variable dict of
-                                Just v ->
-                                    Ok v
+    else
+        let
+            named =
+                iterateSymbolTable panelEntry
 
-                                Nothing ->
-                                    Err "Variable not found." 
-                        )
-                ))
-                named
-    in
-        { panelEntry | plotValues = named, evaluatedPlotValues = evalutated }
+            evalutated =
+                List.map
+                    (\dict ->
+                        (dict, evaluateExpression panelEntry.parsedExpression
+                            (\variable ->
+                                case Dict.get variable dict of
+                                    Just v ->
+                                        Ok v
+
+                                    Nothing ->
+                                        Err "Variable not found." 
+                            )
+                    ))
+                    named
+        in
+            { panelEntry | plotValues = named, evaluatedPlotValues = evalutated }
 
 
 iterateSymbolTable : PanelEntry -> List (Dict.Dict String Float)
@@ -308,6 +312,7 @@ addCurrentExpressionToPanel model =
                     , evaluation = Nothing
                     , plotValues = []
                     , evaluatedPlotValues = []
+                    , panelError = Nothing
                     }
             in
             { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
