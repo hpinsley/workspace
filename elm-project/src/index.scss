@@ -14,14 +14,32 @@ label {
     padding-right: $labelRightPadding;
 }
 
-div#computations {
+div#screen {
+    border: 1px solid green;
+    width: 98vw;
+    height: 98vh;
+    padding: 5px;
+}
+
+div#left-side {
+    float: left;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: $defaultPadding;
+    background-color: $backgroundColor; // Changed background color to light gray
+}
+
+div#right-side {
+    border: 1px solid blue;
+    height: 95vh;
+    width: 70vw;
+    float: left;
     font-family: Arial, Helvetica, sans-serif;
     padding: $defaultPadding;
     background-color: $backgroundColor; // Changed background color to light gray
 }
 
 input#expression-input {
-    width: 500px;
+    width: 10vw;
 }
 
 div#parseErrors {

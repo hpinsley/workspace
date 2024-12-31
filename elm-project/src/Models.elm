@@ -41,8 +41,8 @@ type alias PanelEntry =
     , isCollapsed : Bool
     , evaluation : Maybe Float
     , plotValues : List (Dict String Float)
-    , evaluatedPlotValues: List ( Dict.Dict String Float, Result String Float )
-    , panelError: Maybe String
+    , evaluatedPlotValues : List ( Dict.Dict String Float, Result String Float )
+    , panelError : Maybe String
     }
 
 

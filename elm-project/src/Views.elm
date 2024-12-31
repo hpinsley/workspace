@@ -33,21 +33,11 @@ isValidExpression model =
             True
 
 
-view : Model -> Html Msg
-view model =
+leftSide : Model -> Html Msg
+leftSide model =
     div
-        [ id "computations" ]
-        [ -- [ TextField.outlined
-          --     (TextField.config
-          --         -- |> TextField.setAttributes [ Html.Attributes.id "expression" ]  -- Not working.  Maybe see: https://github.com/aforemny/material-components-web-elm/pull/109
-          --         |> TextField.setAttributes [ Html.Attributes.style "width" "100%" ]
-          --         |> TextField.setLabel (Just "Expression")
-          --         -- |> TextField.setValue model.expression
-          --         |> TextField.setValue (Just "inital-value")
-          --         |> TextField.setOnInput UpdateExpression
-          --     )
-          --
-          label [] [ text "Expression" ]
+        [ id "left-side" ]
+        [ label [] [ text "Expression" ]
         , input [ id "expression-input", title "Expression", onInput UpdateExpression, value (Maybe.withDefault "" model.expression) ] []
         , Button.text (Button.config |> Button.setOnClick AddToPanel |> Button.setDisabled (isValidExpression model |> not)) "Add to Panel"
         , div [ id "parseErrors" ] [ text model.parseErrors ]
@@ -55,4 +45,18 @@ view model =
         , div [ id "time" ]
             [ getFormattedTime model.currentTime |> text
             ]
+        ]
+
+rightSide : Model -> Html Msg
+rightSide model =
+    div [id "right-side"]
+    [
+        text "Right side"
+    ]
+
+view : Model -> Html Msg
+view model =
+    div [id "screen" ]
+        [ leftSide model
+        , rightSide model
         ]

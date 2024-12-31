@@ -41,7 +41,7 @@ viewPanelEntry panelEntry =
         , div [ id "panel-entry-variables" ]
             [ showVariableList panelEntry
             ]
-        , div [id "panel-errors"] [ getPanelEntryErrors panelEntry |> text ]
+        , div [ id "panel-errors" ] [ getPanelEntryErrors panelEntry |> text ]
         , Button.text (Button.config |> Button.setOnClick (EvaluateExpression panelEntry.expression)) "Evaluate"
         , Button.text (Button.config |> Button.setOnClick (DeleteExpression panelEntry.expression)) "Delete"
         , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
@@ -49,18 +49,21 @@ viewPanelEntry panelEntry =
         , div [ id "plot-values" ] [ displayPlotValues panelEntry ]
         ]
 
+
 getPanelEntryErrors : PanelEntry -> String
 getPanelEntryErrors panelEntry =
-    let errors = panelEntry.variables
-                    |> Dict.values
-                    |> List.filterMap .errMsg
-                    |> String.join ", "
+    let
+        errors =
+            panelEntry.variables
+                |> Dict.values
+                |> List.filterMap .errMsg
+                |> String.join ", "
     in
-        (Maybe.withDefault "" panelEntry.panelError) ++ errors
+    Maybe.withDefault "" panelEntry.panelError ++ errors
+
 
 displayPlotValues : PanelEntry -> Html Msg
 displayPlotValues panelEntry =
-    
     div []
         [ div [] [ "Value Count: " ++ (panelEntry.evaluatedPlotValues |> List.length |> toString) |> text ]
         , case panelEntry.evaluatedPlotValues of
@@ -90,7 +93,7 @@ showPlotValue plotValue =
 showSymbolTableEntry : PanelEntry -> SymbolTableEntry -> Html Msg
 showSymbolTableEntry panelEntry symbolTableEntry =
     tr []
-        [ td [class "variable-name"] [ text symbolTableEntry.variable ]
+        [ td [ class "variable-name" ] [ text symbolTableEntry.variable ]
         , td []
             [ div []
                 [ symbolTableEntry.currentValue |> String.fromFloat |> text ]

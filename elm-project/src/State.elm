@@ -99,7 +99,7 @@ update msg model =
 
 plotPanelEntry : PanelEntry -> PanelEntry
 plotPanelEntry panelEntry =
-    if (Dict.size panelEntry.variables) > 2 then
+    if Dict.size panelEntry.variables > 2 then
         { panelEntry | panelError = Just "At most two variables can be plotted." }
 
     else
@@ -110,19 +110,21 @@ plotPanelEntry panelEntry =
             evalutated =
                 List.map
                     (\dict ->
-                        (dict, evaluateExpression panelEntry.parsedExpression
+                        ( dict
+                        , evaluateExpression panelEntry.parsedExpression
                             (\variable ->
                                 case Dict.get variable dict of
                                     Just v ->
                                         Ok v
 
                                     Nothing ->
-                                        Err "Variable not found." 
+                                        Err "Variable not found."
                             )
-                    ))
+                        )
+                    )
                     named
         in
-            { panelEntry | plotValues = named, evaluatedPlotValues = evalutated }
+        { panelEntry | plotValues = named, evaluatedPlotValues = evalutated }
 
 
 iterateSymbolTable : PanelEntry -> List (Dict.Dict String Float)
