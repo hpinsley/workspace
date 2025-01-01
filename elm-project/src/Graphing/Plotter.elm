@@ -56,27 +56,18 @@ plot2d model orderedPairs =
                             ++ " "
                             ++ (yWidth |> String.fromFloat)
                             |> Debug.log "viewboxAttribte"
-        path = build2DPath orderedPairs |> Debug.log "path"
+        path = build2DPath (adjustYValue maxY) orderedPairs |> Debug.log "path"
     in
         div
             [ Html.Attributes.id "plot-2d" ]
             [ Html.text "2D Plot"
-            , div []
+            , div [Html.Attributes.id "svg-container"]
                 [ svg
                     [ Svg.Attributes.width "100%"
                     , Svg.Attributes.height "100%"
                     , viewBox viewboxAttribte
                     ]
                     [ 
-                        -- rect
-                        --     [ x (String.fromFloat minX)
-                        --     , y (String.fromFloat minY)
-                        --     , Svg.Attributes.width (String.fromFloat xWidth)
-                        --     , Svg.Attributes.height (String.fromFloat yWidth)
-                        --     , rx "15"
-                        --     , ry "15"
-                        --     ]
-                        --     []
                         Svg.path
                             [ Svg.Attributes.d path
                             , Svg.Attributes.fill "none"
@@ -88,13 +79,18 @@ plot2d model orderedPairs =
                 ]
             ]
 
+adjustYValue: Float -> Float -> Float
+adjustYValue maxY y = 
+    maxY - y
 
-build2DPath : List (List Float) -> String
-build2DPath orderedPairs =
+build2DPath : (Float -> Float) -> List (List Float) -> String
+build2DPath yAdjust orderedPairs =
     let
         xValues = List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs
-        yValues = List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs
-        points = List.map2 (\x y -> (String.fromFloat x) ++ "," ++ (String.fromFloat y)) xValues yValues
+        yValues = List.map (\pair -> (Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair))))) orderedPairs
+        adjustedYValues = List.map yAdjust yValues
+
+        points = List.map2 (\x y -> (String.fromFloat x) ++ "," ++ (String.fromFloat y)) xValues adjustedYValues
         path = "M " ++ (List.head points |> Maybe.withDefault "0,0") ++ " L " ++ (List.tail points |> Maybe.withDefault [] |> String.join " L ")
     in
         path

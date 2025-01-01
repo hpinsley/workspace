@@ -120,4 +120,11 @@ div#variables {
 
 div#plot {
     font-size: 10pt;
+
+    div#svg-container {
+        border: 1px solid black;
+        height: 95vh;
+        width: 70vw;
+        background-color: tan;
+    }
 }
