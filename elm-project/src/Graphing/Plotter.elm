@@ -41,34 +41,63 @@ plot model panelEntry =
 
 plot2d : Model -> List (List Float) -> Html Msg
 plot2d model orderedPairs =
-    div
-        [ Html.Attributes.id "plot-2d" ]
-        [ Html.text "2D Plot"
-        , div []
-            [ svg
-                [ Svg.Attributes.width "120"
-                , Svg.Attributes.height "120"
-                , viewBox "0 0 120 120"
-                ]
-                [ rect
-                    [ x "10"
-                    , y "10"
-                    , Svg.Attributes.width "100"
-                    , Svg.Attributes.height "100"
-                    , rx "15"
-                    , ry "15"
+    let
+        minX = List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minX"
+        maxX = List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "maxX"
+        minY = List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minY"
+        maxY = List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "maxY"
+        xWidth = maxX - minX |> Debug.log "xWidth"
+        yWidth = maxY - minY |> Debug.log "yWidth"
+        viewboxAttribte = (minX |> String.fromFloat)
+                            ++ " "
+                            ++ (minY |> String.fromFloat)
+                            ++ " "
+                            ++ (xWidth |> String.fromFloat)
+                            ++ " "
+                            ++ (yWidth |> String.fromFloat)
+                            |> Debug.log "viewboxAttribte"
+        path = build2DPath orderedPairs |> Debug.log "path"
+    in
+        div
+            [ Html.Attributes.id "plot-2d" ]
+            [ Html.text "2D Plot"
+            , div []
+                [ svg
+                    [ Svg.Attributes.width "100%"
+                    , Svg.Attributes.height "100%"
+                    , viewBox viewboxAttribte
                     ]
-                    []
-                , circle
-                    [ cx "50"
-                    , cy "50"
-                    , r "50"
+                    [ 
+                        -- rect
+                        --     [ x (String.fromFloat minX)
+                        --     , y (String.fromFloat minY)
+                        --     , Svg.Attributes.width (String.fromFloat xWidth)
+                        --     , Svg.Attributes.height (String.fromFloat yWidth)
+                        --     , rx "15"
+                        --     , ry "15"
+                        --     ]
+                        --     []
+                        Svg.path
+                            [ Svg.Attributes.d path
+                            , Svg.Attributes.fill "none"
+                            , Svg.Attributes.stroke "black"
+                            , Svg.Attributes.strokeWidth "0.01"
+                            ]
+                            []
                     ]
-                    []
                 ]
             ]
-        ]
 
+
+build2DPath : List (List Float) -> String
+build2DPath orderedPairs =
+    let
+        xValues = List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs
+        yValues = List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs
+        points = List.map2 (\x y -> (String.fromFloat x) ++ "," ++ (String.fromFloat y)) xValues yValues
+        path = "M " ++ (List.head points |> Maybe.withDefault "0,0") ++ " L " ++ (List.tail points |> Maybe.withDefault [] |> String.join " L ")
+    in
+        path
 
 plot3d : Model -> List (List Float) -> Html Msg
 plot3d model orderedPairs =
