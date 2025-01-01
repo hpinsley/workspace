@@ -11,7 +11,6 @@ import PanelEntryView exposing (viewPanelEntry)
 viewPanel : Model -> Html Msg
 viewPanel model =
     div [ id "panel" ]
-    [
-        div [ id "panel-entries" ] 
-        (model.panelEntries |> List.map (viewPanelEntry model))
-    ]   
+        [ div [ id "panel-entries" ]
+            (model.panelEntries |> List.map (viewPanelEntry model))
+        ]

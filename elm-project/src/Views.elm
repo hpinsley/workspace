@@ -1,6 +1,7 @@
 module Views exposing (view)
 
 import Dict
+import Graphing.Plotter exposing (plot)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -11,7 +12,6 @@ import Material.TextField as TextField
 import Models exposing (..)
 import PanelView exposing (viewPanel)
 import Time
-import Graphing.Plotter exposing (plot)
 
 
 getFormattedTime : Maybe Time.Posix -> String
@@ -52,13 +52,14 @@ leftSide model =
 rightSide : Model -> Html Msg
 rightSide model =
     div [ id "right-side" ]
-        [ h1 [] [ case model.activePlotEntry of
-                    Just activePanelEntry ->
-                        plot model activePanelEntry
+        [ h1 []
+            [ case model.activePlotEntry of
+                Just activePanelEntry ->
+                    plot model activePanelEntry
 
-                    Nothing ->
-                        text "No active expression"
-                ]
+                Nothing ->
+                    text "No active expression"
+            ]
         ]
 
 

@@ -14,8 +14,10 @@ import Parser exposing (symbol)
 
 viewPanelEntry : Model -> PanelEntry -> Html Msg
 viewPanelEntry model panelEntry =
-    div [ class "panel-entry" 
-        , class (case model.activePlotEntry of
+    div
+        [ class "panel-entry"
+        , class
+            (case model.activePlotEntry of
                 Just activePanelEntry ->
                     if activePanelEntry == panelEntry then
                         "active"

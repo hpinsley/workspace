@@ -97,25 +97,30 @@ update msg model =
                 m =
                     updatePanelEntry panelEntry.expression plotPanelEntry model
 
-                m2 = case findPanelEntry m panelEntry.expression of
-                    Just pe ->
-                        if List.length pe.evaluatedPlotValues > 0 then
-                            { m | activePlotEntry = Just pe }
-                        else
-                            m
+                m2 =
+                    case findPanelEntry m panelEntry.expression of
+                        Just pe ->
+                            if List.length pe.evaluatedPlotValues > 0 then
+                                { m | activePlotEntry = Just pe }
 
-                    Nothing ->
-                        m
+                            else
+                                m
+
+                        Nothing ->
+                            m
             in
-                ( m2, Cmd.none )
+            ( m2, Cmd.none )
+
 
 findPanelEntry : Model -> String -> Maybe PanelEntry
 findPanelEntry model expression =
     case List.filter (\pe -> pe.expression == expression) model.panelEntries of
         [ pe ] ->
             Just pe
+
         _ ->
             Nothing
+
 
 plotPanelEntry : PanelEntry -> PanelEntry
 plotPanelEntry panelEntry =
