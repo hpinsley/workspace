@@ -11,6 +11,7 @@ import Material.TextField as TextField
 import Models exposing (..)
 import PanelView exposing (viewPanel)
 import Time
+import Graphing.Plotter exposing (plot)
 
 
 getFormattedTime : Maybe Time.Posix -> String
@@ -53,7 +54,7 @@ rightSide model =
     div [ id "right-side" ]
         [ h1 [] [ case model.activePlotEntry of
                     Just activePanelEntry ->
-                        text activePanelEntry.expression
+                        plot model activePanelEntry
 
                     Nothing ->
                         text "No active expression"
