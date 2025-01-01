@@ -38,14 +38,21 @@ plot2d : Model -> List (List Float) -> Html Msg
 plot2d model orderedPairs =
     div
         [ id "plot-2d" ]
-        [ text "2D Plot" ]
+        [ 
+            text "2D Plot"
+            , div [][Debug.toString orderedPairs |> text]
+        ]
 
 plot3d : Model -> List (List Float) -> Html Msg
 plot3d model orderedPairs =
     div
         [ id "plot-3d" ]
-        [ text "3D Plot" ]
-        
+        [ 
+            text "3D Plot"
+          , div [][Debug.toString orderedPairs |> text]
+        ]
+
+
 get_ordered_pairs: List ( Dict.Dict String Float, Result String Float ) -> List(List Float)
 get_ordered_pairs plotValues =
     plotValues
