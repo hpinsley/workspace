@@ -60,7 +60,7 @@ plot2d model orderedPairs =
         yTransform = adjustYValue maxY minY
         functionPath = build2DPath yTransform orderedPairs
         xAxisPath = buildXAxisPath minX maxX yTransform |> Debug.log "xAxisPath"
-        yAxisPath = buildYAxisPath minY maxY yTransform |> Debug.log "yAxisPath"
+        yAxisPath = buildYAxisPath minX maxX minY maxY yTransform |> Debug.log "yAxisPath"
     in
         div
             [ Html.Attributes.id "plot-2d" ]
@@ -105,12 +105,46 @@ buildXAxisPath minX maxX yTrasform =
     in
         build2DPath yTrasform points
 
-buildYAxisPath : Float -> Float -> (Float -> Float) -> String
-buildYAxisPath minY maxY yTrasform =
+buildYAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> String
+buildYAxisPath minX maxX minY maxY yTrasform =
     let
         points = [ [ 0.0, minY ], [ 0.0, maxY ] ] |> Debug.log "y-axis-points"
+        tickMarks = buildYAxisTickMarks minX maxX minY maxY |> Debug.log "y-axis ticks"
+        axisLine = build2DPath yTrasform points
+        ticks = tickMarks
     in
-        build2DPath yTrasform points
+        axisLine ++ tickMarks
+
+buildYAxisTickMarks: Float -> Float -> Float -> Float -> String
+buildYAxisTickMarks xMin xMax yMin yMax =
+    let
+        bottomTick = floor yMin |> Debug.log "bottom-tick"
+        topTick = ceiling yMax |> Debug.log "top-tick"
+
+        height = abs(topTick - bottomTick) |> Debug.log "height"
+        numTicks = height
+        tickDistance = 1
+
+        tickMarksAt = List.range bottomTick topTick
+                        |> List.map toFloat |> Debug.log "tick-marks"
+        width = abs (xMax - xMin) * 0.05 |> Debug.log "tick-width"
+        xTickStart = -width
+        xTickEnd = width
+
+        tickPoints = tickMarksAt
+            |> List.map (\yVal -> ((xTickStart, yVal), (xTickEnd, yVal))) |> Debug.log "tick-points"
+
+        cmds = tickPoints
+            |> List.map (\((x1, y1), (x2, y2)) -> (
+                " M " ++ String.fromFloat x1 ++ "," ++ String.fromFloat y1 ++ 
+                " L " ++ String.fromFloat x2 ++ "," ++ String.fromFloat y2 
+                ))
+                |> List.foldl (++) ""
+                |> Debug.log "cmds"
+
+        -- tickDistance = (toFloat height) / (toFloat numTicks) |> Debug.log "tick-distance"
+    in
+        cmds
 
 adjustYValue: Float -> Float -> Float -> Float
 adjustYValue maxY minY y = 
