@@ -22,7 +22,7 @@ plot model panelEntry =
             [ Html.Attributes.id "plot-body" ]
             [ let
                 orderedPairs =
-                    panelEntry.evaluatedPlotValues |> get_ordered_pairs
+                    panelEntry.evaluatedPlotValues |> get_ordered_pairs |> Debug.log "orderedPairs"
               in
               case Dict.size panelEntry.variables of
                 1 ->
@@ -56,7 +56,11 @@ plot2d model orderedPairs =
                             ++ " "
                             ++ (yWidth |> String.fromFloat)
                             |> Debug.log "viewboxAttribte"
-        path = build2DPath (adjustYValue maxY minY) orderedPairs |> Debug.log "path"
+
+        yTransform = adjustYValue maxY minY
+        functionPath = build2DPath yTransform orderedPairs
+        xAxisPath = buildXAxisPath minX maxX yTransform |> Debug.log "xAxisPath"
+        yAxisPath = buildYAxisPath minY maxY yTransform |> Debug.log "yAxisPath"
     in
         div
             [ Html.Attributes.id "plot-2d" ]
@@ -69,15 +73,44 @@ plot2d model orderedPairs =
                     ]
                     [ 
                         Svg.path
-                            [ Svg.Attributes.d path
+                            [ Svg.Attributes.d functionPath
                             , Svg.Attributes.fill "none"
                             , Svg.Attributes.stroke "black"
                             , Svg.Attributes.strokeWidth "0.01"
                             ]
                             []
+                        ,Svg.path
+                            [ Svg.Attributes.d xAxisPath
+                            , Svg.Attributes.fill "none"
+                            , Svg.Attributes.stroke "green"
+                            , Svg.Attributes.strokeWidth "0.01"
+                            ]
+                            []
+                        ,Svg.path
+                            [ Svg.Attributes.d yAxisPath
+                            , Svg.Attributes.fill "none"
+                            , Svg.Attributes.stroke "green"
+                            , Svg.Attributes.strokeWidth "0.01"
+                            ]
+                            []
+
                     ]
                 ]
             ]
+
+buildXAxisPath : Float -> Float -> (Float -> Float) -> String
+buildXAxisPath minX maxX yTrasform =
+    let
+        points = [ [ minX, 0.0 ], [ maxX, 0.0 ] ] |> Debug.log "x-axis-points"
+    in
+        build2DPath yTrasform points
+
+buildYAxisPath : Float -> Float -> (Float -> Float) -> String
+buildYAxisPath minY maxY yTrasform =
+    let
+        points = [ [ 0.0, minY ], [ 0.0, maxY ] ] |> Debug.log "y-axis-points"
+    in
+        build2DPath yTrasform points
 
 adjustYValue: Float -> Float -> Float -> Float
 adjustYValue maxY minY y = 
