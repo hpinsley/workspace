@@ -56,7 +56,7 @@ plot2d model orderedPairs =
                             ++ " "
                             ++ (yWidth |> String.fromFloat)
                             |> Debug.log "viewboxAttribte"
-        path = build2DPath (adjustYValue maxY) orderedPairs |> Debug.log "path"
+        path = build2DPath (adjustYValue maxY minY) orderedPairs |> Debug.log "path"
     in
         div
             [ Html.Attributes.id "plot-2d" ]
@@ -79,9 +79,9 @@ plot2d model orderedPairs =
                 ]
             ]
 
-adjustYValue: Float -> Float -> Float
-adjustYValue maxY y = 
-    maxY - y
+adjustYValue: Float -> Float -> Float -> Float
+adjustYValue maxY minY y = 
+    (maxY + minY) - y
 
 build2DPath : (Float -> Float) -> List (List Float) -> String
 build2DPath yAdjust orderedPairs =
