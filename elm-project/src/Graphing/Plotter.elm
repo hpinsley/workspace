@@ -71,29 +71,30 @@ plot2d model orderedPairs =
                     , Svg.Attributes.height "100%"
                     , viewBox viewboxAttribte
                     ]
-                    [ 
-                        Svg.path
-                            [ Svg.Attributes.d functionPath
-                            , Svg.Attributes.fill "none"
-                            , Svg.Attributes.stroke "black"
-                            , Svg.Attributes.strokeWidth "0.01"
-                            ]
-                            []
-                        ,Svg.path
-                            [ Svg.Attributes.d xAxisPath
-                            , Svg.Attributes.fill "none"
-                            , Svg.Attributes.stroke "green"
-                            , Svg.Attributes.strokeWidth "0.01"
-                            ]
-                            []
-                        ,Svg.path
-                            [ Svg.Attributes.d yAxisPath
-                            , Svg.Attributes.fill "none"
-                            , Svg.Attributes.stroke "green"
-                            , Svg.Attributes.strokeWidth "0.01"
-                            ]
-                            []
-                    ]
+                    yLabels
+                    -- [ 
+                        -- Svg.path
+                        --     [ Svg.Attributes.d functionPath
+                        --     , Svg.Attributes.fill "none"
+                        --     , Svg.Attributes.stroke "black"
+                        --     , Svg.Attributes.strokeWidth "0.01"
+                        --     ]
+                        --     []
+                        -- ,Svg.path
+                        --     [ Svg.Attributes.d xAxisPath
+                        --     , Svg.Attributes.fill "none"
+                        --     , Svg.Attributes.stroke "green"
+                        --     , Svg.Attributes.strokeWidth "0.01"
+                        --     ]
+                        --     []
+                        -- ,Svg.path
+                        --     [ Svg.Attributes.d yAxisPath
+                        --     , Svg.Attributes.fill "none"
+                        --     , Svg.Attributes.stroke "green"
+                        --     , Svg.Attributes.strokeWidth "0.01"
+                        --     ]
+                        --     []
+                    -- ]
                 ]
             ]
 
@@ -111,7 +112,6 @@ buildYAxisPath minX maxX minY maxY yTransform =
         axisLine = build2DPath yTransform points
 
         (tickMarks, labels) = buildYAxisTickMarks minX maxX minY maxY yTransform |> Debug.log "y-axis ticks"
-        ticks = tickMarks
     in
         (axisLine ++ tickMarks, labels)
 
@@ -120,10 +120,6 @@ buildYAxisTickMarks xMin xMax yMin yMax yTransform =
     let
         bottomTick = floor yMin |> Debug.log "bottom-tick"
         topTick = ceiling yMax |> Debug.log "top-tick"
-
-        height = abs(topTick - bottomTick) |> Debug.log "height"
-        numTicks = height
-        tickDistance = 1
 
         tickMarksAt = List.range bottomTick topTick
                         |> List.map toFloat 
@@ -147,11 +143,13 @@ buildYAxisTickMarks xMin xMax yMin yMax yTransform =
                     |> List.map (\y -> (y, yTransform(y), -3*width))
                     |> List.map (\(y, yLoc, xLoc) -> Svg.text_ 
                                     [
-                                        Svg.Attributes.x (String.fromFloat xLoc),
-                                        Svg.Attributes.y (String.fromFloat yLoc)
+                                         Svg.Attributes.x (String.fromFloat xLoc)
+                                        ,Svg.Attributes.y (String.fromFloat yLoc)
+                                        ,Svg.Attributes.fontSize "0.1"
+
                                     ]
                                     [
-                                        Html.text (String.fromFloat y)
+                                        Svg.text (String.fromFloat y)
                                     ]
                                 )
         -- tickDistance = (toFloat height) / (toFloat numTicks) |> Debug.log "tick-distance"
