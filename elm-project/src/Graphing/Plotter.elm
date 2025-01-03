@@ -62,7 +62,7 @@ plot2d model orderedPairs =
         xAxisPath = buildXAxisPath minX maxX yTransform |> Debug.log "xAxisPath"
         (yAxisPath, yLabels) = buildYAxisPath minX maxX minY maxY yTransform |> Debug.log "yAxisPath"
 
-        basicItems =                     [ 
+        elements = [ 
                         Svg.path
                             [ Svg.Attributes.d functionPath
                             , Svg.Attributes.fill "none"
@@ -84,9 +84,7 @@ plot2d model orderedPairs =
                             , Svg.Attributes.strokeWidth "0.01"
                             ]
                             []
-                    ]
-        all_items = basicItems ++ yLabels
-
+                    ] ++ yLabels
     in
         div
             [ Html.Attributes.id "plot-2d" ]
@@ -97,7 +95,7 @@ plot2d model orderedPairs =
                     , Svg.Attributes.height "100%"
                     , viewBox viewboxAttribte
                     ]
-                    all_items
+                    elements
                 ]
             ]
 
@@ -127,7 +125,7 @@ buildYAxisTickMarks xMin xMax yMin yMax yTransform =
         tickMarksAt = List.range bottomTick topTick
                         |> List.map toFloat 
                         |> Debug.log "tick-marks"
-        width = abs (xMax - xMin) * 0.05 |> Debug.log "tick-width"
+        width = abs (xMax - xMin) * 0.01 |> Debug.log "tick-width"
         xTickStart = -width
         xTickEnd = width
 
@@ -143,12 +141,13 @@ buildYAxisTickMarks xMin xMax yMin yMax yTransform =
                 |> Debug.log "cmds"
 
         labelSvg = tickMarksAt
-                    |> List.map (\y -> (y, yTransform(y), -3*width))
+                    |> List.map (\y -> (y, yTransform(y), -2*width))
                     |> List.map (\(y, yLoc, xLoc) -> Svg.text_ 
                                     [
                                          Svg.Attributes.x (String.fromFloat xLoc)
                                         ,Svg.Attributes.y (String.fromFloat yLoc)
-                                        ,Svg.Attributes.fontSize "0.1"
+                                        ,Svg.Attributes.fontSize "0.2"
+                                        ,Svg.Attributes.alignmentBaseline "middle"
 
                                     ]
                                     [
