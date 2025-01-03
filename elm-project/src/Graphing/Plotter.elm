@@ -61,6 +61,32 @@ plot2d model orderedPairs =
         functionPath = build2DPath yTransform orderedPairs
         xAxisPath = buildXAxisPath minX maxX yTransform |> Debug.log "xAxisPath"
         (yAxisPath, yLabels) = buildYAxisPath minX maxX minY maxY yTransform |> Debug.log "yAxisPath"
+
+        basicItems =                     [ 
+                        Svg.path
+                            [ Svg.Attributes.d functionPath
+                            , Svg.Attributes.fill "none"
+                            , Svg.Attributes.stroke "black"
+                            , Svg.Attributes.strokeWidth "0.01"
+                            ]
+                            []
+                        ,Svg.path
+                            [ Svg.Attributes.d xAxisPath
+                            , Svg.Attributes.fill "none"
+                            , Svg.Attributes.stroke "green"
+                            , Svg.Attributes.strokeWidth "0.01"
+                            ]
+                            []
+                        ,Svg.path
+                            [ Svg.Attributes.d yAxisPath
+                            , Svg.Attributes.fill "none"
+                            , Svg.Attributes.stroke "green"
+                            , Svg.Attributes.strokeWidth "0.01"
+                            ]
+                            []
+                    ]
+        all_items = basicItems ++ yLabels
+
     in
         div
             [ Html.Attributes.id "plot-2d" ]
@@ -71,30 +97,7 @@ plot2d model orderedPairs =
                     , Svg.Attributes.height "100%"
                     , viewBox viewboxAttribte
                     ]
-                    yLabels
-                    -- [ 
-                        -- Svg.path
-                        --     [ Svg.Attributes.d functionPath
-                        --     , Svg.Attributes.fill "none"
-                        --     , Svg.Attributes.stroke "black"
-                        --     , Svg.Attributes.strokeWidth "0.01"
-                        --     ]
-                        --     []
-                        -- ,Svg.path
-                        --     [ Svg.Attributes.d xAxisPath
-                        --     , Svg.Attributes.fill "none"
-                        --     , Svg.Attributes.stroke "green"
-                        --     , Svg.Attributes.strokeWidth "0.01"
-                        --     ]
-                        --     []
-                        -- ,Svg.path
-                        --     [ Svg.Attributes.d yAxisPath
-                        --     , Svg.Attributes.fill "none"
-                        --     , Svg.Attributes.stroke "green"
-                        --     , Svg.Attributes.strokeWidth "0.01"
-                        --     ]
-                        --     []
-                    -- ]
+                    all_items
                 ]
             ]
 
