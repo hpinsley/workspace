@@ -99,24 +99,24 @@ plot2d model orderedPairs =
             ]
 
 buildXAxisPath : Float -> Float -> (Float -> Float) -> String
-buildXAxisPath minX maxX yTrasform =
+buildXAxisPath minX maxX yTransform =
     let
         points = [ [ minX, 0.0 ], [ maxX, 0.0 ] ] |> Debug.log "x-axis-points"
     in
-        build2DPath yTrasform points
+        build2DPath yTransform points
 
 buildYAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> String
-buildYAxisPath minX maxX minY maxY yTrasform =
+buildYAxisPath minX maxX minY maxY yTransform =
     let
         points = [ [ 0.0, minY ], [ 0.0, maxY ] ] |> Debug.log "y-axis-points"
-        tickMarks = buildYAxisTickMarks minX maxX minY maxY |> Debug.log "y-axis ticks"
-        axisLine = build2DPath yTrasform points
+        tickMarks = buildYAxisTickMarks minX maxX minY maxY yTransform |> Debug.log "y-axis ticks"
+        axisLine = build2DPath yTransform points
         ticks = tickMarks
     in
         axisLine ++ tickMarks
 
-buildYAxisTickMarks: Float -> Float -> Float -> Float -> String
-buildYAxisTickMarks xMin xMax yMin yMax =
+buildYAxisTickMarks: Float -> Float -> Float -> Float -> (Float -> Float) -> String
+buildYAxisTickMarks xMin xMax yMin yMax yTransform =
     let
         bottomTick = floor yMin |> Debug.log "bottom-tick"
         topTick = ceiling yMax |> Debug.log "top-tick"
@@ -126,7 +126,9 @@ buildYAxisTickMarks xMin xMax yMin yMax =
         tickDistance = 1
 
         tickMarksAt = List.range bottomTick topTick
-                        |> List.map toFloat |> Debug.log "tick-marks"
+                        |> List.map toFloat 
+                        |> List.map yTransform
+                        |> Debug.log "tick-marks"
         width = abs (xMax - xMin) * 0.05 |> Debug.log "tick-width"
         xTickStart = -width
         xTickEnd = width
