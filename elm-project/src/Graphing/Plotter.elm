@@ -94,6 +94,8 @@ plot2d model orderedPairs =
                     [ Svg.Attributes.width "100%"
                     , Svg.Attributes.height "100%"
                     , viewBox viewboxAttribte
+                    , Svg.Attributes.preserveAspectRatio "xMidYMid meet"
+                    -- , Svg.Attributes.preserveAspectRatio "none"
                     ]
                     elements
                 ]
@@ -146,7 +148,7 @@ buildYAxisTickMarks xMin xMax yMin yMax yTransform =
                                     [
                                          Svg.Attributes.x (String.fromFloat xLoc)
                                         ,Svg.Attributes.y (String.fromFloat yLoc)
-                                        ,Svg.Attributes.fontSize "0.2"
+                                        ,Svg.Attributes.fontSize "0.1"
                                         ,Svg.Attributes.alignmentBaseline "middle"
 
                                     ]
