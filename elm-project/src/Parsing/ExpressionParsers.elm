@@ -88,9 +88,19 @@ variableParser =
         |= variable
             { start = Char.isAlphaNum
             , inner = \c -> Char.isAlphaNum c || c == '_'
-            , reserved = Set.fromList []
+            , reserved = Set.fromList ["e","pi"]
             }
 
+constantParser : Parser Factor
+constantParser =
+    Parser.oneOf
+        [ 
+            succeed (FloatFactor pi)
+                |. symbol "pi"
+                |> Parser.backtrackable
+            , succeed (FloatFactor e)
+                |. symbol "e"
+        ]
 
 function1Parser : Parser Function1
 function1Parser =
@@ -123,7 +133,8 @@ unaryfactorParser =
         , succeed SingleArgumentFunction
             |= function1Parser
             |> Parser.backtrackable
-        , variableParser
+        , variableParser |> Parser.backtrackable
+        , constantParser
         ]
 
 
