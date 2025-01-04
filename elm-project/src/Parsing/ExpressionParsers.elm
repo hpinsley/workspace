@@ -146,25 +146,47 @@ addOpParser =
 factorParser : Parser Factor
 factorParser =
     Parser.oneOf
-        [ succeed BinaryFactor
-            |= unaryfactorParser
+        [ 
+            succeed Power
+                |= unaryfactorParser
+                |. symbol "^"
+                |= lazy (\_ -> factorParser)
+                |> backtrackable
+            , succeed BinaryFactor
+                |= unaryfactorParser
+                |= mulOpParser
+                |= lazy (\_ -> factorParser)
+                |> backtrackable
+            , succeed ExpressionFactor
+                |. symbol "("
+                |= lazy (\_ -> expressionParser)
+                |. symbol ")"
+                |> backtrackable
+            , unaryfactorParser
+        ]
+
+termParser : Parser Term
+termParser =
+    Parser.oneOf
+        [ succeed BinaryTerm
+            |= lazy (\_ -> factorParser)
             |= mulOpParser
             |= lazy (\_ -> factorParser)
             |> backtrackable
-        , unaryfactorParser
+        , succeed UnaryTerm
+            |= lazy (\_ -> factorParser)
         ]
-
 
 expressionParser : Parser Expression
 expressionParser =
     Parser.oneOf
         [ succeed BinaryExpression
-            |= factorParser
+            |= lazy (\_ -> termParser)
             |= addOpParser
-            |= lazy (\_ -> expressionParser)
+            |= lazy (\_ -> termParser)
             |> backtrackable
         , succeed UnaryExpression
-            |= factorParser
+            |= lazy (\_ -> termParser)
         ]
 
 

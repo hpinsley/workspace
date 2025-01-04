@@ -36,9 +36,14 @@ type Factor
     | FloatFactor Float
     | SingleArgumentFunction Function1
     | VariableFactor Variable
+    | Power Factor Factor
     | BinaryFactor Factor MulOp Factor
+    | ExpressionFactor Expression
 
+type Term
+    = BinaryTerm Factor MulOp Factor
+    | UnaryTerm Factor
 
 type Expression
-    = BinaryExpression Factor AddOp Expression
-    | UnaryExpression Factor
+    = BinaryExpression Term AddOp Term
+    | UnaryExpression Term

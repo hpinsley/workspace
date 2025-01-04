@@ -27,10 +27,10 @@ extractVariableListFromFunction1 f =
 extractVariableListFromFactor : Factor -> List Variable
 extractVariableListFromFactor factor =
     case factor of
-        IntFactor n ->
+        IntFactor _ ->
             []
 
-        FloatFactor n ->
+        FloatFactor _ ->
             []
 
         SingleArgumentFunction f ->
@@ -39,15 +39,29 @@ extractVariableListFromFactor factor =
         VariableFactor v ->
             [ v ]
 
-        BinaryFactor f1 mulOp f2 ->
+        BinaryFactor f1 _ f2 ->
             extractVariableListFromFactor f1 ++ extractVariableListFromFactor f2
 
+        Power f1 f2 ->
+            extractVariableListFromFactor f1 ++ extractVariableListFromFactor f2
+
+        ExpressionFactor expr ->
+            extractVariableListFromExpression expr
+
+extractVariableListFromTerm : Term -> List Variable
+extractVariableListFromTerm term =
+    case term of
+        BinaryTerm leftFactor _ rightFactor ->
+            extractVariableListFromFactor leftFactor ++ extractVariableListFromFactor rightFactor
+
+        UnaryTerm factor ->
+            extractVariableListFromFactor factor
 
 extractVariableListFromExpression : Expression -> List Variable
 extractVariableListFromExpression expression =
     case expression of
-        BinaryExpression factor addOp rightExpression ->
-            extractVariableListFromFactor factor ++ extractVariableListFromExpression rightExpression
+        BinaryExpression leftTerm _ rightTerm ->
+            extractVariableListFromTerm leftTerm ++ extractVariableListFromTerm rightTerm
 
-        UnaryExpression factor ->
-            extractVariableListFromFactor factor
+        UnaryExpression term ->
+            extractVariableListFromTerm term

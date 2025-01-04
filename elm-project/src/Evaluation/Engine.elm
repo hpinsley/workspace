@@ -8,22 +8,41 @@ import Parsing.ExpressionModels exposing (..)
 evaluateExpression : Expression -> (String -> Result String Float) -> Result String Float
 evaluateExpression expression symbolLookup =
     case expression of
-        BinaryExpression factor addop expression2 ->
+        BinaryExpression term addop term2 ->
             let
                 result1 =
-                    evaluateFactor factor symbolLookup
+                    evaluateTerm term symbolLookup
 
                 result2 =
-                    evaluateExpression expression2 symbolLookup
+                    evaluateTerm term2 symbolLookup
 
                 final =
                     Result.map2 (applyAddOp addop) result1 result2
             in
             final
 
-        UnaryExpression factor ->
-            evaluateFactor factor symbolLookup
+        UnaryExpression term ->
+            evaluateTerm term symbolLookup
 
+
+evaluateTerm : Term -> (String -> Result String Float) -> Result String Float
+evaluateTerm term symbolLookup =
+    case term of
+        BinaryTerm factor mulop factor2 ->
+            let
+                result1 =
+                    evaluateFactor factor symbolLookup
+
+                result2 =
+                    evaluateFactor factor2 symbolLookup
+
+                final =
+                    Result.map2 (applyMulOp mulop) result1 result2
+            in
+            final
+
+        UnaryTerm factor ->
+            evaluateFactor factor symbolLookup
 
 evaluateFactor : Factor -> (String -> Result String Float) -> Result String Float
 evaluateFactor factor symbolLookup =
@@ -59,7 +78,23 @@ evaluateFactor factor symbolLookup =
                 final =
                     Result.map2 (applyMulOp mulop) result1 result2
             in
-            final
+                final
+
+        Power factor1 factor2 ->
+            let
+                result1 =
+                    evaluateFactor factor1 symbolLookup
+
+                result2 =
+                    evaluateFactor factor2 symbolLookup
+
+                final =
+                    Result.map2 (^) result1 result2
+            in
+                final
+
+        ExpressionFactor expr ->
+            evaluateExpression expr symbolLookup
 
 
 applyMulOp : MulOp -> Float -> Float -> Float
