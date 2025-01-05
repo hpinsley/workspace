@@ -59,14 +59,14 @@ viewPanelEntry model panelEntry =
         , Button.text (Button.config |> Button.setOnClick (DeleteExpression panelEntry.expression)) "Delete"
         , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         , Button.text (Button.config |> Button.setOnClick (Plot panelEntry)) "Plot"
-        , div [ id "plot-values" ] [ displayPlotValues panelEntry ]
+        -- , div [ id "plot-values" ] [ displayPlotValues panelEntry ]
         , displayViewportScaling panelEntry
         ]
 
 
 displayViewportScaling : PanelEntry -> Html Msg
 displayViewportScaling panelEntry =
-    div [ class "viewport-scaling" ]
+    div [ id "viewport-scaling" ]
         [ 
               panelEntryAlignmentView (SetXAlignment panelEntry) "X"
             , panelEntryAlignmentView (SetYAlignment panelEntry) "Y"
