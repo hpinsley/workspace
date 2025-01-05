@@ -272,39 +272,39 @@ updateSymbolTableEntry expressionToMatch variableToMatch mapFunc model =
     m
 
 
+parseAndEvaluateRangeExpression: String -> Result String Float
+parseAndEvaluateRangeExpression expression =
+    case ExpressionParsers.parseExpression expression of
+        Ok parsedExpression ->
+            evaluateExpression parsedExpression (\_ -> Err "Cannot use variables here")
+
+        Err msg ->
+            Err msg
+
 updateSymbolTableEntryStartValue : SymbolTableEntry -> SymbolTableEntry
 updateSymbolTableEntryStartValue entry =
-    case ExpressionParsers.parseExpression entry.startValueBuffer of
-        Ok parsedExpression ->
-            case evaluateExpression parsedExpression (\_ -> Err "Cannot use variables here") of
-                Ok value ->
-                    { entry | startValue = value, currentValue = value, errMsg = Nothing }
-                Err msg ->
-                    { entry | errMsg = Just msg }
-
-        Err _ ->
-            { entry | errMsg = Just "Invalid expression." }
+    case parseAndEvaluateRangeExpression entry.startValueBuffer of
+        Ok value ->
+            { entry | startValue = value, currentValue = value, errMsg = Nothing }
+        Err msg ->
+            { entry | errMsg = Just msg }
 
 
 updateSymbolTableEntryEndValue : SymbolTableEntry -> SymbolTableEntry
 updateSymbolTableEntryEndValue entry =
-    case String.toFloat entry.endValueBuffer of
-        Just value ->
+    case parseAndEvaluateRangeExpression entry.endValueBuffer of
+        Ok value ->
             { entry | endValue = value, errMsg = Nothing }
-
-        Nothing ->
-            { entry | errMsg = Just "Invalid value." }
-
+        Err msg ->
+            { entry | errMsg = Just msg }
 
 updateSymbolTableEntryIncrementValue : SymbolTableEntry -> SymbolTableEntry
 updateSymbolTableEntryIncrementValue entry =
-    case String.toFloat entry.incrementValueBuffer of
-        Just value ->
+    case parseAndEvaluateRangeExpression entry.incrementValueBuffer of
+        Ok value ->
             { entry | incrementValue = value, errMsg = Nothing }
-
-        Nothing ->
-            { entry | errMsg = Just "Invalid value." }
-
+        Err msg ->
+            { entry | errMsg = Just msg }
 
 addCurrentExpressionToPanel : Model -> Model
 addCurrentExpressionToPanel model =

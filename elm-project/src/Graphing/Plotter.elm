@@ -94,8 +94,8 @@ plot2d model orderedPairs =
                     [ Svg.Attributes.width "100%"
                     , Svg.Attributes.height "100%"
                     , viewBox viewboxAttribte
-                    , Svg.Attributes.preserveAspectRatio "xMidYMid meet"
-                    -- , Svg.Attributes.preserveAspectRatio "none"
+                    -- , Svg.Attributes.preserveAspectRatio "xMidYMid meet"
+                    , Svg.Attributes.preserveAspectRatio "none"
                     ]
                     elements
                 ]
