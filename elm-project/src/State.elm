@@ -274,12 +274,16 @@ updateSymbolTableEntry expressionToMatch variableToMatch mapFunc model =
 
 updateSymbolTableEntryStartValue : SymbolTableEntry -> SymbolTableEntry
 updateSymbolTableEntryStartValue entry =
-    case String.toFloat entry.startValueBuffer of
-        Just value ->
-            { entry | startValue = value, currentValue = value, errMsg = Nothing }
+    case ExpressionParsers.parseExpression entry.startValueBuffer of
+        Ok parsedExpression ->
+            case evaluateExpression parsedExpression (\_ -> Err "Cannot use variables here") of
+                Ok value ->
+                    { entry | startValue = value, currentValue = value, errMsg = Nothing }
+                Err msg ->
+                    { entry | errMsg = Just msg }
 
-        Nothing ->
-            { entry | errMsg = Just "Invalid value." }
+        Err _ ->
+            { entry | errMsg = Just "Invalid expression." }
 
 
 updateSymbolTableEntryEndValue : SymbolTableEntry -> SymbolTableEntry
