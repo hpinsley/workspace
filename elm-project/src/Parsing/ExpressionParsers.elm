@@ -126,8 +126,8 @@ function1Parser =
         ]
 
 
-unaryfactorParser : Parser Factor
-unaryfactorParser =
+unSignedUnaryfactorParser : Parser Factor
+unSignedUnaryfactorParser =
     oneOf
         [ numberParser |> Parser.backtrackable
         , succeed SingleArgumentFunction
@@ -137,7 +137,17 @@ unaryfactorParser =
         , constantParser
         ]
 
-
+unaryfactorParser : Parser Factor
+unaryfactorParser =
+    Parser.oneOf
+        [ 
+            succeed NegatedFactor
+                |. symbol "-"
+                |= unSignedUnaryfactorParser
+                |> backtrackable
+            , unSignedUnaryfactorParser
+        ]
+        
 mulOpParser : Parser MulOp
 mulOpParser =
     Parser.oneOf

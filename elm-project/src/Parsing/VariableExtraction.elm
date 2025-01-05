@@ -48,6 +48,9 @@ extractVariableListFromFactor factor =
         ExpressionFactor expr ->
             extractVariableListFromExpression expr
 
+        NegatedFactor f ->
+            extractVariableListFromFactor f
+
 extractVariableListFromTerm : Term -> List Variable
 extractVariableListFromTerm term =
     case term of

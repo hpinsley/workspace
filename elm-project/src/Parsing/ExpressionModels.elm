@@ -39,6 +39,7 @@ type Factor
     | Power Factor Factor
     | BinaryFactor Factor MulOp Factor
     | ExpressionFactor Expression
+    | NegatedFactor Factor
 
 type Term
     = BinaryTerm Factor MulOp Factor

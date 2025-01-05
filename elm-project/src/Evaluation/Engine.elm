@@ -96,6 +96,9 @@ evaluateFactor factor symbolLookup =
         ExpressionFactor expr ->
             evaluateExpression expr symbolLookup
 
+        NegatedFactor innerFactor ->
+            evaluateFactor innerFactor symbolLookup |> Result.map negate
+
 
 applyMulOp : MulOp -> Float -> Float -> Float
 applyMulOp mulOp x y =
