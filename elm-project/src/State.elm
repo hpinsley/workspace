@@ -10,6 +10,7 @@ import Parser exposing (float)
 import Parsing.ExpressionModels exposing (..)
 import Parsing.ExpressionParsers as ExpressionParsers
 import Parsing.VariableExtraction exposing (extractVariablesFromExpression)
+import Set exposing (Set)
 import Time exposing (..)
 
 
@@ -111,6 +112,19 @@ update msg model =
             in
             ( m2, Cmd.none )
 
+        SetXAlignment panelEntry alignment ->
+            let
+                m =
+                    updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentX = alignment }) model
+            in
+                ( m, Cmd.none )
+
+        SetYAlignment panelEntry alignment ->
+            let
+                m =
+                    updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentY = alignment }) model
+            in
+                ( m, Cmd.none )
 
 findPanelEntry : Model -> String -> Maybe PanelEntry
 findPanelEntry model expression =
@@ -272,7 +286,7 @@ updateSymbolTableEntry expressionToMatch variableToMatch mapFunc model =
     m
 
 
-parseAndEvaluateRangeExpression: String -> Result String Float
+parseAndEvaluateRangeExpression : String -> Result String Float
 parseAndEvaluateRangeExpression expression =
     case ExpressionParsers.parseExpression expression of
         Ok parsedExpression ->
@@ -281,11 +295,13 @@ parseAndEvaluateRangeExpression expression =
         Err msg ->
             Err msg
 
+
 updateSymbolTableEntryStartValue : SymbolTableEntry -> SymbolTableEntry
 updateSymbolTableEntryStartValue entry =
     case parseAndEvaluateRangeExpression entry.startValueBuffer of
         Ok value ->
             { entry | startValue = value, currentValue = value, errMsg = Nothing }
+
         Err msg ->
             { entry | errMsg = Just msg }
 
@@ -295,16 +311,20 @@ updateSymbolTableEntryEndValue entry =
     case parseAndEvaluateRangeExpression entry.endValueBuffer of
         Ok value ->
             { entry | endValue = value, errMsg = Nothing }
+
         Err msg ->
             { entry | errMsg = Just msg }
+
 
 updateSymbolTableEntryIncrementValue : SymbolTableEntry -> SymbolTableEntry
 updateSymbolTableEntryIncrementValue entry =
     case parseAndEvaluateRangeExpression entry.incrementValueBuffer of
         Ok value ->
             { entry | incrementValue = value, errMsg = Nothing }
+
         Err msg ->
             { entry | errMsg = Just msg }
+
 
 addCurrentExpressionToPanel : Model -> Model
 addCurrentExpressionToPanel model =
@@ -344,6 +364,9 @@ addCurrentExpressionToPanel model =
                     , plotValues = []
                     , evaluatedPlotValues = []
                     , panelError = Nothing
+                    , alignmentX = AlignMid
+                    , alignmentY = AlignMid
+                    , meetOrSlice = Meet
                     }
             in
             { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }

@@ -8,13 +8,13 @@ import Parsing.ExpressionModels exposing (..)
 evaluateExpression : Expression -> (String -> Result String Float) -> Result String Float
 evaluateExpression expression symbolLookup =
     case expression of
-        BinaryExpression term addop term2 ->
+        BinaryExpression term addop expression2 ->
             let
                 result1 =
                     evaluateTerm term symbolLookup
 
                 result2 =
-                    evaluateTerm term2 symbolLookup
+                    evaluateExpression expression2 symbolLookup
 
                 final =
                     Result.map2 (applyAddOp addop) result1 result2
@@ -28,13 +28,13 @@ evaluateExpression expression symbolLookup =
 evaluateTerm : Term -> (String -> Result String Float) -> Result String Float
 evaluateTerm term symbolLookup =
     case term of
-        BinaryTerm factor mulop factor2 ->
+        BinaryTerm factor mulop term2 ->
             let
                 result1 =
                     evaluateFactor factor symbolLookup
 
                 result2 =
-                    evaluateFactor factor2 symbolLookup
+                    evaluateTerm term2 symbolLookup
 
                 final =
                     Result.map2 (applyMulOp mulop) result1 result2
@@ -43,6 +43,7 @@ evaluateTerm term symbolLookup =
 
         UnaryTerm factor ->
             evaluateFactor factor symbolLookup
+
 
 evaluateFactor : Factor -> (String -> Result String Float) -> Result String Float
 evaluateFactor factor symbolLookup =
@@ -78,7 +79,7 @@ evaluateFactor factor symbolLookup =
                 final =
                     Result.map2 (applyMulOp mulop) result1 result2
             in
-                final
+            final
 
         Power factor1 factor2 ->
             let
@@ -91,7 +92,7 @@ evaluateFactor factor symbolLookup =
                 final =
                     Result.map2 (^) result1 result2
             in
-                final
+            final
 
         ExpressionFactor expr ->
             evaluateExpression expr symbolLookup

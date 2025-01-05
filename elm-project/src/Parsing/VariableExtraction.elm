@@ -51,20 +51,22 @@ extractVariableListFromFactor factor =
         NegatedFactor f ->
             extractVariableListFromFactor f
 
+
 extractVariableListFromTerm : Term -> List Variable
 extractVariableListFromTerm term =
     case term of
-        BinaryTerm leftFactor _ rightFactor ->
-            extractVariableListFromFactor leftFactor ++ extractVariableListFromFactor rightFactor
+        BinaryTerm leftFactor _ rightTerm ->
+            extractVariableListFromFactor leftFactor ++ extractVariableListFromTerm rightTerm
 
         UnaryTerm factor ->
             extractVariableListFromFactor factor
 
+
 extractVariableListFromExpression : Expression -> List Variable
 extractVariableListFromExpression expression =
     case expression of
-        BinaryExpression leftTerm _ rightTerm ->
-            extractVariableListFromTerm leftTerm ++ extractVariableListFromTerm rightTerm
+        BinaryExpression leftTerm _ rightExpression ->
+            extractVariableListFromTerm leftTerm ++ extractVariableListFromExpression rightExpression
 
         UnaryExpression term ->
             extractVariableListFromTerm term

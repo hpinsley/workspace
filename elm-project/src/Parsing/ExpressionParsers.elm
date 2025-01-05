@@ -88,19 +88,20 @@ variableParser =
         |= variable
             { start = Char.isAlphaNum
             , inner = \c -> Char.isAlphaNum c || c == '_'
-            , reserved = Set.fromList ["e","pi"]
+            , reserved = Set.fromList [ "e", "pi" ]
             }
+
 
 constantParser : Parser Factor
 constantParser =
     Parser.oneOf
-        [ 
-            succeed (FloatFactor pi)
-                |. symbol "pi"
-                |> Parser.backtrackable
-            , succeed (FloatFactor e)
-                |. symbol "e"
+        [ succeed (FloatFactor pi)
+            |. symbol "pi"
+            |> Parser.backtrackable
+        , succeed (FloatFactor e)
+            |. symbol "e"
         ]
+
 
 function1Parser : Parser Function1
 function1Parser =
@@ -137,17 +138,18 @@ unSignedUnaryfactorParser =
         , constantParser
         ]
 
+
 unaryfactorParser : Parser Factor
 unaryfactorParser =
     Parser.oneOf
-        [ 
-            succeed NegatedFactor
-                |. symbol "-"
-                |= unSignedUnaryfactorParser
-                |> backtrackable
-            , unSignedUnaryfactorParser
+        [ succeed NegatedFactor
+            |. symbol "-"
+            |= unSignedUnaryfactorParser
+            |> backtrackable
+        , unSignedUnaryfactorParser
         ]
-        
+
+
 mulOpParser : Parser MulOp
 mulOpParser =
     Parser.oneOf
@@ -167,24 +169,24 @@ addOpParser =
 factorParser : Parser Factor
 factorParser =
     Parser.oneOf
-        [ 
-            succeed Power
-                |= unaryfactorParser
-                |. symbol "^"
-                |= lazy (\_ -> factorParser)
-                |> backtrackable
-            , succeed BinaryFactor
-                |= unaryfactorParser
-                |= mulOpParser
-                |= lazy (\_ -> factorParser)
-                |> backtrackable
-            , succeed ExpressionFactor
-                |. symbol "("
-                |= lazy (\_ -> expressionParser)
-                |. symbol ")"
-                |> backtrackable
-            , unaryfactorParser
+        [ succeed Power
+            |= unaryfactorParser
+            |. symbol "^"
+            |= lazy (\_ -> factorParser)
+            |> backtrackable
+        , succeed BinaryFactor
+            |= unaryfactorParser
+            |= mulOpParser
+            |= lazy (\_ -> factorParser)
+            |> backtrackable
+        , succeed ExpressionFactor
+            |. symbol "("
+            |= lazy (\_ -> expressionParser)
+            |. symbol ")"
+            |> backtrackable
+        , unaryfactorParser
         ]
+
 
 termParser : Parser Term
 termParser =
@@ -192,11 +194,12 @@ termParser =
         [ succeed BinaryTerm
             |= lazy (\_ -> factorParser)
             |= mulOpParser
-            |= lazy (\_ -> factorParser)
+            |= lazy (\_ -> termParser)
             |> backtrackable
         , succeed UnaryTerm
             |= lazy (\_ -> factorParser)
         ]
+
 
 expressionParser : Parser Expression
 expressionParser =
@@ -204,7 +207,7 @@ expressionParser =
         [ succeed BinaryExpression
             |= lazy (\_ -> termParser)
             |= addOpParser
-            |= lazy (\_ -> termParser)
+            |= lazy (\_ -> expressionParser)
             |> backtrackable
         , succeed UnaryExpression
             |= lazy (\_ -> termParser)
