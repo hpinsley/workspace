@@ -26,7 +26,7 @@ plot model panelEntry =
               in
               case Dict.size panelEntry.variables of
                 1 ->
-                    plot2d model orderedPairs
+                    plot2d model panelEntry orderedPairs
 
                 2 ->
                     plot3d model orderedPairs
@@ -39,8 +39,8 @@ plot model panelEntry =
         ]
 
 
-plot2d : Model -> List (List Float) -> Html Msg
-plot2d model orderedPairs =
+plot2d : Model -> PanelEntry -> List (List Float) -> Html Msg
+plot2d model panelEntry orderedPairs =
     let
         minX =
             List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minX"
@@ -117,12 +117,31 @@ plot2d model orderedPairs =
                 , viewBox viewboxAttribte
 
                 -- , Svg.Attributes.preserveAspectRatio "xMidYMid meet"
-                , Svg.Attributes.preserveAspectRatio "none"
+                , Svg.Attributes.preserveAspectRatio (buildPreserveAspectRatioString panelEntry |> Debug.log "preserveAspectRatio")
                 ]
                 elements
             ]
         ]
 
+buildPreserveAspectRatioString : PanelEntry -> String
+buildPreserveAspectRatioString panelEntry =
+    let
+        xPart = case panelEntry.alignmentX of
+                AlignMin -> "xMin"
+                AlignMid -> "xMid"
+                AlignMax -> "xMax"
+
+        -- These are Pascal case
+        yPart = case panelEntry.alignmentY of
+                AlignMin -> "YMin"
+                AlignMid -> "YMid"
+                AlignMax -> "YMax"
+
+        meetOrSlice = case panelEntry.meetOrSlice of
+            Meet -> "meet"
+            Slice -> "slice"
+    in
+        xPart ++ yPart ++ " " ++ meetOrSlice
 
 buildXAxisPath : Float -> Float -> (Float -> Float) -> String
 buildXAxisPath minX maxX yTransform =

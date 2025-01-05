@@ -84,7 +84,7 @@ update msg model =
                 m =
                     updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | incrementValueBuffer = value }) model
             in
-            ( m, Cmd.none )
+                ( m, Cmd.none )
 
         UpdateVarIncrementValue panelEntry symbolTableEntry _ ->
             let
@@ -110,21 +110,29 @@ update msg model =
                         Nothing ->
                             m
             in
-            ( m2, Cmd.none )
+                ( m2, Cmd.none )
 
         SetXAlignment panelEntry alignment ->
             let
                 m =
                     updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentX = alignment }) model
             in
-                ( m, Cmd.none )
+                -- ( m, Cmd.none )
+                (update (Plot panelEntry) m)
 
         SetYAlignment panelEntry alignment ->
             let
                 m =
                     updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentY = alignment }) model
             in
-                ( m, Cmd.none )
+                (update (Plot panelEntry) m)
+
+        SetAlignmentBehavior panelEntry alignmentBehavior ->
+            let
+                m =
+                    updatePanelEntry panelEntry.expression (\pe -> { pe | meetOrSlice = alignmentBehavior }) model
+            in
+                (update (Plot panelEntry) m)
 
 findPanelEntry : Model -> String -> Maybe PanelEntry
 findPanelEntry model expression =

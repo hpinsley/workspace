@@ -70,6 +70,38 @@ displayViewportScaling panelEntry =
         [ 
               panelEntryAlignmentView (SetXAlignment panelEntry) "X"
             , panelEntryAlignmentView (SetYAlignment panelEntry) "Y"
+            , panelEntryAlignmentBehaviorView (SetAlignmentBehavior panelEntry)
+        ]
+
+
+panelEntryAlignmentBehaviorView : (SvgAlignmentBehavor -> Msg) -> Html Msg
+panelEntryAlignmentBehaviorView msgFunc =
+    fieldset []
+        [ legend [] [ text "Alignment Behavior" ]
+        , div []
+            [ input
+                [ Html.Attributes.id ("alignment-behavior-meet")
+                , Html.Attributes.type_ "radio"
+                , Html.Attributes.name "alignment-behavior"
+                , Html.Attributes.value "Meet"
+                , Html.Attributes.selected False
+                , Html.Events.onClick (msgFunc Meet)
+                ]
+                []
+            , label [ Html.Attributes.for "alignment-behavior-meet" ] [ text "Meet" ]
+            ]
+        , div []
+            [ input
+                [ Html.Attributes.id ("alignment-behavior-slice")
+                , Html.Attributes.type_ "radio"
+                , Html.Attributes.name "alignment-behavior"
+                , Html.Attributes.value "Slice"
+                , Html.Attributes.selected False
+                , Html.Events.onClick (msgFunc Slice)
+                ]
+                []
+            , label [ Html.Attributes.for "alignment-behavior-slice" ] [ text "Slice" ]
+            ]
         ]
 
 

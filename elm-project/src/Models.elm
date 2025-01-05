@@ -21,6 +21,7 @@ type Msg
     | Plot PanelEntry
     | SetXAlignment PanelEntry SvgAlignment
     | SetYAlignment PanelEntry SvgAlignment
+    | SetAlignmentBehavior PanelEntry SvgAlignmentBehavor
 
 
 type alias SymbolTableEntry =
