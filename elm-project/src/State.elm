@@ -10,6 +10,7 @@ import Parser exposing (float)
 import Parsing.ExpressionModels exposing (..)
 import Parsing.ExpressionParsers as ExpressionParsers
 import Parsing.VariableExtraction exposing (extractVariablesFromExpression)
+import Set exposing (Set)
 import Time exposing (..)
 
 
@@ -83,7 +84,7 @@ update msg model =
                 m =
                     updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | incrementValueBuffer = value }) model
             in
-            ( m, Cmd.none )
+                ( m, Cmd.none )
 
         UpdateVarIncrementValue panelEntry symbolTableEntry _ ->
             let
@@ -109,8 +110,29 @@ update msg model =
                         Nothing ->
                             m
             in
-            ( m2, Cmd.none )
+                ( m2, Cmd.none )
 
+        SetXAlignment panelEntry alignment ->
+            let
+                m =
+                    updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentX = alignment }) model
+            in
+                -- ( m, Cmd.none )
+                (update (Plot panelEntry) m)
+
+        SetYAlignment panelEntry alignment ->
+            let
+                m =
+                    updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentY = alignment }) model
+            in
+                (update (Plot panelEntry) m)
+
+        SetAlignmentBehavior panelEntry alignmentBehavior ->
+            let
+                m =
+                    updatePanelEntry panelEntry.expression (\pe -> { pe | meetOrSlice = alignmentBehavior }) model
+            in
+                (update (Plot panelEntry) m)
 
 findPanelEntry : Model -> String -> Maybe PanelEntry
 findPanelEntry model expression =
@@ -272,34 +294,44 @@ updateSymbolTableEntry expressionToMatch variableToMatch mapFunc model =
     m
 
 
+parseAndEvaluateRangeExpression : String -> Result String Float
+parseAndEvaluateRangeExpression expression =
+    case ExpressionParsers.parseExpression expression of
+        Ok parsedExpression ->
+            evaluateExpression parsedExpression (\_ -> Err "Cannot use variables here")
+
+        Err msg ->
+            Err msg
+
+
 updateSymbolTableEntryStartValue : SymbolTableEntry -> SymbolTableEntry
 updateSymbolTableEntryStartValue entry =
-    case String.toFloat entry.startValueBuffer of
-        Just value ->
+    case parseAndEvaluateRangeExpression entry.startValueBuffer of
+        Ok value ->
             { entry | startValue = value, currentValue = value, errMsg = Nothing }
 
-        Nothing ->
-            { entry | errMsg = Just "Invalid value." }
+        Err msg ->
+            { entry | errMsg = Just msg }
 
 
 updateSymbolTableEntryEndValue : SymbolTableEntry -> SymbolTableEntry
 updateSymbolTableEntryEndValue entry =
-    case String.toFloat entry.endValueBuffer of
-        Just value ->
+    case parseAndEvaluateRangeExpression entry.endValueBuffer of
+        Ok value ->
             { entry | endValue = value, errMsg = Nothing }
 
-        Nothing ->
-            { entry | errMsg = Just "Invalid value." }
+        Err msg ->
+            { entry | errMsg = Just msg }
 
 
 updateSymbolTableEntryIncrementValue : SymbolTableEntry -> SymbolTableEntry
 updateSymbolTableEntryIncrementValue entry =
-    case String.toFloat entry.incrementValueBuffer of
-        Just value ->
+    case parseAndEvaluateRangeExpression entry.incrementValueBuffer of
+        Ok value ->
             { entry | incrementValue = value, errMsg = Nothing }
 
-        Nothing ->
-            { entry | errMsg = Just "Invalid value." }
+        Err msg ->
+            { entry | errMsg = Just msg }
 
 
 addCurrentExpressionToPanel : Model -> Model
@@ -340,6 +372,9 @@ addCurrentExpressionToPanel model =
                     , plotValues = []
                     , evaluatedPlotValues = []
                     , panelError = Nothing
+                    , alignmentX = AlignMid
+                    , alignmentY = AlignMid
+                    , meetOrSlice = Meet
                     }
             in
             { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }

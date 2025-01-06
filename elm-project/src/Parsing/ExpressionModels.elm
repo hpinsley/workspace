@@ -1,12 +1,11 @@
 module Parsing.ExpressionModels exposing (..)
 
 -- We want to move to this:
-
 -- Expression   ::= Term (ADDOP Term)*
 -- Term         ::= Factor (MULOP Factor)*
 -- Factor       ::= NUMBER | VARIABLE | '(' Expression ')' | Factor '^' Factor
 -- ADDOP        ::= '+' | '-'
--- MULOP        ::= '*' | '/' 
+-- MULOP        ::= '*' | '/'
 -- NUMBER       ::= [0-9]+
 -- VARIABLE     ::= [a-zA-Z]
 
@@ -36,9 +35,17 @@ type Factor
     | FloatFactor Float
     | SingleArgumentFunction Function1
     | VariableFactor Variable
+    | Power Factor Factor
     | BinaryFactor Factor MulOp Factor
+    | ExpressionFactor Expression
+    | NegatedFactor Factor
+
+
+type Term
+    = BinaryTerm Factor MulOp Term
+    | UnaryTerm Factor
 
 
 type Expression
-    = BinaryExpression Factor AddOp Expression
-    | UnaryExpression Factor
+    = BinaryExpression Term AddOp Expression
+    | UnaryExpression Term

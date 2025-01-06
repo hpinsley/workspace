@@ -19,6 +19,9 @@ type Msg
     | UpdateVarIncrementValue PanelEntry SymbolTableEntry String
     | TogglePanelEntry PanelEntry
     | Plot PanelEntry
+    | SetXAlignment PanelEntry SvgAlignment
+    | SetYAlignment PanelEntry SvgAlignment
+    | SetAlignmentBehavior PanelEntry SvgAlignmentBehavor
 
 
 type alias SymbolTableEntry =
@@ -43,7 +46,21 @@ type alias PanelEntry =
     , plotValues : List (Dict String Float)
     , evaluatedPlotValues : List ( Dict.Dict String Float, Result String Float )
     , panelError : Maybe String
+    , alignmentX : SvgAlignment
+    , alignmentY : SvgAlignment
+    , meetOrSlice : SvgAlignmentBehavor
     }
+
+
+type SvgAlignment
+    = AlignMin
+    | AlignMid
+    | AlignMax
+
+
+type SvgAlignmentBehavor
+    = Meet
+    | Slice
 
 
 type alias Model =

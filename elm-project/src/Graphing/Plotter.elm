@@ -26,7 +26,7 @@ plot model panelEntry =
               in
               case Dict.size panelEntry.variables of
                 1 ->
-                    plot2d model orderedPairs
+                    plot2d model panelEntry orderedPairs
 
                 2 ->
                     plot3d model orderedPairs
@@ -39,140 +39,223 @@ plot model panelEntry =
         ]
 
 
-plot2d : Model -> List (List Float) -> Html Msg
-plot2d model orderedPairs =
+plot2d : Model -> PanelEntry -> List (List Float) -> Html Msg
+plot2d model panelEntry orderedPairs =
     let
-        minX = List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minX"
-        maxX = List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "maxX"
-        minY = List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minY"
-        maxY = List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "maxY"
-        xWidth = maxX - minX |> Debug.log "xWidth"
-        yWidth = maxY - minY |> Debug.log "yWidth"
-        viewboxAttribte = (minX |> String.fromFloat)
-                            ++ " "
-                            ++ (minY |> String.fromFloat)
-                            ++ " "
-                            ++ (xWidth |> String.fromFloat)
-                            ++ " "
-                            ++ (yWidth |> String.fromFloat)
-                            |> Debug.log "viewboxAttribte"
+        minX =
+            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minX"
 
-        yTransform = adjustYValue maxY minY
-        functionPath = build2DPath yTransform orderedPairs
-        xAxisPath = buildXAxisPath minX maxX yTransform |> Debug.log "xAxisPath"
-        (yAxisPath, yLabels) = buildYAxisPath minX maxX minY maxY yTransform |> Debug.log "yAxisPath"
+        maxX =
+            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "maxX"
 
-        elements = [ 
-                        Svg.path
-                            [ Svg.Attributes.d functionPath
-                            , Svg.Attributes.fill "none"
-                            , Svg.Attributes.stroke "black"
-                            , Svg.Attributes.strokeWidth "0.01"
-                            ]
-                            []
-                        ,Svg.path
-                            [ Svg.Attributes.d xAxisPath
-                            , Svg.Attributes.fill "none"
-                            , Svg.Attributes.stroke "green"
-                            , Svg.Attributes.strokeWidth "0.01"
-                            ]
-                            []
-                        ,Svg.path
-                            [ Svg.Attributes.d yAxisPath
-                            , Svg.Attributes.fill "none"
-                            , Svg.Attributes.stroke "green"
-                            , Svg.Attributes.strokeWidth "0.01"
-                            ]
-                            []
-                    ] ++ yLabels
-    in
-        div
-            [ Html.Attributes.id "plot-2d" ]
-            [ Html.text "2D Plot"
-            , div [Html.Attributes.id "svg-container"]
-                [ svg
-                    [ Svg.Attributes.width "100%"
-                    , Svg.Attributes.height "100%"
-                    , viewBox viewboxAttribte
-                    ]
-                    elements
+        minY =
+            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minY"
+
+        maxY =
+            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "maxY"
+
+        xWidth =
+            maxX - minX |> Debug.log "xWidth"
+
+        yWidth =
+            maxY - minY |> Debug.log "yWidth"
+
+        viewboxAttribte =
+            (minX |> String.fromFloat)
+                ++ " "
+                ++ (minY |> String.fromFloat)
+                ++ " "
+                ++ (xWidth |> String.fromFloat)
+                ++ " "
+                ++ (yWidth |> String.fromFloat)
+                |> Debug.log "viewboxAttribte"
+
+        yTransform =
+            adjustYValue maxY minY
+
+        functionPath =
+            build2DPath yTransform orderedPairs
+
+        xAxisPath =
+            buildXAxisPath minX maxX yTransform |> Debug.log "xAxisPath"
+
+        ( yAxisPath, yLabels ) =
+            buildYAxisPath minX maxX minY maxY yTransform |> Debug.log "yAxisPath"
+
+        elements =
+            [ Svg.path
+                [ Svg.Attributes.d functionPath
+                , Svg.Attributes.fill "none"
+                , Svg.Attributes.stroke "black"
+                , Svg.Attributes.strokeWidth "0.01"
                 ]
+                []
+            , Svg.path
+                [ Svg.Attributes.d xAxisPath
+                , Svg.Attributes.fill "none"
+                , Svg.Attributes.stroke "green"
+                , Svg.Attributes.strokeWidth "0.01"
+                ]
+                []
+            , Svg.path
+                [ Svg.Attributes.d yAxisPath
+                , Svg.Attributes.fill "none"
+                , Svg.Attributes.stroke "green"
+                , Svg.Attributes.strokeWidth "0.01"
+                ]
+                []
             ]
+                ++ yLabels
+    in
+    div
+        [ Html.Attributes.id "plot-2d" ]
+        [ Html.text "2D Plot"
+        , div [ Html.Attributes.id "svg-container" ]
+            [ svg
+                [ Svg.Attributes.width "100%"
+                , Svg.Attributes.height "100%"
+                , viewBox viewboxAttribte
+
+                -- , Svg.Attributes.preserveAspectRatio "xMidYMid meet"
+                , Svg.Attributes.preserveAspectRatio (buildPreserveAspectRatioString panelEntry |> Debug.log "preserveAspectRatio")
+                ]
+                elements
+            ]
+        ]
+
+buildPreserveAspectRatioString : PanelEntry -> String
+buildPreserveAspectRatioString panelEntry =
+    let
+        xPart = case panelEntry.alignmentX of
+                AlignMin -> "xMin"
+                AlignMid -> "xMid"
+                AlignMax -> "xMax"
+
+        -- These are Pascal case
+        yPart = case panelEntry.alignmentY of
+                AlignMin -> "YMin"
+                AlignMid -> "YMid"
+                AlignMax -> "YMax"
+
+        meetOrSlice = case panelEntry.meetOrSlice of
+            Meet -> "meet"
+            Slice -> "slice"
+    in
+        xPart ++ yPart ++ " " ++ meetOrSlice
 
 buildXAxisPath : Float -> Float -> (Float -> Float) -> String
 buildXAxisPath minX maxX yTransform =
     let
-        points = [ [ minX, 0.0 ], [ maxX, 0.0 ] ] |> Debug.log "x-axis-points"
+        points =
+            [ [ minX, 0.0 ], [ maxX, 0.0 ] ] |> Debug.log "x-axis-points"
     in
-        build2DPath yTransform points
+    build2DPath yTransform points
 
-buildYAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> (String, List (Svg Msg))
+
+buildYAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> ( String, List (Svg Msg) )
 buildYAxisPath minX maxX minY maxY yTransform =
     let
-        points = [ [ 0.0, minY ], [ 0.0, maxY ] ] |> Debug.log "y-axis-points"
-        axisLine = build2DPath yTransform points
+        points =
+            [ [ 0.0, minY ], [ 0.0, maxY ] ] |> Debug.log "y-axis-points"
 
-        (tickMarks, labels) = buildYAxisTickMarks minX maxX minY maxY yTransform |> Debug.log "y-axis ticks"
+        axisLine =
+            build2DPath yTransform points
+
+        ( tickMarks, labels ) =
+            buildYAxisTickMarks minX maxX minY maxY yTransform |> Debug.log "y-axis ticks"
     in
-        (axisLine ++ tickMarks, labels)
+    ( axisLine ++ tickMarks, labels )
 
-buildYAxisTickMarks: Float -> Float -> Float -> Float -> (Float -> Float) -> (String, List (Svg Msg))
+
+buildYAxisTickMarks : Float -> Float -> Float -> Float -> (Float -> Float) -> ( String, List (Svg Msg) )
 buildYAxisTickMarks xMin xMax yMin yMax yTransform =
     let
-        bottomTick = floor yMin |> Debug.log "bottom-tick"
-        topTick = ceiling yMax |> Debug.log "top-tick"
+        bottomTick =
+            floor yMin |> Debug.log "bottom-tick"
 
-        tickMarksAt = List.range bottomTick topTick
-                        |> List.map toFloat 
-                        |> Debug.log "tick-marks"
-        width = abs (xMax - xMin) * 0.01 |> Debug.log "tick-width"
-        xTickStart = -width
-        xTickEnd = width
+        topTick =
+            ceiling yMax |> Debug.log "top-tick"
 
-        tickPoints = tickMarksAt
-            |> List.map (\yVal -> ((xTickStart, yTransform(yVal)), (xTickEnd, yTransform(yVal)))) |> Debug.log "tick-points"
+        tickMarksAt =
+            List.range bottomTick topTick
+                |> List.map toFloat
+                |> Debug.log "tick-marks"
 
-        tickCmds = tickPoints
-            |> List.map (\((x1, y1), (x2, y2)) -> (
-                " M " ++ String.fromFloat x1 ++ "," ++ String.fromFloat y1 ++ 
-                " L " ++ String.fromFloat x2 ++ "," ++ String.fromFloat y2 
-                ))
+        width =
+            abs (xMax - xMin) * 0.01 |> Debug.log "tick-width"
+
+        xTickStart =
+            -width
+
+        xTickEnd =
+            width
+
+        tickPoints =
+            tickMarksAt
+                |> List.map (\yVal -> ( ( xTickStart, yTransform yVal ), ( xTickEnd, yTransform yVal ) ))
+                |> Debug.log "tick-points"
+
+        tickCmds =
+            tickPoints
+                |> List.map
+                    (\( ( x1, y1 ), ( x2, y2 ) ) ->
+                        " M "
+                            ++ String.fromFloat x1
+                            ++ ","
+                            ++ String.fromFloat y1
+                            ++ " L "
+                            ++ String.fromFloat x2
+                            ++ ","
+                            ++ String.fromFloat y2
+                    )
                 |> List.foldl (++) ""
                 |> Debug.log "cmds"
 
-        labelSvg = tickMarksAt
-                    |> List.map (\y -> (y, yTransform(y), -2*width))
-                    |> List.map (\(y, yLoc, xLoc) -> Svg.text_ 
-                                    [
-                                         Svg.Attributes.x (String.fromFloat xLoc)
-                                        ,Svg.Attributes.y (String.fromFloat yLoc)
-                                        ,Svg.Attributes.fontSize "0.2"
-                                        ,Svg.Attributes.alignmentBaseline "middle"
+        labelSvg =
+            tickMarksAt
+                |> List.map (\y -> ( y, yTransform y, -2 * width ))
+                |> List.map
+                    (\( y, yLoc, xLoc ) ->
+                        Svg.text_
+                            [ Svg.Attributes.x (String.fromFloat xLoc)
+                            , Svg.Attributes.y (String.fromFloat yLoc)
+                            , Svg.Attributes.fontSize "0.1"
+                            , Svg.Attributes.alignmentBaseline "middle"
+                            ]
+                            [ Svg.text (String.fromFloat y)
+                            ]
+                    )
 
-                                    ]
-                                    [
-                                        Svg.text (String.fromFloat y)
-                                    ]
-                                )
         -- tickDistance = (toFloat height) / (toFloat numTicks) |> Debug.log "tick-distance"
     in
-        (tickCmds, labelSvg)
+    ( tickCmds, labelSvg )
 
-adjustYValue: Float -> Float -> Float -> Float
-adjustYValue maxY minY y = 
+
+adjustYValue : Float -> Float -> Float -> Float
+adjustYValue maxY minY y =
     (maxY + minY) - y
+
 
 build2DPath : (Float -> Float) -> List (List Float) -> String
 build2DPath yAdjust orderedPairs =
     let
-        xValues = List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs
-        yValues = List.map (\pair -> (Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair))))) orderedPairs
-        adjustedYValues = List.map yAdjust yValues
+        xValues =
+            List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs
 
-        points = List.map2 (\x y -> (String.fromFloat x) ++ "," ++ (String.fromFloat y)) xValues adjustedYValues
-        path = "M " ++ (List.head points |> Maybe.withDefault "0,0") ++ " L " ++ (List.tail points |> Maybe.withDefault [] |> String.join " L ")
+        yValues =
+            List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs
+
+        adjustedYValues =
+            List.map yAdjust yValues
+
+        points =
+            List.map2 (\x y -> String.fromFloat x ++ "," ++ String.fromFloat y) xValues adjustedYValues
+
+        path =
+            "M " ++ (List.head points |> Maybe.withDefault "0,0") ++ " L " ++ (List.tail points |> Maybe.withDefault [] |> String.join " L ")
     in
-        path
+    path
+
 
 plot3d : Model -> List (List Float) -> Html Msg
 plot3d model orderedPairs =

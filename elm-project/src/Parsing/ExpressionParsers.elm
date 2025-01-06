@@ -88,8 +88,19 @@ variableParser =
         |= variable
             { start = Char.isAlphaNum
             , inner = \c -> Char.isAlphaNum c || c == '_'
-            , reserved = Set.fromList []
+            , reserved = Set.fromList [ "e", "pi" ]
             }
+
+
+constantParser : Parser Factor
+constantParser =
+    Parser.oneOf
+        [ succeed (FloatFactor pi)
+            |. symbol "pi"
+            |> Parser.backtrackable
+        , succeed (FloatFactor e)
+            |. symbol "e"
+        ]
 
 
 function1Parser : Parser Function1
@@ -116,14 +127,26 @@ function1Parser =
         ]
 
 
-unaryfactorParser : Parser Factor
-unaryfactorParser =
+unSignedUnaryfactorParser : Parser Factor
+unSignedUnaryfactorParser =
     oneOf
         [ numberParser |> Parser.backtrackable
         , succeed SingleArgumentFunction
             |= function1Parser
             |> Parser.backtrackable
-        , variableParser
+        , variableParser |> Parser.backtrackable
+        , constantParser
+        ]
+
+
+unaryfactorParser : Parser Factor
+unaryfactorParser =
+    Parser.oneOf
+        [ succeed NegatedFactor
+            |. symbol "-"
+            |= unSignedUnaryfactorParser
+            |> backtrackable
+        , unSignedUnaryfactorParser
         ]
 
 
@@ -146,12 +169,35 @@ addOpParser =
 factorParser : Parser Factor
 factorParser =
     Parser.oneOf
-        [ succeed BinaryFactor
+        [ succeed Power
+            |= unaryfactorParser
+            |. symbol "^"
+            |= lazy (\_ -> factorParser)
+            |> backtrackable
+        , succeed BinaryFactor
             |= unaryfactorParser
             |= mulOpParser
             |= lazy (\_ -> factorParser)
             |> backtrackable
+        , succeed ExpressionFactor
+            |. symbol "("
+            |= lazy (\_ -> expressionParser)
+            |. symbol ")"
+            |> backtrackable
         , unaryfactorParser
+        ]
+
+
+termParser : Parser Term
+termParser =
+    Parser.oneOf
+        [ succeed BinaryTerm
+            |= lazy (\_ -> factorParser)
+            |= mulOpParser
+            |= lazy (\_ -> termParser)
+            |> backtrackable
+        , succeed UnaryTerm
+            |= lazy (\_ -> factorParser)
         ]
 
 
@@ -159,12 +205,12 @@ expressionParser : Parser Expression
 expressionParser =
     Parser.oneOf
         [ succeed BinaryExpression
-            |= factorParser
+            |= lazy (\_ -> termParser)
             |= addOpParser
             |= lazy (\_ -> expressionParser)
             |> backtrackable
         , succeed UnaryExpression
-            |= factorParser
+            |= lazy (\_ -> termParser)
         ]
 
 

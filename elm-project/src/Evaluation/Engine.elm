@@ -8,10 +8,10 @@ import Parsing.ExpressionModels exposing (..)
 evaluateExpression : Expression -> (String -> Result String Float) -> Result String Float
 evaluateExpression expression symbolLookup =
     case expression of
-        BinaryExpression factor addop expression2 ->
+        BinaryExpression term addop expression2 ->
             let
                 result1 =
-                    evaluateFactor factor symbolLookup
+                    evaluateTerm term symbolLookup
 
                 result2 =
                     evaluateExpression expression2 symbolLookup
@@ -21,7 +21,27 @@ evaluateExpression expression symbolLookup =
             in
             final
 
-        UnaryExpression factor ->
+        UnaryExpression term ->
+            evaluateTerm term symbolLookup
+
+
+evaluateTerm : Term -> (String -> Result String Float) -> Result String Float
+evaluateTerm term symbolLookup =
+    case term of
+        BinaryTerm factor mulop term2 ->
+            let
+                result1 =
+                    evaluateFactor factor symbolLookup
+
+                result2 =
+                    evaluateTerm term2 symbolLookup
+
+                final =
+                    Result.map2 (applyMulOp mulop) result1 result2
+            in
+            final
+
+        UnaryTerm factor ->
             evaluateFactor factor symbolLookup
 
 
@@ -61,6 +81,25 @@ evaluateFactor factor symbolLookup =
             in
             final
 
+        Power factor1 factor2 ->
+            let
+                result1 =
+                    evaluateFactor factor1 symbolLookup
+
+                result2 =
+                    evaluateFactor factor2 symbolLookup
+
+                final =
+                    Result.map2 (^) result1 result2 |> Debug.log ("Raising " ++ (Debug.toString result1) ++ " to the power of " ++ (Debug.toString result2))
+            in
+            final
+
+        ExpressionFactor expr ->
+            evaluateExpression expr symbolLookup
+
+        NegatedFactor innerFactor ->
+            evaluateFactor innerFactor symbolLookup |> Result.map negate
+
 
 applyMulOp : MulOp -> Float -> Float -> Float
 applyMulOp mulOp x y =
@@ -70,21 +109,17 @@ applyMulOp mulOp x y =
     in
     case mulOp of
         Times ->
-            x * y
+            x * y |> Debug.log ("Multiplied " ++ (String.fromFloat x) ++ " to " ++ (String.fromFloat y))
 
         Divide ->
-            x / y
+            x / y |> Debug.log ("Divided " ++ (String.fromFloat x) ++ " by " ++ (String.fromFloat y))
 
 
 applyAddOp : AddOp -> Float -> Float -> Float
 applyAddOp addOp x y =
-    let
-        _ =
-            Debug.log ("Parsing " ++ String.fromFloat x ++ " and " ++ String.fromFloat y)
-    in
     case addOp of
         Plus ->
-            x + y
+            x + y |> Debug.log ("Added " ++ (String.fromFloat x) ++ " to " ++ (String.fromFloat y))
 
         Minus ->
-            x - y
+            x - y |> Debug.log ("Subtracted " ++ (String.fromFloat y) ++ " from " ++ (String.fromFloat x))
