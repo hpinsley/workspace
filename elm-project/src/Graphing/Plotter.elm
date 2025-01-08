@@ -10,6 +10,12 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 
 
+x_TICK_WIDTH_YRANGE_PCT = 0.04
+xTICK_LABEL_OFFSET_HEIGHT_PCT = -2.0
+
+y_TICK_WIDTH_XRANGE_PCT = 0.02
+yTICK_LABEL_OFFSET_WIDTH_PCT = -2.0
+
 plot : Model -> PanelEntry -> Html Msg
 plot model panelEntry =
     div
@@ -182,11 +188,12 @@ buildYAxisTickMarks xMin xMax yMin yMax yTransform =
 
         tickMarksAt =
             List.range bottomTick topTick
+                |> List.filter (\i -> i /= 0)
                 |> List.map toFloat
                 |> Debug.log "tick-marks"
 
         width =
-            abs (xMax - xMin) * 0.01 |> Debug.log "tick-width"
+            abs (xMax - xMin) * y_TICK_WIDTH_XRANGE_PCT |> Debug.log "tick-width"
 
         xTickStart =
             -width
@@ -217,7 +224,7 @@ buildYAxisTickMarks xMin xMax yMin yMax yTransform =
 
         labelSvg =
             tickMarksAt
-                |> List.map (\y -> ( y, yTransform y, -2 * width ))
+                |> List.map (\y -> ( y, yTransform y, yTICK_LABEL_OFFSET_WIDTH_PCT * width ))
                 |> List.map
                     (\( y, yLoc, xLoc ) ->
                         Svg.text_
@@ -245,11 +252,12 @@ buildXAxisTickMarks xMin xMax yMin yMax yTransform =
 
         tickMarksAt =
             List.range leftTick rightTick
+                |> List.filter (\i -> i /= 0)
                 |> List.map toFloat
                 |> Debug.log "x-axis tick-marks"
 
         height =
-            abs (yMax - yMin) * 0.01 |> Debug.log "x-tick-height"
+            abs (yMax - yMin) * x_TICK_WIDTH_YRANGE_PCT |> Debug.log "x-tick-height"
 
         yTickStart =
             -height
@@ -280,7 +288,7 @@ buildXAxisTickMarks xMin xMax yMin yMax yTransform =
 
         labelSvg =
             tickMarksAt
-                |> List.map (\x -> ( x, x, yTransform (-2 * height )))
+                |> List.map (\x -> ( x, x, yTransform (xTICK_LABEL_OFFSET_HEIGHT_PCT * height )))
                 |> List.map
                     (\( x, xLoc, yLoc ) ->
                         Svg.text_
