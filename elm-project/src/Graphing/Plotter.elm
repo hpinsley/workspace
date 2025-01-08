@@ -76,7 +76,7 @@ plot2d model panelEntry orderedPairs =
         functionPath =
             build2DPath yTransform orderedPairs
 
-        xAxisPath =
+        (xAxisPath, xLabels) =
             buildXAxisPath minX maxX minY maxY yTransform |> Debug.log "xAxisPath"
 
         ( yAxisPath, yLabels ) =
@@ -106,6 +106,7 @@ plot2d model panelEntry orderedPairs =
                 []
             ]
                 ++ yLabels
+                ++ xLabels
     in
     div
         [ Html.Attributes.id "plot-2d" ]
@@ -143,7 +144,7 @@ buildPreserveAspectRatioString panelEntry =
     in
         xPart ++ yPart ++ " " ++ meetOrSlice
 
-buildXAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> String
+buildXAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> ( String, List (Svg Msg) )
 buildXAxisPath minX maxX minY maxY yTransform =
     let
         points =
@@ -152,7 +153,7 @@ buildXAxisPath minX maxX minY maxY yTransform =
         ( tickMarks, labels ) =
             buildXAxisTickMarks minX maxX minY maxY yTransform |> Debug.log "x-axis ticks"
     in
-        axisLine ++ tickMarks
+        (axisLine ++ tickMarks, labels)
 
 
 buildYAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> ( String, List (Svg Msg) )
@@ -277,25 +278,24 @@ buildXAxisTickMarks xMin xMax yMin yMax yTransform =
                 |> List.foldl (++) ""
                 |> Debug.log "cmds"
 
-        -- labelSvg =
-        --     tickMarksAt
-        --         |> List.map (\y -> ( y, yTransform y, -2 * width ))
-        --         |> List.map
-        --             (\( y, yLoc, xLoc ) ->
-        --                 Svg.text_
-        --                     [ Svg.Attributes.x (String.fromFloat xLoc)
-        --                     , Svg.Attributes.y (String.fromFloat yLoc)
-        --                     , Svg.Attributes.fontSize "0.1"
-        --                     , Svg.Attributes.alignmentBaseline "middle"
-        --                     ]
-        --                     [ Svg.text (String.fromFloat y)
-        --                     ]
-        --             )
+        labelSvg =
+            tickMarksAt
+                |> List.map (\x -> ( x, x, yTransform (-2 * height )))
+                |> List.map
+                    (\( x, xLoc, yLoc ) ->
+                        Svg.text_
+                            [ Svg.Attributes.x (String.fromFloat xLoc)
+                            , Svg.Attributes.y (String.fromFloat yLoc)
+                            , Svg.Attributes.fontSize "0.1"
+                            , Svg.Attributes.alignmentBaseline "middle"
+                            ]
+                            [ Svg.text (String.fromFloat x)
+                            ]
+                    )
 
         -- tickDistance = (toFloat height) / (toFloat numTicks) |> Debug.log "tick-distance"
     in
-        -- ( tickCmds, labelSvg )
-        ( tickCmds, [] )
+        ( tickCmds, labelSvg )
 
 adjustYValue : Float -> Float -> Float -> Float
 adjustYValue maxY minY y =
