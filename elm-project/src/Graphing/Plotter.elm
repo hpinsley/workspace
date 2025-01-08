@@ -77,7 +77,7 @@ plot2d model panelEntry orderedPairs =
             build2DPath yTransform orderedPairs
 
         xAxisPath =
-            buildXAxisPath minX maxX yTransform |> Debug.log "xAxisPath"
+            buildXAxisPath minX maxX minY maxY yTransform |> Debug.log "xAxisPath"
 
         ( yAxisPath, yLabels ) =
             buildYAxisPath minX maxX minY maxY yTransform |> Debug.log "yAxisPath"
@@ -143,13 +143,16 @@ buildPreserveAspectRatioString panelEntry =
     in
         xPart ++ yPart ++ " " ++ meetOrSlice
 
-buildXAxisPath : Float -> Float -> (Float -> Float) -> String
-buildXAxisPath minX maxX yTransform =
+buildXAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> String
+buildXAxisPath minX maxX minY maxY yTransform =
     let
         points =
             [ [ minX, 0.0 ], [ maxX, 0.0 ] ] |> Debug.log "x-axis-points"
+        axisLine = build2DPath yTransform points
+        ( tickMarks, labels ) =
+            buildXAxisTickMarks minX maxX minY maxY yTransform |> Debug.log "x-axis ticks"
     in
-    build2DPath yTransform points
+        axisLine ++ tickMarks
 
 
 buildYAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> ( String, List (Svg Msg) )
@@ -228,8 +231,71 @@ buildYAxisTickMarks xMin xMax yMin yMax yTransform =
 
         -- tickDistance = (toFloat height) / (toFloat numTicks) |> Debug.log "tick-distance"
     in
-    ( tickCmds, labelSvg )
+        ( tickCmds, labelSvg )
 
+buildXAxisTickMarks : Float -> Float -> Float -> Float -> (Float -> Float) -> ( String, List (Svg Msg) )
+buildXAxisTickMarks xMin xMax yMin yMax yTransform =
+    let
+        leftTick =
+            floor xMin |> Debug.log "left-tick"
+
+        rightTick =
+            ceiling xMax |> Debug.log "right-tick"
+
+        tickMarksAt =
+            List.range leftTick rightTick
+                |> List.map toFloat
+                |> Debug.log "x-axis tick-marks"
+
+        height =
+            abs (yMax - yMin) * 0.01 |> Debug.log "x-tick-height"
+
+        yTickStart =
+            -height
+
+        yTickEnd =
+            height
+
+        tickPoints =
+            tickMarksAt
+                |> List.map (\xVal -> ( ( xVal, yTransform yTickStart ), ( xVal, yTransform yTickEnd ) ))
+                |> Debug.log "x-axis tick-points"
+
+        tickCmds =
+            tickPoints
+                |> List.map
+                    (\( ( x1, y1 ), ( x2, y2 ) ) ->
+                        " M "
+                            ++ String.fromFloat x1
+                            ++ ","
+                            ++ String.fromFloat y1
+                            ++ " L "
+                            ++ String.fromFloat x2
+                            ++ ","
+                            ++ String.fromFloat y2
+                    )
+                |> List.foldl (++) ""
+                |> Debug.log "cmds"
+
+        -- labelSvg =
+        --     tickMarksAt
+        --         |> List.map (\y -> ( y, yTransform y, -2 * width ))
+        --         |> List.map
+        --             (\( y, yLoc, xLoc ) ->
+        --                 Svg.text_
+        --                     [ Svg.Attributes.x (String.fromFloat xLoc)
+        --                     , Svg.Attributes.y (String.fromFloat yLoc)
+        --                     , Svg.Attributes.fontSize "0.1"
+        --                     , Svg.Attributes.alignmentBaseline "middle"
+        --                     ]
+        --                     [ Svg.text (String.fromFloat y)
+        --                     ]
+        --             )
+
+        -- tickDistance = (toFloat height) / (toFloat numTicks) |> Debug.log "tick-distance"
+    in
+        -- ( tickCmds, labelSvg )
+        ( tickCmds, [] )
 
 adjustYValue : Float -> Float -> Float -> Float
 adjustYValue maxY minY y =
