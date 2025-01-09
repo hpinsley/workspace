@@ -9,7 +9,7 @@ import Html.Events.Extra
 import Material.Button as Button
 import Material.Checkbox as Checkbox
 import Models exposing (..)
-
+import Utils
 
 viewPanelEntry : Model -> PanelEntry -> Html Msg
 viewPanelEntry model panelEntry =
@@ -77,7 +77,7 @@ displayViewportScaling panelEntry =
 panelEntryAlignmentBehaviorView : (SvgAlignmentBehavor -> Msg) -> Html Msg
 panelEntryAlignmentBehaviorView msgFunc =
     fieldset []
-        [ legend [] [ text "Alignment Behavior" ]
+        [ legend [] [ text "Behavior" ]
         , div []
             [ input
                 [ Html.Attributes.id ("alignment-behavior-meet")
@@ -223,7 +223,10 @@ showSymbolTableEntry panelEntry symbolTableEntry =
         [ td [ class "variable-name" ] [ text symbolTableEntry.variable ]
         , td []
             [ div []
-                [ symbolTableEntry.currentValue |> String.fromFloat |> text ]
+                [ symbolTableEntry.currentValue
+                    |> Utils.roundFloat 3
+                    |> String.fromFloat 
+                    |> text ]
             ]
         , td []
             [ div []
@@ -238,24 +241,33 @@ showSymbolTableEntry panelEntry symbolTableEntry =
             ]
         , td []
             [ div []
-                [ input
-                    [ class "var-input"
-                    , Html.Events.Extra.onChange (UpdateVarEndValue panelEntry symbolTableEntry)
-                    , onInput (UpdateVarEndValueBuffer panelEntry symbolTableEntry)
-                    , value symbolTableEntry.endValueBuffer
-                    ]
-                    []
+                [ 
+                    if symbolTableEntry.mayVary
+                    then
+                        input
+                            [ class "var-input"
+                            , Html.Events.Extra.onChange (UpdateVarEndValue panelEntry symbolTableEntry)
+                            , onInput (UpdateVarEndValueBuffer panelEntry symbolTableEntry)
+                            , value symbolTableEntry.endValueBuffer
+                            ]
+                            []
+                    else text ""
                 ]
             ]
         , td []
             [ div []
-                [ input
-                    [ class "var-input"
-                    , Html.Events.Extra.onChange (UpdateVarIncrementValue panelEntry symbolTableEntry)
-                    , onInput (UpdateVarIncrementValueBuffer panelEntry symbolTableEntry)
-                    , value symbolTableEntry.incrementValueBuffer
-                    ]
-                    []
+                [
+                    if symbolTableEntry.mayVary
+                    then
+                        input
+                        [ class "var-input"
+                        , Html.Events.Extra.onChange (UpdateVarIncrementValue panelEntry symbolTableEntry)
+                        , onInput (UpdateVarIncrementValueBuffer panelEntry symbolTableEntry)
+                        , value symbolTableEntry.incrementValueBuffer
+                        ]
+                        []
+                    else
+                        text ""
                 ]
             ]
         , td []

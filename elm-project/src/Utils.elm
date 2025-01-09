@@ -82,3 +82,12 @@ updateSymbolTableEntry expressionToMatch variableToMatch mapFunc model =
             updatePanelEntry expressionToMatch mapper model
     in
         m
+
+roundFloat: Int -> Float -> Float
+roundFloat n f =
+    let
+        factor = (10^n) |> toFloat
+        temp = f * factor |> round |> toFloat
+        result = temp / factor
+    in
+        result
