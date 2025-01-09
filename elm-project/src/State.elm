@@ -51,6 +51,14 @@ update msg model =
             in
             ( m, Cmd.none )
 
+        ToggleVarMayVary panelEntry symbolTableEntry ->
+            let
+                m =
+                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | mayVary = not e.mayVary }) model
+                    
+            in
+                ( m, Cmd.none )
+
         UpdateVarStartValueBuffer panelEntry symbolTableEntry value ->
             let
                 m =
@@ -365,6 +373,7 @@ addCurrentExpressionToPanel model =
                                         , endValueBuffer = ""
                                         , incrementValue = 0.0
                                         , incrementValueBuffer = ""
+                                        , mayVary = True
                                         }
                                 )
                     , isCollapsed = False

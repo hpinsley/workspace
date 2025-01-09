@@ -258,6 +258,15 @@ showSymbolTableEntry panelEntry symbolTableEntry =
                     []
                 ]
             ]
+        , td []
+            [ div []
+                [ 
+                    input [   type_ "checkbox"
+                            , Html.Attributes.checked symbolTableEntry.mayVary
+                            , onClick (ToggleVarMayVary panelEntry symbolTableEntry)
+                    ][]
+                ]
+            ]
         ]
 
 
@@ -280,6 +289,7 @@ showVariableList panelEntry =
                         , th [] [ text "Start" ]
                         , th [] [ text "End" ]
                         , th [] [ text "Increment" ]
+                        , th [] [ text "Vary" ]
                         ]
                     ]
                 , tbody [] (variables |> List.map (showSymbolTableEntry panelEntry))

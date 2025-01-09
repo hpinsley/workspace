@@ -17,6 +17,7 @@ type Msg
     | UpdateVarStartValue PanelEntry SymbolTableEntry String
     | UpdateVarEndValue PanelEntry SymbolTableEntry String
     | UpdateVarIncrementValue PanelEntry SymbolTableEntry String
+    | ToggleVarMayVary PanelEntry SymbolTableEntry
     | TogglePanelEntry PanelEntry
     | Plot PanelEntry
     | SetXAlignment PanelEntry SvgAlignment
@@ -34,6 +35,7 @@ type alias SymbolTableEntry =
     , incrementValue : Float
     , incrementValueBuffer : String
     , errMsg : Maybe String
+    , mayVary: Bool
     }
 
 
