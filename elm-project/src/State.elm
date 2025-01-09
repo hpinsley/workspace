@@ -151,11 +151,21 @@ findPanelEntry model expression =
         _ ->
             Nothing
 
+getVaryingVariables: PanelEntry -> List SymbolTableEntry
+getVaryingVariables panelEntry =
+    panelEntry.variables
+        |> Dict.values
+        |> List.filter (\pe -> pe.mayVary)
+
+getVaryingVariableCount: PanelEntry -> Int
+getVaryingVariableCount panelEntry =
+    panelEntry |> getVaryingVariables |> List.length
+
 
 plotPanelEntry : PanelEntry -> PanelEntry
 plotPanelEntry panelEntry =
-    if Dict.size panelEntry.variables > 2 then
-        { panelEntry | panelError = Just "At most two variables can be plotted." }
+    if (getVaryingVariableCount panelEntry) > 2 then
+        { panelEntry | panelError = Just "At most two VARYING variables can be plotted." }
 
     else
         let
@@ -179,7 +189,7 @@ plotPanelEntry panelEntry =
                     )
                     named
         in
-        { panelEntry | plotValues = named, evaluatedPlotValues = evalutated }
+        { panelEntry | plotValues = named, evaluatedPlotValues = evalutated, panelError = Nothing }
 
 
 iterateSymbolTable : PanelEntry -> List (Dict.Dict String Float)
@@ -216,7 +226,11 @@ iterateVariables sofar variables =
                     List.range 0 steps |> List.map toFloat
 
                 values =
-                    List.map (\m -> variable.startValue + (m * variable.incrementValue)) multipliers
+                    if variable.mayVary
+                    then
+                        List.map (\m -> variable.startValue + (m * variable.incrementValue)) multipliers
+                    else
+                        [variable.currentValue]
 
                 permuated =
                     case sofar of
@@ -226,7 +240,7 @@ iterateVariables sofar variables =
                         _ ->
                             List.Cartesian.map2 (::) values sofar
             in
-            iterateVariables permuated rest
+                iterateVariables permuated rest
 
 
 evaluatePanel : PanelEntry -> PanelEntry
