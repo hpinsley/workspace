@@ -6,6 +6,7 @@ import Evaluation.Engine exposing (..)
 import List exposing (reverse)
 import List.Cartesian
 import Models exposing (..)
+import Utils
 import Parser exposing (float)
 import Parsing.ExpressionModels exposing (..)
 import Parsing.ExpressionParsers as ExpressionParsers
@@ -40,21 +41,21 @@ update msg model =
         EvaluateExpression expr ->
             let
                 m =
-                    updatePanelEntry expr evaluatePanel model
+                    Utils.updatePanelEntry expr evaluatePanel model
             in
-            ( m, Cmd.none )
+                ( m, Cmd.none )
 
         TogglePanelEntry panelEntry ->
             let
                 m =
-                    updatePanelEntry panelEntry.expression (\pe -> { pe | isCollapsed = not pe.isCollapsed }) model
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | isCollapsed = not pe.isCollapsed }) model
             in
-            ( m, Cmd.none )
+                ( m, Cmd.none )
 
         ToggleVarMayVary panelEntry symbolTableEntry ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | mayVary = not e.mayVary }) model
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | mayVary = not e.mayVary }) model
                     
             in
                 ( m, Cmd.none )
@@ -62,52 +63,52 @@ update msg model =
         UpdateVarStartValueBuffer panelEntry symbolTableEntry value ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | startValueBuffer = value }) model
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | startValueBuffer = value }) model
             in
-            ( m, Cmd.none )
+                ( m, Cmd.none )
 
         UpdateVarStartValue panelEntry symbolTableEntry _ ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryStartValue model
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryStartValue model
             in
-            ( m, Cmd.none )
+                ( m, Cmd.none )
 
         UpdateVarEndValueBuffer panelEntry symbolTableEntry value ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | endValueBuffer = value }) model
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | endValueBuffer = value }) model
             in
             ( m, Cmd.none )
 
         UpdateVarEndValue panelEntry symbolTableEntry _ ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryEndValue model
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryEndValue model
             in
             ( m, Cmd.none )
 
         UpdateVarIncrementValueBuffer panelEntry symbolTableEntry value ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | incrementValueBuffer = value }) model
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | incrementValueBuffer = value }) model
             in
                 ( m, Cmd.none )
 
         UpdateVarIncrementValue panelEntry symbolTableEntry _ ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryIncrementValue model
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryIncrementValue model
             in
             ( m, Cmd.none )
 
         Plot panelEntry ->
             let
                 m =
-                    updatePanelEntry panelEntry.expression plotPanelEntry model
+                    Utils.updatePanelEntry panelEntry.expression plotPanelEntry model
 
                 m2 =
-                    case findPanelEntry m panelEntry.expression of
+                    case Utils.findPanelEntry m panelEntry.expression of
                         Just pe ->
                             if List.length pe.evaluatedPlotValues > 0 then
                                 { m | activePlotEntry = Just pe }
@@ -123,7 +124,7 @@ update msg model =
         SetXAlignment panelEntry alignment ->
             let
                 m =
-                    updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentX = alignment }) model
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentX = alignment }) model
             in
                 -- ( m, Cmd.none )
                 (update (Plot panelEntry) m)
@@ -131,40 +132,21 @@ update msg model =
         SetYAlignment panelEntry alignment ->
             let
                 m =
-                    updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentY = alignment }) model
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentY = alignment }) model
             in
                 (update (Plot panelEntry) m)
 
         SetAlignmentBehavior panelEntry alignmentBehavior ->
             let
                 m =
-                    updatePanelEntry panelEntry.expression (\pe -> { pe | meetOrSlice = alignmentBehavior }) model
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | meetOrSlice = alignmentBehavior }) model
             in
                 (update (Plot panelEntry) m)
-
-findPanelEntry : Model -> String -> Maybe PanelEntry
-findPanelEntry model expression =
-    case List.filter (\pe -> pe.expression == expression) model.panelEntries of
-        [ pe ] ->
-            Just pe
-
-        _ ->
-            Nothing
-
-getVaryingVariables: PanelEntry -> List SymbolTableEntry
-getVaryingVariables panelEntry =
-    panelEntry.variables
-        |> Dict.values
-        |> List.filter (\pe -> pe.mayVary)
-
-getVaryingVariableCount: PanelEntry -> Int
-getVaryingVariableCount panelEntry =
-    panelEntry |> getVaryingVariables |> List.length
 
 
 plotPanelEntry : PanelEntry -> PanelEntry
 plotPanelEntry panelEntry =
-    if (getVaryingVariableCount panelEntry) > 2 then
+    if (Utils.getVaryingVariableCount panelEntry) > 2 then
         { panelEntry | panelError = Just "At most two VARYING variables can be plotted." }
 
     else
@@ -263,57 +245,6 @@ evaluatePanel panelEntry =
 
         Err _ ->
             panelEntry
-
-
-
--- This function updates a specific PanelEntry in the model's panelEntries list.
--- It takes three arguments:
--- 1. expressionToMatch: A String representing the expression to match.
--- 2. mapFunc: A function that takes a PanelEntry and returns an updated PanelEntry.
--- 3. model: The current state of the model.
--- The function returns a new model with the updated panelEntries list.
-
-
-updatePanelEntry : String -> (PanelEntry -> PanelEntry) -> Model -> Model
-updatePanelEntry expressionToMatch mapFunc model =
-    let
-        panelEntries =
-            model.panelEntries
-                |> List.map
-                    (\pe ->
-                        if pe.expression == expressionToMatch then
-                            mapFunc pe
-
-                        else
-                            pe
-                    )
-    in
-    { model | panelEntries = panelEntries }
-
-
-updateSymbolTableEntry : String -> Variable -> (SymbolTableEntry -> SymbolTableEntry) -> Model -> Model
-updateSymbolTableEntry expressionToMatch variableToMatch mapFunc model =
-    let
-        mapper =
-            \pe ->
-                { pe
-                    | variables =
-                        Dict.map
-                            (\k ->
-                                \v ->
-                                    if k == variableToMatch then
-                                        mapFunc v
-
-                                    else
-                                        v
-                            )
-                            pe.variables
-                }
-
-        m =
-            updatePanelEntry expressionToMatch mapper model
-    in
-    m
 
 
 parseAndEvaluateRangeExpression : String -> Result String Float
