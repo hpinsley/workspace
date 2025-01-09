@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Models exposing (..)
+import Utils
 import PanelEntryView exposing (displayPlotValues)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
@@ -30,7 +31,7 @@ plot model panelEntry =
                 orderedPairs =
                     panelEntry.evaluatedPlotValues |> get_ordered_pairs |> Debug.log "orderedPairs"
               in
-              case Dict.size panelEntry.variables of
+              case Utils.getVaryingVariableCount panelEntry of
                 1 ->
                     plot2d model panelEntry orderedPairs
 

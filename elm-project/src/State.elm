@@ -151,6 +151,14 @@ plotPanelEntry panelEntry =
 
     else
         let
+            nonVaryingLookup =
+                panelEntry.variables
+                    |> Dict.values
+                    |> List.filter (\v -> not v.mayVary)
+                    |> List.map (\e -> (e.variable, e.currentValue))
+                    |> Dict.fromList
+                    |> Debug.log "Constant lookup dict"
+
             named =
                 iterateSymbolTable panelEntry
 
@@ -165,7 +173,11 @@ plotPanelEntry panelEntry =
                                         Ok v
 
                                     Nothing ->
-                                        Err "Variable not found."
+                                        case Dict.get variable nonVaryingLookup of
+                                            Just v ->
+                                                Ok v
+                                            Nothing ->
+                                                Err "Variable or constant not found."
                             )
                         )
                     )
@@ -174,14 +186,15 @@ plotPanelEntry panelEntry =
         { panelEntry | plotValues = named, evaluatedPlotValues = evalutated, panelError = Nothing }
 
 
+-- Create a list of Dictionary lookups for the VARYING variables
 iterateSymbolTable : PanelEntry -> List (Dict.Dict String Float)
 iterateSymbolTable panelEntry =
     let
         varialbeNames =
-            panelEntry.variables |> Dict.values |> List.map .variable
+            panelEntry.variables |> Dict.values |> List.filter (\e -> e.mayVary) |> List.map .variable
 
         values =
-            iterateVariables [ [] ] (Dict.values panelEntry.variables)
+            iterateVariables [ [] ] (Dict.values panelEntry.variables |> List.filter (\e -> e.mayVary))
                 |> List.map reverse
 
         named =
