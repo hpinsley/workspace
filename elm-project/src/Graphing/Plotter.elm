@@ -23,7 +23,7 @@ plot model panelEntry =
             [ Html.Attributes.id "plot-body" ]
             [ let
                 orderedPairs =
-                    panelEntry.evaluatedPlotValues |> get_ordered_pairs |> Debug.log "orderedPairs"
+                    panelEntry.evaluatedPlotValues |> get_ordered_pairs -- |> Debug.log "orderedPairs"
               in
               case Utils.getVaryingVariableCount panelEntry of
                 1 ->
