@@ -10,7 +10,6 @@ import PanelEntryView exposing (displayPlotValues)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Matrix exposing (Matrix)
-import Graphing.Plot3d exposing (..)
 
 x_TICK_WIDTH_YRANGE_PCT = 0.04
 xTICK_LABEL_OFFSET_HEIGHT_PCT = -2.0

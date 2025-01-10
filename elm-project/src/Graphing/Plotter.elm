@@ -6,10 +6,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Models exposing (..)
 import Utils
-import PanelEntryView exposing (displayPlotValues)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import Matrix exposing (Matrix)
 import Graphing.Plot2d exposing (..)
 import Graphing.Plot3d exposing (..)
 
