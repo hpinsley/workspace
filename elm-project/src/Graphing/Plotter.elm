@@ -9,7 +9,8 @@ import Utils
 import PanelEntryView exposing (displayPlotValues)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-
+import Matrix exposing (Matrix)
+import Graphing.Plot3d exposing (..)
 
 x_TICK_WIDTH_YRANGE_PCT = 0.04
 xTICK_LABEL_OFFSET_HEIGHT_PCT = -2.0
@@ -36,7 +37,7 @@ plot model panelEntry =
                     plot2d model panelEntry orderedPairs
 
                 2 ->
-                    plot3d model orderedPairs
+                    plot3d model panelEntry orderedPairs
 
                 _ ->
                     div
@@ -44,7 +45,6 @@ plot model panelEntry =
                         [ Html.text "Cannot plot more than 2 variables" ]
             ]
         ]
-
 
 plot2d : Model -> PanelEntry -> List (List Float) -> Html Msg
 plot2d model panelEntry orderedPairs =
@@ -330,16 +330,6 @@ build2DPath yAdjust orderedPairs =
             "M " ++ (List.head points |> Maybe.withDefault "0,0") ++ " L " ++ (List.tail points |> Maybe.withDefault [] |> String.join " L ")
     in
     path
-
-
-plot3d : Model -> List (List Float) -> Html Msg
-plot3d model orderedPairs =
-    div
-        [ Html.Attributes.id "plot-3d" ]
-        [ Html.text "3D Plot"
-        , div [] [ Debug.toString orderedPairs |> Html.text ]
-        ]
-
 
 get_ordered_pairs : List ( Dict.Dict String Float, Result String Float ) -> List (List Float)
 get_ordered_pairs plotValues =

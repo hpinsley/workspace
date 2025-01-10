@@ -1,17 +1,11 @@
 module Utils exposing (..)
 
-import Debug exposing (toString)
 import Dict
 import Evaluation.Engine exposing (..)
-import List exposing (reverse)
-import List.Cartesian
 import Models exposing (..)
-import Parser exposing (float)
 import Parsing.ExpressionModels exposing (..)
-import Parsing.ExpressionParsers as ExpressionParsers
-import Parsing.VariableExtraction exposing (extractVariablesFromExpression)
-import Set exposing (Set)
 import Time exposing (..)
+import Matrix exposing (Matrix)
 
 
 findPanelEntry : Model -> String -> Maybe PanelEntry
@@ -91,3 +85,36 @@ roundFloat n f =
         result = temp / factor
     in
         result
+
+x3dRotation: Float -> (Matrix Float)
+x3dRotation theta =
+    case Matrix.fromLists [
+                 [1.0, 0.0, 0.0]
+                ,[0.0, cos theta, negate (sin theta)]
+                ,[0.0, sin theta, negate (cos theta)] 
+            ] of
+                
+        Just m -> m
+        Nothing -> Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
+
+y3dRotation: Float -> (Matrix Float)
+y3dRotation theta =
+    case Matrix.fromLists [
+                 [cos theta, 0.0, sin theta]
+                ,[0.0, 1.0, 0.0]
+                ,[negate (sin theta), 0.0, cos theta] 
+            ] of
+                
+        Just m -> m
+        Nothing -> Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
+
+z3dRotation: Float -> (Matrix Float)
+z3dRotation theta =
+    case Matrix.fromLists [
+                 [cos theta, negate (sin theta), 0.0]
+                ,[sin theta, cos theta, 0.0]
+                ,[0.0, 0.0, 1] 
+            ] of
+                
+        Just m -> m
+        Nothing -> Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
