@@ -17,7 +17,8 @@ plot3d model panelEntry orderedPairs =
     let
         -- value_matrix = Matrix.fromLists orderedPairs
         y_radacted = orderedPairs
-            |> List.map (\v -> List.take 2 v)
+            |> List.map dropYComponent
+
         -- theta = pi / 4.0
 
         -- _ = Matrix.pretty (\v -> Debug.toString v) (Utils.x3dRotation theta) |> Debug.log "xmatrix"
@@ -31,3 +32,8 @@ plot3d model panelEntry orderedPairs =
             , div [] [ plot2d model panelEntry y_radacted ]
             ]
 
+dropYComponent: List Float -> List Float
+dropYComponent v =
+    case v of
+        head :: tail -> head :: (List.drop 1 tail)
+        [] -> []
