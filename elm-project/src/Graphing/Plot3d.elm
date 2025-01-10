@@ -1,4 +1,4 @@
-module Graphing.Plot3d exposing (..)
+module Graphing.Plot3d exposing (plot3d)
 
 import Dict exposing (..)
 import Html exposing (..)
