@@ -22,15 +22,15 @@ plot model panelEntry =
         , div
             [ Html.Attributes.id "plot-body" ]
             [ let
-                orderedPairs =
-                    panelEntry.evaluatedPlotValues |> build_vectors -- |> Debug.log "orderedPairs"
+                vectors =
+                    panelEntry.evaluatedPlotValues |> Debug.log "evaluatedPlotValues"
               in
               case Utils.getVaryingVariableCount panelEntry of
                 1 ->
-                    plot2d model panelEntry orderedPairs
+                    plot2d model panelEntry vectors
 
                 2 ->
-                    plot3d model panelEntry orderedPairs
+                    plot3d model panelEntry vectors
 
                 _ ->
                     div
@@ -38,18 +38,3 @@ plot model panelEntry =
                         [ Html.text "Cannot plot more than 2 variables" ]
             ]
         ]
-
-build_vectors : List ( VariableLookup, Result String Float ) -> List Vector
-build_vectors plotValues =
-    plotValues
-        |> List.map
-            (\( dict, result ) ->
-                case result of
-                    Ok value ->
-                        Just ( dict, value )
-
-                    Err _ ->
-                        Nothing
-            )
-        |> List.filterMap identity
-        |> List.map (\( dict, value ) -> List.append (Dict.values dict) [ value ])

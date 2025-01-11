@@ -212,7 +212,7 @@ displayPlotValues panelEntry =
         ]
 
 
-showPlotValue : (VariableLookup, Result String Float ) -> Html Msg
+showPlotValue : Vector -> Html Msg
 showPlotValue plotValue =
     div [] [ toString plotValue |> text ]
 
