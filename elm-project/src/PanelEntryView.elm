@@ -11,6 +11,7 @@ import Material.Checkbox as Checkbox
 import Models exposing (..)
 import Utils
 
+
 viewPanelEntry : Model -> PanelEntry -> Html Msg
 viewPanelEntry model panelEntry =
     div
@@ -59,6 +60,7 @@ viewPanelEntry model panelEntry =
         , Button.text (Button.config |> Button.setOnClick (DeleteExpression panelEntry.expression)) "Delete"
         , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         , Button.text (Button.config |> Button.setOnClick (Plot panelEntry)) "Plot"
+
         -- , div [ id "plot-values" ] [ displayPlotValues panelEntry ]
         , displayAxisInfo panelEntry
         , displayViewportScaling panelEntry
@@ -68,31 +70,41 @@ viewPanelEntry model panelEntry =
 displayViewportScaling : PanelEntry -> Html Msg
 displayViewportScaling panelEntry =
     div [ id "viewport-scaling" ]
-        [ 
-              panelEntryAlignmentView (SetXAlignment panelEntry) "X"
-            , panelEntryAlignmentView (SetYAlignment panelEntry) "Y"
-            , panelEntryAlignmentBehaviorView (SetAlignmentBehavior panelEntry)
+        [ panelEntryAlignmentView (SetXAlignment panelEntry) "X"
+        , panelEntryAlignmentView (SetYAlignment panelEntry) "Y"
+        , panelEntryAlignmentBehaviorView (SetAlignmentBehavior panelEntry)
         ]
 
-displayAxisInfo: PanelEntry -> Html Msg
+
+displayAxisInfo : PanelEntry -> Html Msg
 displayAxisInfo panelEntry =
     div [ id "axes-info" ]
-        [     
-            fieldset []
-                [ 
-                    legend [] [ text "Axis Rotation" ]
-                    , panelEntrySingleAxisView "X"
-                  , panelEntrySingleAxisView "Y"
-                  , panelEntrySingleAxisView "Z"
-                ]
+        [ fieldset []
+            [ legend [] [ text "Axis Rotation" ]
+            , panelEntrySingleAxisView panelEntry panelEntry.xAxis
+            , panelEntrySingleAxisView panelEntry panelEntry.yAxis
+            , panelEntrySingleAxisView panelEntry panelEntry.zAxis
+            ]
         ]
 
-panelEntrySingleAxisView : String -> Html Msg
-panelEntrySingleAxisView axisName =
-    div [class "axis-info"]
-    [
-        text axisName
-    ]
+
+panelEntrySingleAxisView : PanelEntry -> Axis -> Html Msg
+panelEntrySingleAxisView panelEntry axis =
+    div [ class "axis-info" ]
+        [ 
+            floatUpDownControl axis.axisName { min=0.0, max=2*pi, increment=pi/16.0 } axis.rotationAngle
+        ]
+
+floatUpDownControl : String -> MinMaxIncrement -> Float -> Html Msg
+floatUpDownControl controlLabel range currentValue =
+    div [
+            class "min-max-increment"
+        ]
+        [
+              text controlLabel
+            , text ""
+            , currentValue |> Utils.roundFloat 2 |> String.fromFloat |> text
+        ]
 
 
 panelEntryAlignmentBehaviorView : (SvgAlignmentBehavor -> Msg) -> Html Msg
@@ -101,7 +113,7 @@ panelEntryAlignmentBehaviorView msgFunc =
         [ legend [] [ text "Behavior" ]
         , div []
             [ input
-                [ Html.Attributes.id ("alignment-behavior-meet")
+                [ Html.Attributes.id "alignment-behavior-meet"
                 , Html.Attributes.type_ "radio"
                 , Html.Attributes.name "alignment-behavior"
                 , Html.Attributes.value "Meet"
@@ -113,7 +125,7 @@ panelEntryAlignmentBehaviorView msgFunc =
             ]
         , div []
             [ input
-                [ Html.Attributes.id ("alignment-behavior-slice")
+                [ Html.Attributes.id "alignment-behavior-slice"
                 , Html.Attributes.type_ "radio"
                 , Html.Attributes.name "alignment-behavior"
                 , Html.Attributes.value "Slice"
@@ -246,8 +258,9 @@ showSymbolTableEntry panelEntry symbolTableEntry =
             [ div []
                 [ symbolTableEntry.currentValue
                     |> Utils.roundFloat 3
-                    |> String.fromFloat 
-                    |> text ]
+                    |> String.fromFloat
+                    |> text
+                ]
             ]
         , td []
             [ div []
@@ -262,42 +275,42 @@ showSymbolTableEntry panelEntry symbolTableEntry =
             ]
         , td []
             [ div []
-                [ 
-                    if symbolTableEntry.mayVary
-                    then
-                        input
-                            [ class "var-input"
-                            , Html.Events.Extra.onChange (UpdateVarEndValue panelEntry symbolTableEntry)
-                            , onInput (UpdateVarEndValueBuffer panelEntry symbolTableEntry)
-                            , value symbolTableEntry.endValueBuffer
-                            ]
-                            []
-                    else text ""
+                [ if symbolTableEntry.mayVary then
+                    input
+                        [ class "var-input"
+                        , Html.Events.Extra.onChange (UpdateVarEndValue panelEntry symbolTableEntry)
+                        , onInput (UpdateVarEndValueBuffer panelEntry symbolTableEntry)
+                        , value symbolTableEntry.endValueBuffer
+                        ]
+                        []
+
+                  else
+                    text ""
                 ]
             ]
         , td []
             [ div []
-                [
-                    if symbolTableEntry.mayVary
-                    then
-                        input
+                [ if symbolTableEntry.mayVary then
+                    input
                         [ class "var-input"
                         , Html.Events.Extra.onChange (UpdateVarIncrementValue panelEntry symbolTableEntry)
                         , onInput (UpdateVarIncrementValueBuffer panelEntry symbolTableEntry)
                         , value symbolTableEntry.incrementValueBuffer
                         ]
                         []
-                    else
-                        text ""
+
+                  else
+                    text ""
                 ]
             ]
         , td []
             [ div []
-                [ 
-                    input [   type_ "checkbox"
-                            , Html.Attributes.checked symbolTableEntry.mayVary
-                            , onClick (ToggleVarMayVary panelEntry symbolTableEntry)
-                    ][]
+                [ input
+                    [ type_ "checkbox"
+                    , Html.Attributes.checked symbolTableEntry.mayVary
+                    , onClick (ToggleVarMayVary panelEntry symbolTableEntry)
+                    ]
+                    []
                 ]
             ]
         ]

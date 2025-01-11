@@ -4,23 +4,36 @@ import Dict exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Matrix exposing (Matrix)
 import Models exposing (..)
-import Utils
 import PanelEntryView exposing (displayPlotValues)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import Matrix exposing (Matrix)
+import Utils
 
-x_TICK_WIDTH_YRANGE_PCT = 0.04
-xTICK_LABEL_OFFSET_HEIGHT_PCT = -2.0
 
-y_TICK_WIDTH_XRANGE_PCT = 0.02
-yTICK_LABEL_OFFSET_WIDTH_PCT = -2.0
+x_TICK_WIDTH_YRANGE_PCT =
+    0.04
+
+
+xTICK_LABEL_OFFSET_HEIGHT_PCT =
+    -2.0
+
+
+y_TICK_WIDTH_XRANGE_PCT =
+    0.02
+
+
+yTICK_LABEL_OFFSET_WIDTH_PCT =
+    -2.0
+
 
 plot2d : Model -> PanelEntry -> List Vector -> Html Msg
 plot2d model panelEntry orderedPairs =
     let
-        _ = Debug.log "Plot2D points to plot" (List.length orderedPairs)
+        _ =
+            Debug.log "Plot2D points to plot" (List.length orderedPairs)
+
         minX =
             List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minX"
 
@@ -55,7 +68,7 @@ plot2d model panelEntry orderedPairs =
         functionPath =
             build2DPath yTransform orderedPairs
 
-        (xAxisPath, xLabels) =
+        ( xAxisPath, xLabels ) =
             buildXAxisPath minX maxX minY maxY yTransform |> Debug.log "xAxisPath"
 
         ( yAxisPath, yLabels ) =
@@ -103,36 +116,57 @@ plot2d model panelEntry orderedPairs =
             ]
         ]
 
+
 buildPreserveAspectRatioString : PanelEntry -> String
 buildPreserveAspectRatioString panelEntry =
     let
-        xPart = case panelEntry.alignmentX of
-                AlignMin -> "xMin"
-                AlignMid -> "xMid"
-                AlignMax -> "xMax"
+        xPart =
+            case panelEntry.alignmentX of
+                AlignMin ->
+                    "xMin"
+
+                AlignMid ->
+                    "xMid"
+
+                AlignMax ->
+                    "xMax"
 
         -- These are Pascal case
-        yPart = case panelEntry.alignmentY of
-                AlignMin -> "YMin"
-                AlignMid -> "YMid"
-                AlignMax -> "YMax"
+        yPart =
+            case panelEntry.alignmentY of
+                AlignMin ->
+                    "YMin"
 
-        meetOrSlice = case panelEntry.meetOrSlice of
-            Meet -> "meet"
-            Slice -> "slice"
+                AlignMid ->
+                    "YMid"
+
+                AlignMax ->
+                    "YMax"
+
+        meetOrSlice =
+            case panelEntry.meetOrSlice of
+                Meet ->
+                    "meet"
+
+                Slice ->
+                    "slice"
     in
-        xPart ++ yPart ++ " " ++ meetOrSlice
+    xPart ++ yPart ++ " " ++ meetOrSlice
+
 
 buildXAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> ( String, List (Svg Msg) )
 buildXAxisPath minX maxX minY maxY yTransform =
     let
         points =
             [ [ minX, 0.0 ], [ maxX, 0.0 ] ] |> Debug.log "x-axis-points"
-        axisLine = build2DPath yTransform points
+
+        axisLine =
+            build2DPath yTransform points
+
         ( tickMarks, labels ) =
             buildXAxisTickMarks minX maxX minY maxY yTransform |> Debug.log "x-axis ticks"
     in
-        (axisLine ++ tickMarks, labels)
+    ( axisLine ++ tickMarks, labels )
 
 
 buildYAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> ( String, List (Svg Msg) )
@@ -212,7 +246,8 @@ buildYAxisTickMarks xMin xMax yMin yMax yTransform =
 
         -- tickDistance = (toFloat height) / (toFloat numTicks) |> Debug.log "tick-distance"
     in
-        ( tickCmds, labelSvg )
+    ( tickCmds, labelSvg )
+
 
 buildXAxisTickMarks : Float -> Float -> Float -> Float -> (Float -> Float) -> ( String, List (Svg Msg) )
 buildXAxisTickMarks xMin xMax yMin yMax yTransform =
@@ -261,7 +296,7 @@ buildXAxisTickMarks xMin xMax yMin yMax yTransform =
 
         labelSvg =
             tickMarksAt
-                |> List.map (\x -> ( x, x, yTransform (xTICK_LABEL_OFFSET_HEIGHT_PCT * height )))
+                |> List.map (\x -> ( x, x, yTransform (xTICK_LABEL_OFFSET_HEIGHT_PCT * height) ))
                 |> List.map
                     (\( x, xLoc, yLoc ) ->
                         Svg.text_
@@ -276,7 +311,8 @@ buildXAxisTickMarks xMin xMax yMin yMax yTransform =
 
         -- tickDistance = (toFloat height) / (toFloat numTicks) |> Debug.log "tick-distance"
     in
-        ( tickCmds, labelSvg )
+    ( tickCmds, labelSvg )
+
 
 adjustYValue : Float -> Float -> Float -> Float
 adjustYValue maxY minY y =

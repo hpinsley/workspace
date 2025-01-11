@@ -90,7 +90,7 @@ evaluateFactor factor symbolLookup =
                     evaluateFactor factor2 symbolLookup
 
                 final =
-                    Result.map2 (^) result1 result2 |> Debug.log ("Raising " ++ (Debug.toString result1) ++ " to the power of " ++ (Debug.toString result2))
+                    Result.map2 (^) result1 result2 |> Debug.log ("Raising " ++ Debug.toString result1 ++ " to the power of " ++ Debug.toString result2)
             in
             final
 

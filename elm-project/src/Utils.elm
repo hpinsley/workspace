@@ -2,10 +2,11 @@ module Utils exposing (..)
 
 import Dict
 import Evaluation.Engine exposing (..)
+import Matrix exposing (..)
 import Models exposing (..)
 import Parsing.ExpressionModels exposing (..)
 import Time exposing (..)
-import Matrix exposing (..)
+
 
 findPanelEntry : Model -> String -> Maybe PanelEntry
 findPanelEntry model expression =
@@ -16,15 +17,18 @@ findPanelEntry model expression =
         _ ->
             Nothing
 
-getVaryingVariables: PanelEntry -> List SymbolTableEntry
+
+getVaryingVariables : PanelEntry -> List SymbolTableEntry
 getVaryingVariables panelEntry =
     panelEntry.variables
         |> Dict.values
         |> List.filter (\pe -> pe.mayVary)
 
-getVaryingVariableCount: PanelEntry -> Int
+
+getVaryingVariableCount : PanelEntry -> Int
 getVaryingVariableCount panelEntry =
     panelEntry |> getVaryingVariables |> List.length
+
 
 
 -- This function updates a specific PanelEntry in the model's panelEntries list.
@@ -74,116 +78,168 @@ updateSymbolTableEntry expressionToMatch variableToMatch mapFunc model =
         m =
             updatePanelEntry expressionToMatch mapper model
     in
-        m
+    m
 
-roundFloat: Int -> Float -> Float
+
+roundFloat : Int -> Float -> Float
 roundFloat n f =
     let
-        factor = (10^n) |> toFloat
-        temp = f * factor |> round |> toFloat
-        result = temp / factor
+        factor =
+            (10 ^ n) |> toFloat
+
+        temp =
+            f * factor |> round |> toFloat
+
+        result =
+            temp / factor
     in
-        result
+    result
 
-x3dRotation: Float -> FloatMatrix
+
+x3dRotation : Float -> FloatMatrix
 x3dRotation theta =
-    case Matrix.fromLists [
-                 [1.0, 0.0, 0.0]
-                ,[0.0, cos theta, negate (sin theta)]
-                ,[0.0, sin theta, negate (cos theta)] 
-            ] of
-                
-        Just m -> m
-        Nothing -> Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
+    case
+        Matrix.fromLists
+            [ [ 1.0, 0.0, 0.0 ]
+            , [ 0.0, cos theta, negate (sin theta) ]
+            , [ 0.0, sin theta, negate (cos theta) ]
+            ]
+    of
+        Just m ->
+            m
 
-y3dRotation: Float -> FloatMatrix
+        Nothing ->
+            Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
+
+
+y3dRotation : Float -> FloatMatrix
 y3dRotation theta =
-    case Matrix.fromLists [
-                 [cos theta, 0.0, sin theta]
-                ,[0.0, 1.0, 0.0]
-                ,[negate (sin theta), 0.0, cos theta] 
-            ] of
-                
-        Just m -> m
-        Nothing -> Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
+    case
+        Matrix.fromLists
+            [ [ cos theta, 0.0, sin theta ]
+            , [ 0.0, 1.0, 0.0 ]
+            , [ negate (sin theta), 0.0, cos theta ]
+            ]
+    of
+        Just m ->
+            m
 
-z3dRotation: Float -> FloatMatrix
+        Nothing ->
+            Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
+
+
+z3dRotation : Float -> FloatMatrix
 z3dRotation theta =
-    case Matrix.fromLists [
-                 [cos theta, negate (sin theta), 0.0]
-                ,[sin theta, cos theta, 0.0]
-                ,[0.0, 0.0, 1] 
-            ] of
-                
-        Just m -> m
-        Nothing -> Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
+    case
+        Matrix.fromLists
+            [ [ cos theta, negate (sin theta), 0.0 ]
+            , [ sin theta, cos theta, 0.0 ]
+            , [ 0.0, 0.0, 1 ]
+            ]
+    of
+        Just m ->
+            m
 
-xyzRotation: Float -> Float -> Float -> FloatMatrix
+        Nothing ->
+            Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
+
+
+xyzRotation : Float -> Float -> Float -> FloatMatrix
 xyzRotation xTheta yTheta zTheta =
     x3dRotation xTheta
         |> matrixMultiply (y3dRotation yTheta)
         |> matrixMultiply (z3dRotation zTheta)
-        
-printMatrix: String -> FloatMatrix -> ()
+
+
+printMatrix : String -> FloatMatrix -> ()
 printMatrix message m =
     let
-        _ = Matrix.pretty (\v -> Debug.toString v) m |> Debug.log (message ++ ": ")        
+        _ =
+            Matrix.pretty (\v -> Debug.toString v) m |> Debug.log (message ++ ": ")
     in
-        ()
+    ()
 
-matrixMultiply: FloatMatrix -> FloatMatrix -> FloatMatrix
+
+matrixMultiply : FloatMatrix -> FloatMatrix -> FloatMatrix
 matrixMultiply leftMatrix rightMatrix =
     case Matrix.dot leftMatrix rightMatrix of
-        Just m -> m
-        Nothing -> Matrix.identity 3 |> Debug.log "Failed matrix multiply"
+        Just m ->
+            m
 
-transposeVector: FloatMatrix -> Vector -> Vector
+        Nothing ->
+            Matrix.identity 3 |> Debug.log "Failed matrix multiply"
+
+
+transposeVector : FloatMatrix -> Vector -> Vector
 transposeVector m v =
     let
-        vectorAsMatrix = vectorToMatrix v
-        product = matrixMultiply m vectorAsMatrix
+        vectorAsMatrix =
+            vectorToMatrix v
+
+        product =
+            matrixMultiply m vectorAsMatrix
     in
-        product |> matrixToVector
+    product |> matrixToVector
 
-multiply3DData: FloatMatrix -> List Vector -> List Vector
+
+multiply3DData : FloatMatrix -> List Vector -> List Vector
 multiply3DData m vectorList =
-    vectorList |> List.map (transposeVector m)     
+    vectorList |> List.map (transposeVector m)
 
-isPascalCased: String -> Bool
+
+isPascalCased : String -> Bool
 isPascalCased s =
-   case String.uncons s of
-        Just (firstChar, _) ->
+    case String.uncons s of
+        Just ( firstChar, _ ) ->
             Char.isUpper firstChar
 
         Nothing ->
             False
 
-vectorToMatrix: Vector -> FloatMatrix
-vectorToMatrix values =
-    case values 
-        |> Matrix.fromList 3 1 of
-                Just columnVector -> columnVector
-                Nothing -> Matrix.identity 3 |> Debug.log "Failed to create column vector"
 
-matrixToVector: FloatMatrix -> Vector
+vectorToMatrix : Vector -> FloatMatrix
+vectorToMatrix values =
+    case
+        values
+            |> Matrix.fromList 3 1
+    of
+        Just columnVector ->
+            columnVector
+
+        Nothing ->
+            Matrix.identity 3 |> Debug.log "Failed to create column vector"
+
+
+matrixToVector : FloatMatrix -> Vector
 matrixToVector m =
     m |> Matrix.toList
 
 
-dropXComponent: List Float -> List Float
+dropXComponent : List Float -> List Float
 dropXComponent v =
     case List.tail v of
-        Just t -> t
-        Nothing -> [] |> Debug.log("Nothing to drop in dropXComponent")
+        Just t ->
+            t
 
-dropYComponent: List Float -> List Float
+        Nothing ->
+            [] |> Debug.log "Nothing to drop in dropXComponent"
+
+
+dropYComponent : List Float -> List Float
 dropYComponent v =
     case v of
-        head :: tail -> head :: (List.drop 1 tail)
-        [] -> [] |> Debug.log("Nothing to drop in dropYComponent")
+        head :: tail ->
+            head :: List.drop 1 tail
 
-dropZComponent: List Float -> List Float
+        [] ->
+            [] |> Debug.log "Nothing to drop in dropYComponent"
+
+
+dropZComponent : List Float -> List Float
 dropZComponent v =
     case v of
-        x ::  y :: z -> [x,y]
-        _ -> [] |> Debug.log("Nothing to drop in dropZComponent")
+        x :: y :: z ->
+            [ x, y ]
+
+        _ ->
+            [] |> Debug.log "Nothing to drop in dropZComponent"

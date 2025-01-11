@@ -5,41 +5,53 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Models exposing (..)
-import Utils
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
+import Utils
 
-strokeWidth = 0.006
+
+strokeWidth =
+    0.006
+
 
 plot3d : Model -> PanelEntry -> List Vector -> Html Msg
 plot3d model panelEntry orderedPairs =
     let
-        _ = Debug.log "Plot3D points to plot" (List.length orderedPairs)
-        _ = Debug.log "Ordered Pairs" orderedPairs
+        _ =
+            Debug.log "Plot3D points to plot" (List.length orderedPairs)
 
-        rotatedPairs = rotateData panelEntry orderedPairs
+        _ =
+            Debug.log "Ordered Pairs" orderedPairs
 
-        projection = rotatedPairs
-            |> List.map Utils.dropYComponent
+        rotatedPairs =
+            rotateData panelEntry orderedPairs
+
+        projection =
+            rotatedPairs
+                |> List.map Utils.dropYComponent
     in
-        div
-            [ Html.Attributes.id "plot-3d" ]
-            [ 
-                div [] [ plotProjectedPoints model panelEntry projection ]
-            ]
+    div
+        [ Html.Attributes.id "plot-3d" ]
+        [ div [] [ plotProjectedPoints model panelEntry projection ]
+        ]
 
-rotateData: PanelEntry -> List Vector -> List Vector
+
+rotateData : PanelEntry -> List Vector -> List Vector
 rotateData panelEntry vectors =
     let
         -- rotationMatrix = Utils.xyzRotation (pi/2) 0 0    -- Good for looking at the grid?
-        rotationMatrix = Utils.xyzRotation panelEntry.xAxis.rotationAngle panelEntry.yAxis.rotationAngle panelEntry.zAxis.rotationAngle
+        rotationMatrix =
+            Utils.xyzRotation panelEntry.xAxis.rotationAngle panelEntry.yAxis.rotationAngle panelEntry.zAxis.rotationAngle
     in
-        vectors |> Utils.multiply3DData rotationMatrix
-        
+    vectors |> Utils.multiply3DData rotationMatrix
+
+
 plotProjectedPoints : Model -> PanelEntry -> List Vector -> Html Msg
 plotProjectedPoints model panelEntry orderedPairs =
     let
-        _ = Debug.log "Plot2D points to plot" (List.length orderedPairs)
+        _ =
+            Debug.log "Plot2D points to plot" (List.length orderedPairs)
+
         minX =
             List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minX"
 
@@ -58,9 +70,14 @@ plotProjectedPoints model panelEntry orderedPairs =
         yWidth =
             maxY - minY |> Debug.log "yWidth"
 
-        reduction = 0.9
-        expansion = 1.0 / reduction
-        offset = (1.0 - reduction) / 2.0
+        reduction =
+            0.9
+
+        expansion =
+            1.0 / reduction
+
+        offset =
+            (1.0 - reduction) / 2.0
 
         viewboxAttribte =
             (minX - offset * xWidth |> String.fromFloat)
@@ -104,25 +121,43 @@ plotProjectedPoints model panelEntry orderedPairs =
             ]
         ]
 
+
 buildPreserveAspectRatioString : PanelEntry -> String
 buildPreserveAspectRatioString panelEntry =
     let
-        xPart = case panelEntry.alignmentX of
-                AlignMin -> "xMin"
-                AlignMid -> "xMid"
-                AlignMax -> "xMax"
+        xPart =
+            case panelEntry.alignmentX of
+                AlignMin ->
+                    "xMin"
+
+                AlignMid ->
+                    "xMid"
+
+                AlignMax ->
+                    "xMax"
 
         -- These are Pascal case
-        yPart = case panelEntry.alignmentY of
-                AlignMin -> "YMin"
-                AlignMid -> "YMid"
-                AlignMax -> "YMax"
+        yPart =
+            case panelEntry.alignmentY of
+                AlignMin ->
+                    "YMin"
 
-        meetOrSlice = case panelEntry.meetOrSlice of
-            Meet -> "meet"
-            Slice -> "slice"
+                AlignMid ->
+                    "YMid"
+
+                AlignMax ->
+                    "YMax"
+
+        meetOrSlice =
+            case panelEntry.meetOrSlice of
+                Meet ->
+                    "meet"
+
+                Slice ->
+                    "slice"
     in
-        xPart ++ yPart ++ " " ++ meetOrSlice
+    xPart ++ yPart ++ " " ++ meetOrSlice
+
 
 adjustYValue : Float -> Float -> Float -> Float
 adjustYValue maxY minY y =
@@ -147,4 +182,4 @@ build2DPath yAdjust orderedPairs =
         path =
             "M " ++ (List.head points |> Maybe.withDefault "0,0") ++ " L " ++ (List.tail points |> Maybe.withDefault [] |> String.join " L ")
     in
-        path
+    path

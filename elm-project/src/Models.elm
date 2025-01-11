@@ -1,14 +1,32 @@
 module Models exposing (..)
 
 import Dict exposing (..)
+import Matrix exposing (..)
 import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
-import Matrix exposing (..)
 
-type alias Vector = List Float
-type alias FloatMatrix = Matrix Float
-type alias VariableLookup = Dict String Float
-type alias SymbolTableDictionary = Dict String SymbolTableEntry
+
+type alias Vector =
+    List Float
+
+
+type alias FloatMatrix =
+    Matrix Float
+
+
+type alias VariableLookup =
+    Dict String Float
+
+
+type alias SymbolTableDictionary =
+    Dict String SymbolTableEntry
+
+type alias MinMaxIncrement =
+    {
+          min: Float
+        , max: Float
+        , increment: Float
+    }
 
 type Msg
     = Tick Time.Posix
@@ -40,13 +58,16 @@ type alias SymbolTableEntry =
     , incrementValue : Float
     , incrementValueBuffer : String
     , errMsg : Maybe String
-    , mayVary: Bool
+    , mayVary : Bool
     }
 
+
 type alias Axis =
-    {
-        rotationAngle: Float
+    { 
+          axisName: String
+        , rotationAngle : Float
     }
+
 
 type alias PanelEntry =
     { expression : String
@@ -54,15 +75,15 @@ type alias PanelEntry =
     , variables : SymbolTableDictionary
     , isCollapsed : Bool
     , evaluation : Maybe Float
-    , plotValues : List (VariableLookup)
+    , plotValues : List VariableLookup
     , evaluatedPlotValues : List Vector
     , panelError : Maybe String
     , alignmentX : SvgAlignment
     , alignmentY : SvgAlignment
     , meetOrSlice : SvgAlignmentBehavor
-    , xAxis: Axis
-    , yAxis: Axis
-    , zAxis: Axis
+    , xAxis : Axis
+    , yAxis : Axis
+    , zAxis : Axis
     }
 
 
