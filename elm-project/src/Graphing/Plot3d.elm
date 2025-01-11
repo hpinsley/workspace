@@ -9,6 +9,8 @@ import Utils
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 
+strokeWidth = 0.006
+
 plot3d : Model -> PanelEntry -> List Vector -> Html Msg
 plot3d model panelEntry orderedPairs =
     let
@@ -21,8 +23,8 @@ plot3d model panelEntry orderedPairs =
     in
         div
             [ Html.Attributes.id "plot-3d" ]
-            [ Html.text "3D Plot"
-            , div [] [ plotProjectedPoints model panelEntry projection ]
+            [ 
+                div [] [ plotProjectedPoints model panelEntry projection ]
             ]
 
 rotateData: List Vector -> List Vector
@@ -54,14 +56,18 @@ plotProjectedPoints model panelEntry orderedPairs =
         yWidth =
             maxY - minY |> Debug.log "yWidth"
 
+        reduction = 0.9
+        expansion = 1.0 / reduction
+        offset = (1.0 - reduction) / 2.0
+
         viewboxAttribte =
-            (minX |> String.fromFloat)
+            (minX - offset * xWidth |> String.fromFloat)
                 ++ " "
-                ++ (minY |> String.fromFloat)
+                ++ (minY - offset * yWidth |> String.fromFloat)
                 ++ " "
-                ++ (xWidth |> String.fromFloat)
+                ++ (expansion * xWidth |> String.fromFloat)
                 ++ " "
-                ++ (yWidth |> String.fromFloat)
+                ++ (expansion * yWidth |> String.fromFloat)
                 |> Debug.log "viewboxAttribte"
 
         yTransform =
@@ -75,7 +81,7 @@ plotProjectedPoints model panelEntry orderedPairs =
                 [ Svg.Attributes.d functionPath
                 , Svg.Attributes.fill "none"
                 , Svg.Attributes.stroke "black"
-                , Svg.Attributes.strokeWidth "0.01"
+                , Svg.Attributes.strokeWidth (String.fromFloat strokeWidth)
                 ]
                 []
             ]
