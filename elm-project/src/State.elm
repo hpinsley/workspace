@@ -190,17 +190,31 @@ plotPanelEntry panelEntry =
 iterateSymbolTable : PanelEntry -> List (Dict.Dict String Float)
 iterateSymbolTable panelEntry =
     let
-        varialbeNames =
-            panelEntry.variables |> Dict.values |> List.filter (\e -> e.mayVary) |> List.map .variable
+        vars = Dict.values panelEntry.variables
 
-        values =
-            iterateVariables [ [] ] (Dict.values panelEntry.variables |> List.filter (\e -> e.mayVary))
-                |> List.map reverse
+        varyingVars =
+            vars |> List.filter (\e -> e.mayVary)
 
-        named =
-            values |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varialbeNames vArray |> Dict.fromList) |> Debug.log "named"
+        varyingVarNames =
+            varyingVars |> List.filter (\e -> e.mayVary) |> List.map .variable
+
+        values1 =
+            iterateVariables [ [] ] varyingVars
+                |> List.map reverse |> Debug.log "Value1"
+
+        values2 = iterateVariables [[]] (List.reverse varyingVars) |> Debug.log "Value2"
+        named1 =
+            values1 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray |> Dict.fromList) |> Debug.log "named1"
+        named2 =
+            values2 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray |> Dict.fromList) |> Debug.log "named2"
+        named3 = named1 ++ named2 |> Debug.log "named3"
+        x1 =
+            values1 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray) |> Debug.log "x1"
+        x2 =
+            values2 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray) |> Debug.log "x2"
+        x3 = x1 ++ x2 |> Debug.log "x3"
     in
-    named
+        named3
 
 -- TODO: I think this recursive method is the one that can blow the stack
 iterateVariables : List Vector -> List SymbolTableEntry -> List Vector
