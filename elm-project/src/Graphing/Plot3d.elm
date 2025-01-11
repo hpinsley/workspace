@@ -20,7 +20,7 @@ plot3d model panelEntry orderedPairs =
         rotatedPairs = rotateData(orderedPairs)
 
         y_radacted = rotatedPairs
-            |> List.map dropYComponent
+            |> List.map Utils.dropYComponent
     in
         div
             [ Html.Attributes.id "plot-3d" ]
@@ -31,12 +31,7 @@ plot3d model panelEntry orderedPairs =
 rotateData: List(List Float) -> List(List Float)
 rotateData inputData =
     let
-        rotationMatrix = Utils.y3dRotation(pi / 4.0)
+        rotationMatrix = Utils.y3dRotation(1.2)
     in
         inputData |> Utils.multiply3DData rotationMatrix
         
-dropYComponent: List Float -> List Float
-dropYComponent v =
-    case v of
-        head :: tail -> head :: (List.drop 1 tail)
-        [] -> []

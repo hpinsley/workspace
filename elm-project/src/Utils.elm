@@ -146,3 +146,21 @@ make3DVector values =
                 Just columnVector -> columnVector
                 Nothing -> Matrix.identity 3 |> Debug.log "Failed to create column vector"
 
+
+dropXComponent: List Float -> List Float
+dropXComponent v =
+    case List.tail v of
+        Just t -> t
+        Nothing -> [] |> Debug.log("Nothing to drop in dropXComponent")
+
+dropYComponent: List Float -> List Float
+dropYComponent v =
+    case v of
+        head :: tail -> head :: (List.drop 1 tail)
+        [] -> [] |> Debug.log("Nothing to drop in dropYComponent")
+
+dropZComponent: List Float -> List Float
+dropZComponent v =
+    case v of
+        x ::  y :: z -> [x,y]
+        _ -> [] |> Debug.log("Nothing to drop in dropZComponent")
