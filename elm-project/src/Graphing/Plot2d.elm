@@ -90,7 +90,7 @@ plot2d model panelEntry orderedPairs =
     div
         [ Html.Attributes.id "plot-2d" ]
         [ Html.text "2D Plot"
-        , div [ Html.Attributes.id "svg-container" ]
+        , div [ Html.Attributes.class "svg-container" ]
             [ svg
                 [ Svg.Attributes.width "100%"
                 , Svg.Attributes.height "100%"
