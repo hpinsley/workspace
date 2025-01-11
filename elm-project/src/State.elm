@@ -14,6 +14,9 @@ import Parsing.VariableExtraction exposing (extractVariablesFromExpression)
 import Set exposing (Set)
 import Time exposing (..)
 
+defaultXAxisRotation = 0.0
+defaultYAxisRotation = pi / 4.0
+defaultZAxisRotation = pi / 2.0
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -362,6 +365,9 @@ addCurrentExpressionToPanel model =
                     , alignmentX = AlignMid
                     , alignmentY = AlignMid
                     , meetOrSlice = Meet
+                    , xAxis = { rotationAngle = defaultXAxisRotation }
+                    , yAxis = { rotationAngle = defaultYAxisRotation }
+                    , zAxis = { rotationAngle = defaultZAxisRotation }
                     }
             in
             { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }

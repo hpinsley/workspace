@@ -8,6 +8,8 @@ import Matrix exposing (..)
 type alias Vector = List Float
 type alias FloatMatrix = Matrix Float
 type alias VariableLookup = Dict String Float
+type alias SymbolTableDictionary = Dict String SymbolTableEntry
+
 type Msg
     = Tick Time.Posix
     | UpdateExpression String
@@ -41,11 +43,15 @@ type alias SymbolTableEntry =
     , mayVary: Bool
     }
 
+type alias Axis =
+    {
+        rotationAngle: Float
+    }
 
 type alias PanelEntry =
     { expression : String
     , parsedExpression : Expression
-    , variables : Dict String SymbolTableEntry
+    , variables : SymbolTableDictionary
     , isCollapsed : Bool
     , evaluation : Maybe Float
     , plotValues : List (VariableLookup)
@@ -54,6 +60,9 @@ type alias PanelEntry =
     , alignmentX : SvgAlignment
     , alignmentY : SvgAlignment
     , meetOrSlice : SvgAlignmentBehavor
+    , xAxis: Axis
+    , yAxis: Axis
+    , zAxis: Axis
     }
 
 

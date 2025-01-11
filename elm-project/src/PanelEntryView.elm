@@ -60,6 +60,7 @@ viewPanelEntry model panelEntry =
         , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         , Button.text (Button.config |> Button.setOnClick (Plot panelEntry)) "Plot"
         -- , div [ id "plot-values" ] [ displayPlotValues panelEntry ]
+        , displayAxisInfo panelEntry
         , displayViewportScaling panelEntry
         ]
 
@@ -72,6 +73,26 @@ displayViewportScaling panelEntry =
             , panelEntryAlignmentView (SetYAlignment panelEntry) "Y"
             , panelEntryAlignmentBehaviorView (SetAlignmentBehavior panelEntry)
         ]
+
+displayAxisInfo: PanelEntry -> Html Msg
+displayAxisInfo panelEntry =
+    div [ id "axes-info" ]
+        [     
+            fieldset []
+                [ 
+                    legend [] [ text "Axis Rotation" ]
+                    , panelEntrySingleAxisView "X"
+                  , panelEntrySingleAxisView "Y"
+                  , panelEntrySingleAxisView "Z"
+                ]
+        ]
+
+panelEntrySingleAxisView : String -> Html Msg
+panelEntrySingleAxisView axisName =
+    div [class "axis-info"]
+    [
+        text axisName
+    ]
 
 
 panelEntryAlignmentBehaviorView : (SvgAlignmentBehavor -> Msg) -> Html Msg

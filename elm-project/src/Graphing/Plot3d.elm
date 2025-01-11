@@ -17,7 +17,7 @@ plot3d model panelEntry orderedPairs =
         _ = Debug.log "Plot3D points to plot" (List.length orderedPairs)
         _ = Debug.log "Ordered Pairs" orderedPairs
 
-        rotatedPairs = rotateData(orderedPairs)
+        rotatedPairs = rotateData panelEntry orderedPairs
 
         projection = rotatedPairs
             |> List.map Utils.dropYComponent
@@ -28,11 +28,11 @@ plot3d model panelEntry orderedPairs =
                 div [] [ plotProjectedPoints model panelEntry projection ]
             ]
 
-rotateData: List Vector -> List Vector
-rotateData vectors =
+rotateData: PanelEntry -> List Vector -> List Vector
+rotateData panelEntry vectors =
     let
         -- rotationMatrix = Utils.xyzRotation (pi/2) 0 0    -- Good for looking at the grid?
-        rotationMatrix = Utils.xyzRotation 0 (pi/2.0) (pi / 4.0)
+        rotationMatrix = Utils.xyzRotation panelEntry.xAxis.rotationAngle panelEntry.yAxis.rotationAngle panelEntry.zAxis.rotationAngle
     in
         vectors |> Utils.multiply3DData rotationMatrix
         
