@@ -49,7 +49,7 @@ type alias PanelEntry =
     , isCollapsed : Bool
     , evaluation : Maybe Float
     , plotValues : List (VariableLookup)
-    , evaluatedPlotValues : List (VariableLookup, Result String Float )
+    , evaluatedPlotValues : List Vector
     , panelError : Maybe String
     , alignmentX : SvgAlignment
     , alignmentY : SvgAlignment
