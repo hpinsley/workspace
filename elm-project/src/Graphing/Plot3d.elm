@@ -16,7 +16,7 @@ plot3d model panelEntry orderedPairs =
     let
         _ = Debug.log "Plot3D points to plot" (List.length orderedPairs)
         _ = Debug.log "Ordered Pairs" orderedPairs
-        
+
         rotatedPairs = rotateData(orderedPairs)
 
         projection = rotatedPairs
@@ -31,7 +31,7 @@ plot3d model panelEntry orderedPairs =
 rotateData: List Vector -> List Vector
 rotateData vectors =
     let
-        rotationMatrix = Utils.xyzRotation 0 (pi/4) (pi/4)
+        rotationMatrix = Utils.xyzRotation (pi/2) 0 0
     in
         vectors |> Utils.multiply3DData rotationMatrix
         
@@ -75,7 +75,7 @@ plotProjectedPoints model panelEntry orderedPairs =
             adjustYValue maxY minY
 
         functionPath =
-            build2DPath yTransform orderedPairs
+            build2DPath yTransform orderedPairs |> Debug.log "Function Path"
 
         elements =
             [ Svg.path
@@ -146,4 +146,4 @@ build2DPath yAdjust orderedPairs =
         path =
             "M " ++ (List.head points |> Maybe.withDefault "0,0") ++ " L " ++ (List.tail points |> Maybe.withDefault [] |> String.join " L ")
     in
-    path
+        path

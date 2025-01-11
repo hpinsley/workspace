@@ -214,7 +214,7 @@ iterateSymbolTable panelEntry =
             values2 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray) |> Debug.log "x2"
         x3 = x1 ++ x2 |> Debug.log "x3"
     in
-        named3
+        named1 |> Debug.log "final"
 
 -- TODO: I think this recursive method is the one that can blow the stack
 iterateVariables : List Vector -> List SymbolTableEntry -> List Vector
