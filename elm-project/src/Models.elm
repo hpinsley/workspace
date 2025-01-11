@@ -7,7 +7,7 @@ import Matrix exposing (..)
 
 type alias Vector = List Float
 type alias FloatMatrix = Matrix Float
-
+type alias VariableLookup = Dict String Float
 type Msg
     = Tick Time.Posix
     | UpdateExpression String
@@ -48,8 +48,8 @@ type alias PanelEntry =
     , variables : Dict String SymbolTableEntry
     , isCollapsed : Bool
     , evaluation : Maybe Float
-    , plotValues : List (Dict String Float)
-    , evaluatedPlotValues : List ( Dict.Dict String Float, Result String Float )
+    , plotValues : List (VariableLookup)
+    , evaluatedPlotValues : List (VariableLookup, Result String Float )
     , panelError : Maybe String
     , alignmentX : SvgAlignment
     , alignmentY : SvgAlignment

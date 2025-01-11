@@ -187,7 +187,7 @@ plotPanelEntry panelEntry =
 
 
 -- Create a list of Dictionary lookups for the VARYING variables
-iterateSymbolTable : PanelEntry -> List (Dict.Dict String Float)
+iterateSymbolTable : PanelEntry -> List VariableLookup
 iterateSymbolTable panelEntry =
     let
         vars = Dict.values panelEntry.variables
