@@ -39,7 +39,7 @@ plot model panelEntry =
             ]
         ]
 
-get_ordered_pairs : List ( Dict.Dict String Float, Result String Float ) -> List (List Float)
+get_ordered_pairs : List ( Dict.Dict String Float, Result String Float ) -> List Vector
 get_ordered_pairs plotValues =
     plotValues
         |> List.map

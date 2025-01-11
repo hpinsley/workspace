@@ -5,8 +5,8 @@ import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
 import Matrix exposing (..)
 
-type Vector = List Float
-type FloatMatrix = Matrix Float
+type alias Vector = List Float
+type alias FloatMatrix = Matrix Float
 
 type Msg
     = Tick Time.Posix

@@ -203,7 +203,7 @@ iterateSymbolTable panelEntry =
     named
 
 
-iterateVariables : List (List Float) -> List SymbolTableEntry -> List (List Float)
+iterateVariables : List Vector -> List SymbolTableEntry -> List Vector
 iterateVariables sofar variables =
     case variables of
         [] ->
@@ -331,7 +331,7 @@ addCurrentExpressionToPanel model =
                                         , endValueBuffer = ""
                                         , incrementValue = 0.0
                                         , incrementValueBuffer = ""
-                                        , mayVary = True
+                                        , mayVary = not (Utils.isPascalCased v)
                                         }
                                 )
                     , isCollapsed = False

@@ -7,7 +7,6 @@ import Parsing.ExpressionModels exposing (..)
 import Time exposing (..)
 import Matrix exposing (..)
 
-
 findPanelEntry : Model -> String -> Maybe PanelEntry
 findPanelEntry model expression =
     case List.filter (\pe -> pe.expression == expression) model.panelEntries of
@@ -86,7 +85,7 @@ roundFloat n f =
     in
         result
 
-x3dRotation: Float -> (Matrix Float)
+x3dRotation: Float -> FloatMatrix
 x3dRotation theta =
     case Matrix.fromLists [
                  [1.0, 0.0, 0.0]
@@ -97,7 +96,7 @@ x3dRotation theta =
         Just m -> m
         Nothing -> Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
 
-y3dRotation: Float -> (Matrix Float)
+y3dRotation: Float -> FloatMatrix
 y3dRotation theta =
     case Matrix.fromLists [
                  [cos theta, 0.0, sin theta]
@@ -108,7 +107,7 @@ y3dRotation theta =
         Just m -> m
         Nothing -> Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
 
-z3dRotation: Float -> (Matrix Float)
+z3dRotation: Float -> FloatMatrix
 z3dRotation theta =
     case Matrix.fromLists [
                  [cos theta, negate (sin theta), 0.0]
@@ -119,36 +118,50 @@ z3dRotation theta =
         Just m -> m
         Nothing -> Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
 
-printMatrix: String -> (Matrix Float) -> ()
+printMatrix: String -> FloatMatrix -> ()
 printMatrix message m =
     let
         _ = Matrix.pretty (\v -> Debug.toString v) m |> Debug.log (message ++ ": ")        
     in
         ()
 
-transposeVector: Matrix Float -> Vector -> Vector
+matrixMultiply: FloatMatrix -> FloatMatrix -> FloatMatrix
+matrixMultiply leftMatrix rightMatrix =
+    case Matrix.dot leftMatrix rightMatrix of
+        Just m -> m
+        Nothing -> Matrix.identity 3 |> Debug.log "Failed matrix multiply"
+
+transposeVector: FloatMatrix -> Vector -> Vector
 transposeVector m v =
-    v
-
-multiply3DData: (Matrix Float) -> List(List Float) -> List(List Float)
-multiply3DData m input =
     let
-        multiplied = input |> List.map (\values ->
-                            let
-                                vector = make3DVector values
-
-                                _ = vector -- |> printMatrix "m2"
-                            in
-                                values)
+        vectorAsMatrix = vectorToMatrix v
+        product = matrixMultiply m vectorAsMatrix
     in
-        input
-    
-make3DVector: (List Float) -> (Matrix Float)
-make3DVector values =
+        product |> matrixToVector
+
+multiply3DData: FloatMatrix -> List Vector -> List Vector
+multiply3DData m vectorList =
+    vectorList |> List.map (transposeVector m)     
+
+isPascalCased: String -> Bool
+isPascalCased s =
+   case String.uncons s of
+        Just (firstChar, _) ->
+            Char.isUpper firstChar
+
+        Nothing ->
+            False
+
+vectorToMatrix: Vector -> FloatMatrix
+vectorToMatrix values =
     case values 
         |> Matrix.fromList 3 1 of
                 Just columnVector -> columnVector
                 Nothing -> Matrix.identity 3 |> Debug.log "Failed to create column vector"
+
+matrixToVector: FloatMatrix -> Vector
+matrixToVector m =
+    m |> Matrix.toList
 
 
 dropXComponent: List Float -> List Float

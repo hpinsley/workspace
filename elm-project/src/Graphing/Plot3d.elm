@@ -12,7 +12,7 @@ import Matrix exposing (Matrix)
 import Graphing.Plot2d exposing (..)
 
 
-plot3d : Model -> PanelEntry -> List (List Float) -> Html Msg
+plot3d : Model -> PanelEntry -> List Vector -> Html Msg
 plot3d model panelEntry orderedPairs =
     let
         _ = Debug.log "Plot3D points to plot" (List.length orderedPairs)
@@ -28,10 +28,10 @@ plot3d model panelEntry orderedPairs =
             , div [] [ plot2d model panelEntry y_radacted ]
             ]
 
-rotateData: List(List Float) -> List(List Float)
-rotateData inputData =
+rotateData: List Vector -> List Vector
+rotateData vectors =
     let
         rotationMatrix = Utils.y3dRotation(pi / 4.0)
     in
-        inputData |> Utils.multiply3DData rotationMatrix
+        vectors |> Utils.multiply3DData rotationMatrix
         

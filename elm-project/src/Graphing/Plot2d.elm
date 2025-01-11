@@ -17,7 +17,7 @@ xTICK_LABEL_OFFSET_HEIGHT_PCT = -2.0
 y_TICK_WIDTH_XRANGE_PCT = 0.02
 yTICK_LABEL_OFFSET_WIDTH_PCT = -2.0
 
-plot2d : Model -> PanelEntry -> List (List Float) -> Html Msg
+plot2d : Model -> PanelEntry -> List Vector -> Html Msg
 plot2d model panelEntry orderedPairs =
     let
         _ = Debug.log "Plot2D points to plot" (List.length orderedPairs)
@@ -283,7 +283,7 @@ adjustYValue maxY minY y =
     (maxY + minY) - y
 
 
-build2DPath : (Float -> Float) -> List (List Float) -> String
+build2DPath : (Float -> Float) -> List Vector -> String
 build2DPath yAdjust orderedPairs =
     let
         xValues =
