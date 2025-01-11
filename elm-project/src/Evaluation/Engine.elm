@@ -119,7 +119,7 @@ applyAddOp : AddOp -> Float -> Float -> Float
 applyAddOp addOp x y =
     case addOp of
         Plus ->
-            x + y |> Debug.log ("Added " ++ (String.fromFloat x) ++ " to " ++ (String.fromFloat y))
+            x + y
 
         Minus ->
-            x - y |> Debug.log ("Subtracted " ++ (String.fromFloat y) ++ " from " ++ (String.fromFloat x))
+            x - y

@@ -198,11 +198,11 @@ iterateSymbolTable panelEntry =
                 |> List.map reverse
 
         named =
-            values |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varialbeNames vArray |> Dict.fromList)
+            values |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varialbeNames vArray |> Dict.fromList) |> Debug.log "named"
     in
     named
 
-
+-- TODO: I think this recursive method is the one that can blow the stack
 iterateVariables : List Vector -> List SymbolTableEntry -> List Vector
 iterateVariables sofar variables =
     case variables of

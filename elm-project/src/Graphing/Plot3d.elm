@@ -15,6 +15,7 @@ plot3d : Model -> PanelEntry -> List Vector -> Html Msg
 plot3d model panelEntry orderedPairs =
     let
         _ = Debug.log "Plot3D points to plot" (List.length orderedPairs)
+        _ = Debug.log "Ordered Pairs" orderedPairs
         
         rotatedPairs = rotateData(orderedPairs)
 
