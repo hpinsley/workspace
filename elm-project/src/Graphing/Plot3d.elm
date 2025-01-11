@@ -8,7 +8,6 @@ import Models exposing (..)
 import Utils
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import Matrix exposing (Matrix)
 import Graphing.Plot2d exposing (..)
 
 
@@ -31,7 +30,7 @@ plot3d model panelEntry orderedPairs =
 rotateData: List Vector -> List Vector
 rotateData vectors =
     let
-        rotationMatrix = Utils.y3dRotation(pi / 4.0)
+        rotationMatrix = Utils.xyzRotation 0 (pi/4) (pi/3)
     in
         vectors |> Utils.multiply3DData rotationMatrix
         

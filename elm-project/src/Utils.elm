@@ -118,6 +118,12 @@ z3dRotation theta =
         Just m -> m
         Nothing -> Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
 
+xyzRotation: Float -> Float -> Float -> FloatMatrix
+xyzRotation xTheta yTheta zTheta =
+    x3dRotation xTheta
+        |> matrixMultiply (y3dRotation yTheta)
+        |> matrixMultiply (z3dRotation zTheta)
+        
 printMatrix: String -> FloatMatrix -> ()
 printMatrix message m =
     let
