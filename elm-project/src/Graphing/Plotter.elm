@@ -23,7 +23,7 @@ plot model panelEntry =
             [ Html.Attributes.id "plot-body" ]
             [ let
                 orderedPairs =
-                    panelEntry.evaluatedPlotValues |> get_ordered_pairs -- |> Debug.log "orderedPairs"
+                    panelEntry.evaluatedPlotValues |> build_vectors -- |> Debug.log "orderedPairs"
               in
               case Utils.getVaryingVariableCount panelEntry of
                 1 ->
@@ -39,8 +39,8 @@ plot model panelEntry =
             ]
         ]
 
-get_ordered_pairs : List ( VariableLookup, Result String Float ) -> List Vector
-get_ordered_pairs plotValues =
+build_vectors : List ( VariableLookup, Result String Float ) -> List Vector
+build_vectors plotValues =
     plotValues
         |> List.map
             (\( dict, result ) ->
