@@ -118,3 +118,26 @@ z3dRotation theta =
                 
         Just m -> m
         Nothing -> Matrix.identity 3 |> Debug.log "Error creating matrix.  Returning identity matrix."
+
+printMatrix: String -> (Matrix Float) -> ()
+printMatrix message m =
+    let
+        _ = Matrix.pretty (\v -> Debug.toString v) m |> Debug.log (message ++ ": ")        
+    in
+        ()
+
+multiply3DData: (Matrix Float) -> List(List Float) -> List(List Float)
+multiply3DData m input =
+    let
+        multiplied = input |> List.map (\vector ->
+                            let
+                                m2 = case vector |> Matrix.fromList 3 1 of
+                                    Just columnVector -> columnVector
+                                    Nothing -> Matrix.identity 3
+                                    
+                                _ = m2 |> printMatrix "m2"
+                            in
+                                vector)
+    in
+        input
+    

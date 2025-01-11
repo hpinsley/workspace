@@ -15,16 +15,12 @@ import Graphing.Plot2d exposing (..)
 plot3d : Model -> PanelEntry -> List (List Float) -> Html Msg
 plot3d model panelEntry orderedPairs =
     let
-        -- value_matrix = Matrix.fromLists orderedPairs
-        y_radacted = orderedPairs
+        m = Matrix.fromLists orderedPairs |> Maybe.withDefault (Matrix.identity 3)
+        _ = m |> Utils.printMatrix "Original Matrix "
+        rotatedPairs = rotateData(orderedPairs)
+
+        y_radacted = rotatedPairs
             |> List.map dropYComponent
-
-        -- theta = pi / 4.0
-
-        -- _ = Matrix.pretty (\v -> Debug.toString v) (Utils.x3dRotation theta) |> Debug.log "xmatrix"
-        -- _ = Matrix.pretty (\v -> Debug.toString v) (Utils.y3dRotation theta) |> Debug.log "ymatrix"
-        -- _ = Matrix.pretty (\v -> Debug.toString v) (Utils.z3dRotation theta) |> Debug.log "zmatrix"
-
     in
         div
             [ Html.Attributes.id "plot-3d" ]
@@ -32,6 +28,13 @@ plot3d model panelEntry orderedPairs =
             , div [] [ plot2d model panelEntry y_radacted ]
             ]
 
+rotateData: List(List Float) -> List(List Float)
+rotateData inputData =
+    let
+        rotationMatrix = Utils.y3dRotation(pi / 4.0)
+    in
+        inputData |> Utils.multiply3DData rotationMatrix
+        
 dropYComponent: List Float -> List Float
 dropYComponent v =
     case v of
