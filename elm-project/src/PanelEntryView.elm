@@ -92,7 +92,7 @@ panelEntrySingleAxisView : PanelEntry -> Axis -> Html Msg
 panelEntrySingleAxisView panelEntry axis =
     div [ class "axis-info" ]
         [ 
-            floatUpDownControl axis.axisName { min=0.0, max=2*pi, increment=pi/16.0 } axis.rotationAngle
+              floatUpDownControl axis.axisName { min=0.0, max=2*pi, increment=pi/16.0 } axis.rotationAngle
         ]
 
 floatUpDownControl : String -> MinMaxIncrement -> Float -> Html Msg
@@ -101,9 +101,13 @@ floatUpDownControl controlLabel range currentValue =
             class "min-max-increment"
         ]
         [
-              text controlLabel
-            , text ""
-            , currentValue |> Utils.roundFloat 2 |> String.fromFloat |> text
+            fieldset []
+                [
+                      legend [] [ text controlLabel ]
+                    , currentValue |> Utils.roundFloat 2 |> String.fromFloat |> text
+                    , button [class "inc-button inc-up"][text "+"]
+                    , button [class "inc-button inc-down"][text "-"]
+                ]
         ]
 
 
