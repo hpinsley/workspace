@@ -129,15 +129,20 @@ printMatrix message m =
 multiply3DData: (Matrix Float) -> List(List Float) -> List(List Float)
 multiply3DData m input =
     let
-        multiplied = input |> List.map (\vector ->
+        multiplied = input |> List.map (\values ->
                             let
-                                m2 = case vector |> Matrix.fromList 3 1 of
-                                    Just columnVector -> columnVector
-                                    Nothing -> Matrix.identity 3
-                                    
-                                _ = m2 |> printMatrix "m2"
+                                vector = make3DVector values
+
+                                _ = vector |> printMatrix "m2"
                             in
-                                vector)
+                                values)
     in
         input
     
+make3DVector: (List Float) -> (Matrix Float)
+make3DVector values =
+    case values 
+        |> Matrix.fromList 3 1 of
+                Just columnVector -> columnVector
+                Nothing -> Matrix.identity 3 |> Debug.log "Failed to create column vector"
+
