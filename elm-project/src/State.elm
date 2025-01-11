@@ -189,7 +189,7 @@ plotPanelEntry panelEntry =
                                         )
                             |> List.map (\(varlookup, f) -> List.append (Dict.values varlookup) [f])
         in
-        { panelEntry | plotValues = named, evaluatedPlotValues = evaluated, panelError = Nothing }
+            { panelEntry | plotValues = named, evaluatedPlotValues = evaluated, panelError = Nothing }
 
 
 -- Create a list of Dictionary lookups for the VARYING variables
@@ -220,7 +220,7 @@ iterateSymbolTable panelEntry =
             values2 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray) |> Debug.log "x2"
         x3 = x1 ++ x2 |> Debug.log "x3"
     in
-        named1 |> Debug.log "final"
+        named3 |> Debug.log "final"
 
 -- TODO: I think this recursive method is the one that can blow the stack
 iterateVariables : List Vector -> List SymbolTableEntry -> List Vector

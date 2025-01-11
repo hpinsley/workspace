@@ -31,7 +31,8 @@ plot3d model panelEntry orderedPairs =
 rotateData: List Vector -> List Vector
 rotateData vectors =
     let
-        rotationMatrix = Utils.xyzRotation (pi/2) 0 0
+        -- rotationMatrix = Utils.xyzRotation (pi/2) 0 0    -- Good for looking at the grid?
+        rotationMatrix = Utils.xyzRotation 0 (pi/2.0) (pi / 4.0)
     in
         vectors |> Utils.multiply3DData rotationMatrix
         
