@@ -20,6 +20,7 @@ yTICK_LABEL_OFFSET_WIDTH_PCT = -2.0
 plot2d : Model -> PanelEntry -> List (List Float) -> Html Msg
 plot2d model panelEntry orderedPairs =
     let
+        _ = Debug.log "Plot2D points to plot" (List.length orderedPairs)
         minX =
             List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minX"
 

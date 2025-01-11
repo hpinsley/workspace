@@ -5,7 +5,7 @@ import Evaluation.Engine exposing (..)
 import Models exposing (..)
 import Parsing.ExpressionModels exposing (..)
 import Time exposing (..)
-import Matrix exposing (Matrix)
+import Matrix exposing (..)
 
 
 findPanelEntry : Model -> String -> Maybe PanelEntry
@@ -126,6 +126,10 @@ printMatrix message m =
     in
         ()
 
+transposeVector: Matrix Float -> Vector -> Vector
+transposeVector m v =
+    v
+
 multiply3DData: (Matrix Float) -> List(List Float) -> List(List Float)
 multiply3DData m input =
     let
@@ -133,7 +137,7 @@ multiply3DData m input =
                             let
                                 vector = make3DVector values
 
-                                _ = vector |> printMatrix "m2"
+                                _ = vector -- |> printMatrix "m2"
                             in
                                 values)
     in

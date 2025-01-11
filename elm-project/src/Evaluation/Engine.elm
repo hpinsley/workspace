@@ -109,10 +109,10 @@ applyMulOp mulOp x y =
     in
     case mulOp of
         Times ->
-            x * y |> Debug.log ("Multiplied " ++ (String.fromFloat x) ++ " to " ++ (String.fromFloat y))
+            x * y
 
         Divide ->
-            x / y |> Debug.log ("Divided " ++ (String.fromFloat x) ++ " by " ++ (String.fromFloat y))
+            x / y
 
 
 applyAddOp : AddOp -> Float -> Float -> Float

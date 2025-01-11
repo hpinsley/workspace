@@ -15,8 +15,8 @@ import Graphing.Plot2d exposing (..)
 plot3d : Model -> PanelEntry -> List (List Float) -> Html Msg
 plot3d model panelEntry orderedPairs =
     let
-        m = Matrix.fromLists orderedPairs |> Maybe.withDefault (Matrix.identity 3)
-        _ = m |> Utils.printMatrix "Original Matrix "
+        _ = Debug.log "Plot3D points to plot" (List.length orderedPairs)
+        
         rotatedPairs = rotateData(orderedPairs)
 
         y_radacted = rotatedPairs
@@ -31,7 +31,7 @@ plot3d model panelEntry orderedPairs =
 rotateData: List(List Float) -> List(List Float)
 rotateData inputData =
     let
-        rotationMatrix = Utils.y3dRotation(1.2)
+        rotationMatrix = Utils.y3dRotation(pi / 4.0)
     in
         inputData |> Utils.multiply3DData rotationMatrix
         
