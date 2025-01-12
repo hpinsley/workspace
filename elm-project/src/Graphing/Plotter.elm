@@ -1,15 +1,16 @@
 module Graphing.Plotter exposing (..)
 
 import Dict exposing (..)
+import Graphing.Plot2d exposing (..)
+import Graphing.Plot3d exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Models exposing (..)
-import Utils
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import Graphing.Plot2d exposing (..)
-import Graphing.Plot3d exposing (..)
+import Utils
+
 
 plot : Model -> PanelEntry -> Html Msg
 plot model panelEntry =

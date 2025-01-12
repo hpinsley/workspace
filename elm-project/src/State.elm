@@ -6,13 +6,25 @@ import Evaluation.Engine exposing (..)
 import List exposing (reverse)
 import List.Cartesian
 import Models exposing (..)
-import Utils
 import Parser exposing (float)
 import Parsing.ExpressionModels exposing (..)
 import Parsing.ExpressionParsers as ExpressionParsers
 import Parsing.VariableExtraction exposing (extractVariablesFromExpression)
 import Set exposing (Set)
 import Time exposing (..)
+import Utils
+
+
+defaultXAxisRotation =
+    pi / 4.0
+
+
+defaultYAxisRotation =
+    0.0
+
+
+defaultZAxisRotation =
+    pi / 4.0
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -43,7 +55,7 @@ update msg model =
                 m =
                     Utils.updatePanelEntry expr evaluatePanel model
             in
-                ( m, Cmd.none )
+            ( m, Cmd.none )
 
         TogglePanelEntry panelEntry ->
             let
@@ -52,27 +64,102 @@ update msg model =
             in
                 ( m, Cmd.none )
 
+        IncrementXAxisRotation panelEntry ->
+            let
+                newValue = min panelEntry.xAxis.minMaxIncrement.max (panelEntry.xAxis.rotationAngle + panelEntry.xAxis.minMaxIncrement.increment)
+                axis = panelEntry.xAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | xAxis = newAxis } |> plotPanelEntry
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none) |> Debug.log "Returned from IncrementXAxisRotation"
+
+        IncrementYAxisRotation panelEntry ->
+            let
+                newValue = min panelEntry.yAxis.minMaxIncrement.max (panelEntry.yAxis.rotationAngle + panelEntry.yAxis.minMaxIncrement.increment)
+                axis = panelEntry.yAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | yAxis = newAxis } |> plotPanelEntry
+
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
+
+        IncrementZAxisRotation panelEntry ->
+            let
+                newValue = min panelEntry.zAxis.minMaxIncrement.max (panelEntry.zAxis.rotationAngle + panelEntry.zAxis.minMaxIncrement.increment)
+                axis = panelEntry.zAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | zAxis = newAxis } |> plotPanelEntry
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
+
+        DecrementXAxisRotation panelEntry ->
+            let
+                newValue = max panelEntry.xAxis.minMaxIncrement.min (panelEntry.xAxis.rotationAngle - panelEntry.xAxis.minMaxIncrement.increment)
+                axis = panelEntry.xAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | xAxis = newAxis } |> plotPanelEntry
+
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none ) |> Debug.log "Returned from IncrementXAxisRotation"
+
+        DecrementYAxisRotation panelEntry ->
+            let
+                newValue = max panelEntry.yAxis.minMaxIncrement.min (panelEntry.yAxis.rotationAngle - panelEntry.yAxis.minMaxIncrement.increment)
+                axis = panelEntry.yAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | yAxis = newAxis } |> plotPanelEntry
+
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
+
+        DecrementZAxisRotation panelEntry ->
+            let
+                newValue = max panelEntry.zAxis.minMaxIncrement.min (panelEntry.zAxis.rotationAngle - panelEntry.zAxis.minMaxIncrement.increment)
+                axis = panelEntry.zAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | zAxis = newAxis } |> plotPanelEntry
+
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
+
         ToggleVarMayVary panelEntry symbolTableEntry ->
             let
                 m =
                     Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | mayVary = not e.mayVary }) model
-                    
             in
-                ( m, Cmd.none )
+            ( m, Cmd.none )
 
         UpdateVarStartValueBuffer panelEntry symbolTableEntry value ->
             let
                 m =
                     Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | startValueBuffer = value }) model
             in
-                ( m, Cmd.none )
+            ( m, Cmd.none )
 
         UpdateVarStartValue panelEntry symbolTableEntry _ ->
             let
                 m =
                     Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryStartValue model
             in
-                ( m, Cmd.none )
+            ( m, Cmd.none )
 
         UpdateVarEndValueBuffer panelEntry symbolTableEntry value ->
             let
@@ -93,7 +180,7 @@ update msg model =
                 m =
                     Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | incrementValueBuffer = value }) model
             in
-                ( m, Cmd.none )
+            ( m, Cmd.none )
 
         UpdateVarIncrementValue panelEntry symbolTableEntry _ ->
             let
@@ -104,6 +191,37 @@ update msg model =
 
         Plot panelEntry ->
             let
+                m2 = updatePlotModel panelEntry model
+            in
+                ( m2, Cmd.none )
+
+
+        SetXAlignment panelEntry alignment ->
+            let
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentX = alignment }) model
+            in
+            -- ( m, Cmd.none )
+            update (Plot panelEntry) m
+
+        SetYAlignment panelEntry alignment ->
+            let
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentY = alignment }) model
+            in
+            update (Plot panelEntry) m
+
+        SetAlignmentBehavior panelEntry alignmentBehavior ->
+            let
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | meetOrSlice = alignmentBehavior }) model
+            in
+            update (Plot panelEntry) m
+
+updatePlotModel: PanelEntry -> Model -> Model
+updatePlotModel panelEntry model =
+            let
+                _ = Debug.log "Plotting" panelEntry.expression
                 m =
                     Utils.updatePanelEntry panelEntry.expression plotPanelEntry model
 
@@ -119,34 +237,11 @@ update msg model =
                         Nothing ->
                             m
             in
-                ( m2, Cmd.none )
-
-        SetXAlignment panelEntry alignment ->
-            let
-                m =
-                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentX = alignment }) model
-            in
-                -- ( m, Cmd.none )
-                (update (Plot panelEntry) m)
-
-        SetYAlignment panelEntry alignment ->
-            let
-                m =
-                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentY = alignment }) model
-            in
-                (update (Plot panelEntry) m)
-
-        SetAlignmentBehavior panelEntry alignmentBehavior ->
-            let
-                m =
-                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | meetOrSlice = alignmentBehavior }) model
-            in
-                (update (Plot panelEntry) m)
-
+                m2
 
 plotPanelEntry : PanelEntry -> PanelEntry
 plotPanelEntry panelEntry =
-    if (Utils.getVaryingVariableCount panelEntry) > 2 then
+    if Utils.getVaryingVariableCount panelEntry > 2 then
         { panelEntry | panelError = Just "At most two VARYING variables can be plotted." }
 
     else
@@ -155,7 +250,7 @@ plotPanelEntry panelEntry =
                 panelEntry.variables
                     |> Dict.values
                     |> List.filter (\v -> not v.mayVary)
-                    |> List.map (\e -> (e.variable, e.currentValue))
+                    |> List.map (\e -> ( e.variable, e.currentValue ))
                     |> Dict.fromList
                     |> Debug.log "Constant lookup dict"
 
@@ -163,40 +258,49 @@ plotPanelEntry panelEntry =
                 iterateSymbolTable panelEntry
 
             evaluated =
-                    named |>
-                            List.map
-                                (\dict ->
-                                    ( dict
-                                    , evaluateExpression panelEntry.parsedExpression
-                                        (\variable ->
-                                            case Dict.get variable dict of
+                named
+                    |> List.map
+                        (\dict ->
+                            ( dict
+                            , evaluateExpression panelEntry.parsedExpression
+                                (\variable ->
+                                    case Dict.get variable dict of
+                                        Just v ->
+                                            Ok v
+
+                                        Nothing ->
+                                            case Dict.get variable nonVaryingLookup of
                                                 Just v ->
                                                     Ok v
 
                                                 Nothing ->
-                                                    case Dict.get variable nonVaryingLookup of
-                                                        Just v ->
-                                                            Ok v
-                                                        Nothing ->
-                                                            Err "Variable or constant not found."
-                                        )
-                                    )
+                                                    Err "Variable or constant not found."
                                 )
-                            |> List.map (\(varlookup, floatResult) -> 
-                                            case floatResult of
-                                                Ok v -> (varlookup, v)
-                                                Err msg -> (varlookup, 0.0) |> Debug.log ("ERROR: Evaluation failure: " ++ msg)
-                                        )
-                            |> List.map (\(varlookup, f) -> List.append (Dict.values varlookup) [f])
+                            )
+                        )
+                    |> List.map
+                        (\( varlookup, floatResult ) ->
+                            case floatResult of
+                                Ok v ->
+                                    ( varlookup, v )
+
+                                Err msg ->
+                                    ( varlookup, 0.0 ) |> Debug.log ("ERROR: Evaluation failure: " ++ msg)
+                        )
+                    |> List.map (\( varlookup, f ) -> List.append (Dict.values varlookup) [ f ])
         in
             { panelEntry | plotValues = named, evaluatedPlotValues = evaluated, panelError = Nothing }
 
 
+
 -- Create a list of Dictionary lookups for the VARYING variables
+
+
 iterateSymbolTable : PanelEntry -> List VariableLookup
 iterateSymbolTable panelEntry =
     let
-        vars = Dict.values panelEntry.variables
+        vars =
+            Dict.values panelEntry.variables
 
         varyingVars =
             vars |> List.filter (\e -> e.mayVary)
@@ -206,23 +310,37 @@ iterateSymbolTable panelEntry =
 
         values1 =
             iterateVariables [ [] ] varyingVars
-                |> List.map reverse |> Debug.log "Value1"
+                |> List.map reverse
+                |> Debug.log "Value1"
 
-        values2 = iterateVariables [[]] (List.reverse varyingVars) |> Debug.log "Value2"
+        values2 =
+            iterateVariables [ [] ] (List.reverse varyingVars) |> Debug.log "Value2"
+
         named1 =
             values1 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray |> Dict.fromList) |> Debug.log "named1"
+
         named2 =
             values2 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray |> Dict.fromList) |> Debug.log "named2"
-        named3 = named1 ++ named2 |> Debug.log "named3"
+
+        named3 =
+            named1 ++ named2 |> Debug.log "named3"
+
         x1 =
             values1 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray) |> Debug.log "x1"
+
         x2 =
             values2 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray) |> Debug.log "x2"
-        x3 = x1 ++ x2 |> Debug.log "x3"
+
+        x3 =
+            x1 ++ x2 |> Debug.log "x3"
     in
-        named3 |> Debug.log "final"
+    named3 |> Debug.log "final"
+
+
 
 -- TODO: I think this recursive method is the one that can blow the stack
+
+
 iterateVariables : List Vector -> List SymbolTableEntry -> List Vector
 iterateVariables sofar variables =
     case variables of
@@ -241,11 +359,11 @@ iterateVariables sofar variables =
                     List.range 0 steps |> List.map toFloat
 
                 values =
-                    if variable.mayVary
-                    then
+                    if variable.mayVary then
                         List.map (\m -> variable.startValue + (m * variable.incrementValue)) multipliers
+
                     else
-                        [variable.currentValue]
+                        [ variable.currentValue ]
 
                 permuated =
                     case sofar of
@@ -255,7 +373,7 @@ iterateVariables sofar variables =
                         _ ->
                             List.Cartesian.map2 (::) values sofar
             in
-                iterateVariables permuated rest
+            iterateVariables permuated rest
 
 
 evaluatePanel : PanelEntry -> PanelEntry
@@ -362,6 +480,9 @@ addCurrentExpressionToPanel model =
                     , alignmentX = AlignMid
                     , alignmentY = AlignMid
                     , meetOrSlice = Meet
+                    , xAxis = { axisName = "X", rotationAngle = defaultXAxisRotation, minMaxIncrement = { min=0.0, max=2*pi, increment=pi/16.0 } }
+                    , yAxis = { axisName = "Y", rotationAngle = defaultYAxisRotation, minMaxIncrement = { min=0.0, max=2*pi, increment=pi/16.0 } }
+                    , zAxis = { axisName = "Z", rotationAngle = defaultZAxisRotation, minMaxIncrement = { min=0.0, max=2*pi, increment=pi/16.0 }}
                     }
             in
             { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }

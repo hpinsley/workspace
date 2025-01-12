@@ -1,13 +1,33 @@
 module Models exposing (..)
 
 import Dict exposing (..)
+import Matrix exposing (..)
 import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
-import Matrix exposing (..)
 
-type alias Vector = List Float
-type alias FloatMatrix = Matrix Float
-type alias VariableLookup = Dict String Float
+
+type alias Vector =
+    List Float
+
+
+type alias FloatMatrix =
+    Matrix Float
+
+
+type alias VariableLookup =
+    Dict String Float
+
+
+type alias SymbolTableDictionary =
+    Dict String SymbolTableEntry
+
+type alias MinMaxIncrement =
+    {
+          min: Float
+        , max: Float
+        , increment: Float
+    }
+
 type Msg
     = Tick Time.Posix
     | UpdateExpression String
@@ -26,6 +46,12 @@ type Msg
     | SetXAlignment PanelEntry SvgAlignment
     | SetYAlignment PanelEntry SvgAlignment
     | SetAlignmentBehavior PanelEntry SvgAlignmentBehavor
+    | IncrementXAxisRotation PanelEntry 
+    | IncrementYAxisRotation PanelEntry 
+    | IncrementZAxisRotation PanelEntry 
+    | DecrementXAxisRotation PanelEntry 
+    | DecrementYAxisRotation PanelEntry 
+    | DecrementZAxisRotation PanelEntry 
 
 
 type alias SymbolTableEntry =
@@ -38,22 +64,33 @@ type alias SymbolTableEntry =
     , incrementValue : Float
     , incrementValueBuffer : String
     , errMsg : Maybe String
-    , mayVary: Bool
+    , mayVary : Bool
+    }
+
+
+type alias Axis =
+    { 
+          axisName: String
+        , rotationAngle : Float
+        , minMaxIncrement: MinMaxIncrement
     }
 
 
 type alias PanelEntry =
     { expression : String
     , parsedExpression : Expression
-    , variables : Dict String SymbolTableEntry
+    , variables : SymbolTableDictionary
     , isCollapsed : Bool
     , evaluation : Maybe Float
-    , plotValues : List (VariableLookup)
+    , plotValues : List VariableLookup
     , evaluatedPlotValues : List Vector
     , panelError : Maybe String
     , alignmentX : SvgAlignment
     , alignmentY : SvgAlignment
     , meetOrSlice : SvgAlignmentBehavor
+    , xAxis : Axis
+    , yAxis : Axis
+    , zAxis : Axis
     }
 
 
