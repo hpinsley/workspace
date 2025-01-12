@@ -20,7 +20,7 @@ defaultXAxisRotation = pi / 4.0
 defaultYAxisRotation = 0.0
 defaultZAxisRotation = pi / 4.0
 defaultConstantValue = 1.0
-defaultStartValue = 0.0
+defaultStartValue = -pi
 defaultEndValue = pi
 defaultIncrementValue = 0.1
 
@@ -257,11 +257,10 @@ plotPanelEntry panelEntry =
                     |> Dict.fromList
                     |> Debug.log "Constant lookup dict"
 
-            named =
-                iterateSymbolTable panelEntry
+            fromToVaryingDicts = iterateSymbolTable panelEntry |> Debug.log "FromToVaryingDicts"
 
             evaluated =
-                named
+                fromToVaryingDicts
                     |> List.map
                         (\(startDict, endDict) ->
                             (evaluateExpressionWithVariableDictionaries panelEntry.parsedExpression constantsLookup startDict,
@@ -292,7 +291,7 @@ evaluateExpressionWithVariableDictionaries expression constantsLookup variableLo
                             Err msg -> 0.0 |> Debug.log ("ERROR: " ++ msg)
         indepentVariableValues = Dict.values variableLookup
     in
-        indepentVariableValues |> List.append [functionValue]
+        List.append indepentVariableValues [functionValue]
 
 -- Create a list of Dictionary lookups for the VARYING variables
 
@@ -319,48 +318,11 @@ iterateSymbolTableSingleVariable variable =
         pairs = startStop |> List.map (\(from, to ) -> (variable.startValue + variable.incrementValue * from,  variable.startValue + variable.incrementValue * to))
         lookups = pairs |> List.map (\(p1, p2) -> (Dict.fromList [(variable.variable, p1)], Dict.fromList [(variable.variable, p2)]))
     in
-        lookups
+        lookups |> Debug.log "Lookups"
 
 iterateSymbolTableTwoVariables : SymbolTableEntry -> SymbolTableEntry -> List (VariableLookup, VariableLookup)
 iterateSymbolTableTwoVariables v1 v2 =
     []
-
--- TODO: I think this recursive method is the one that can blow the stack
-
-iterateVariables : List Vector -> List SymbolTableEntry -> List Vector
-iterateVariables sofar variables =
-    case variables of
-        [] ->
-            sofar
-
-        variable :: rest ->
-            let
-                width =
-                    variable.endValue - variable.startValue
-
-                steps =
-                    width / variable.incrementValue |> ceiling
-
-                multipliers =
-                    List.range 0 steps |> List.map toFloat
-
-                values =
-                    if variable.mayVary then
-                        List.map (\m -> variable.startValue + (m * variable.incrementValue)) multipliers
-
-                    else
-                        [ variable.currentValue ]
-
-                permuated =
-                    case sofar of
-                        [] ->
-                            [ [] ]
-
-                        _ ->
-                            List.Cartesian.map2 (::) values sofar
-            in
-            iterateVariables permuated rest
-
 
 evaluatePanel : PanelEntry -> PanelEntry
 evaluatePanel panelEntry =
@@ -456,7 +418,7 @@ addCurrentExpressionToPanel model =
                                                     , errMsg = Nothing
                                                     , currentValue = startValue
                                                     , startValue = startValue
-                                                    , startValueBuffer = String.fromFloat startValue
+                                                    , startValueBuffer = if startValue == -pi then "-pi" else String.fromFloat startValue
                                                     , endValue = endValue
                                                     , endValueBuffer = if endValue == pi then "pi" else String.fromFloat endValue
                                                     , incrementValue = incValue

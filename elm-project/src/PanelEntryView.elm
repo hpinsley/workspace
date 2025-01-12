@@ -61,7 +61,7 @@ viewPanelEntry model panelEntry =
         , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         , Button.text (Button.config |> Button.setOnClick (Plot panelEntry)) "Plot"
 
-        , div [ id "plot-values" ] [ displayPlotValues panelEntry ]
+        -- , div [ id "plot-values" ] [ displayPlotValues panelEntry ]
         , displayAxisInfo panelEntry
         , displayViewportScaling panelEntry
         ]

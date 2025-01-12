@@ -31,7 +31,9 @@ plot model panelEntry =
                     plot2d model panelEntry lineSegments
 
                 2 ->
-                    plot3d model panelEntry lineSegments
+                    -- plot3d model panelEntry lineSegments
+                    div []
+                        [ Html.text "3-D Plot note ready" ]
 
                 _ ->
                     div

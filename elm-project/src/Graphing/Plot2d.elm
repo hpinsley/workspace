@@ -34,7 +34,7 @@ plot2d model panelEntry lineSegments =
         _ =
             Debug.log "Plot2D points to plot" (List.length lineSegments)
         (v1Points, v2Points) = lineSegments |> List.unzip
-        allPoints = List.append v1Points v2Points
+        allPoints = List.append v1Points v2Points |> Debug.log "all points"
 
         minX =
             List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "minX"
@@ -343,23 +343,10 @@ build2DPath yAdjust orderedPairs =
 
 build2DPathFromLineSegments : (Float -> Float) -> List LineSegment -> String
 build2DPathFromLineSegments yAdjust lineSegments =
-    let
-        xValues =
-            List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) lineSegments
-
-        yValues =
-            List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) lineSegments
-
-        adjustedYValues =
-            List.map yAdjust yValues
-
-        points =
-            List.map2 (\x y -> String.fromFloat x ++ "," ++ String.fromFloat y) xValues adjustedYValues
-
-        path =
-            "M " ++ (List.head points |> Maybe.withDefault "0,0") ++ " L " ++ (List.tail points |> Maybe.withDefault [] |> String.join " L ")
-    in
-    path
+    lineSegments 
+        |> List.map (build2DPathFromLineSegment yAdjust)
+        |> String.join " "
+        |> Debug.log "2D Path"
 
 build2DPathFromLineSegment : (Float -> Float) -> LineSegment -> String
 build2DPathFromLineSegment yAdjust lineSegment =
@@ -374,4 +361,4 @@ build2DPathFromLineSegment yAdjust lineSegment =
     in
         "M " ++ String.fromFloat xFrom ++ "," ++ String.fromFloat yFrom ++
             " " ++ 
-        "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat yTo ++ " "
+        "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat yTo
