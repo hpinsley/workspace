@@ -322,7 +322,27 @@ iterateSymbolTableSingleVariable variable =
 
 iterateSymbolTableTwoVariables : SymbolTableEntry -> SymbolTableEntry -> List (VariableLookup, VariableLookup)
 iterateSymbolTableTwoVariables v1 v2 =
-    []
+    let
+        v1PointRange = generateVariableRange v1
+        v2PointRange = generateVariableRange v1
+
+        
+
+        lookups = v1PointRange |> List.map (\(p1, p2) -> (Dict.fromList [(v1.variable, p1)], Dict.fromList [(v1.variable, p2)]))
+    in
+        List.append v1Values v2Values
+
+generateVariableRange : SymbolTableEntry -> List (Float, Float)
+generateVariableRange v1 =
+    let
+        v1Width = v1.endValue - v1.startValue
+        v1Steps = v1Width / v1.incrementValue |> ceiling
+        v1stepRange = List.range 0 (v1Steps - 1) |> List.map toFloat
+
+        v1StartStop = v1stepRange |> List.map (\step -> (step, step + 1))
+        v1PointRange = v1StartStop |> List.map (\(from, to ) -> (v1.startValue + v1.incrementValue * from,  v1.startValue + v1.incrementValue * to))
+    in
+        v1PointRange
 
 evaluatePanel : PanelEntry -> PanelEntry
 evaluatePanel panelEntry =
