@@ -40,7 +40,7 @@ plot3d model panelEntry lineSegments =
     div
         [ Html.Attributes.id "plot-3d" ]
         [ 
-            -- div [] [ plotProjectedPoints model panelEntry projection ]
+            div [] [ plotProjectedPoints model panelEntry projection ]
         ]
 
 
