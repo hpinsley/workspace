@@ -291,7 +291,7 @@ plotPanelEntry panelEntry =
                         )
                     |> List.map (\( varlookup, f ) -> List.append (Dict.values varlookup) [ f ])
         in
-            { panelEntry | plotValues = named, evaluatedPlotValues = evaluated, panelError = Nothing }
+            { panelEntry | evaluatedPlotValues = evaluated, panelError = Nothing }
 
 
 
@@ -484,7 +484,6 @@ addCurrentExpressionToPanel model =
                                 )
                     , isCollapsed = False
                     , evaluation = Nothing
-                    , plotValues = []
                     , evaluatedPlotValues = []
                     , panelError = Nothing
                     , alignmentX = AlignMid
@@ -495,7 +494,7 @@ addCurrentExpressionToPanel model =
                     , zAxis = { axisName = "Z", rotationAngle = defaultZAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement }}
                     }
             in
-            { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
+                { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
 
 
 tickModel : Model -> Time.Posix -> Model
