@@ -23,6 +23,11 @@ defaultStartValue = 0.0
 defaultEndValue = pi
 defaultIncrementValue = 0.1
 
+defaultRotationMinValue = 0.0
+defaultRotationMaxValue = 2*pi
+defaultRotations = 32.0
+defaultRotationIncrement = (defaultRotationMaxValue - defaultRotationMinValue) / defaultRotations
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -469,7 +474,7 @@ addCurrentExpressionToPanel model =
                                                     , startValue = startValue
                                                     , startValueBuffer = String.fromFloat startValue
                                                     , endValue = endValue
-                                                    , endValueBuffer = String.fromFloat endValue
+                                                    , endValueBuffer = if endValue == pi then "pi" else String.fromFloat endValue
                                                     , incrementValue = incValue
                                                     , incrementValueBuffer = String.fromFloat incValue
                                                     , mayVary = not (Utils.isPascalCased v)
@@ -485,9 +490,9 @@ addCurrentExpressionToPanel model =
                     , alignmentX = AlignMid
                     , alignmentY = AlignMid
                     , meetOrSlice = Meet
-                    , xAxis = { axisName = "X", rotationAngle = defaultXAxisRotation, minMaxIncrement = { min=0.0, max=2*pi, increment=pi/16.0 } }
-                    , yAxis = { axisName = "Y", rotationAngle = defaultYAxisRotation, minMaxIncrement = { min=0.0, max=2*pi, increment=pi/16.0 } }
-                    , zAxis = { axisName = "Z", rotationAngle = defaultZAxisRotation, minMaxIncrement = { min=0.0, max=2*pi, increment=pi/16.0 }}
+                    , xAxis = { axisName = "X", rotationAngle = defaultXAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement } }
+                    , yAxis = { axisName = "Y", rotationAngle = defaultYAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement} }
+                    , zAxis = { axisName = "Z", rotationAngle = defaultZAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement }}
                     }
             in
             { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
