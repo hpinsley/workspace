@@ -22,7 +22,7 @@ defaultZAxisRotation = pi / 4.0
 defaultConstantValue = 1.0
 defaultStartValue = -pi
 defaultEndValue = pi
-defaultIncrementValue = 0.1
+defaultIncrementValue = 0.12 -- 0.1 can block the stack for some reason.
 
 defaultRotationMinValue = 0.0
 defaultRotationMaxValue = 2*pi
@@ -257,7 +257,7 @@ plotPanelEntry panelEntry =
                     |> Dict.fromList
                     |> Debug.log "Constant lookup dict"
 
-            fromToVaryingDicts = iterateSymbolTable panelEntry |> Debug.log "FromToVaryingDicts"
+            fromToVaryingDicts = iterateSymbolTable panelEntry -- |> Debug.log "FromToVaryingDicts"
 
             evaluated =
                 fromToVaryingDicts
@@ -323,12 +323,12 @@ iterateSymbolTableSingleVariable variable =
 iterateSymbolTableTwoVariables : SymbolTableEntry -> SymbolTableEntry -> List (VariableLookup, VariableLookup)
 iterateSymbolTableTwoVariables v1 v2 =
     let
-        v1Points = generateVariableRange v1 |> Debug.log "v1Points"
-        v2Points = generateVariableRange v2 |> Debug.log "v2Points"
+        v1Points = generateVariableRange v1 -- |> Debug.log "v1Points"
+        v2Points = generateVariableRange v2 -- |> Debug.log "v2Points"
         v1ToPoints = v1Points |> List.drop 1
         v2ToPoints = v2Points |> List.drop 1
-        v1LineSegs = List.map2 (\from to -> Vec2D from to) v1Points v1ToPoints |> Debug.log "v1LineSegs"
-        v2LineSegs = List.map2 (\from to -> Vec2D from to) v2Points v2ToPoints |> Debug.log "v2LineSegs"
+        v1LineSegs = List.map2 (\from to -> Vec2D from to) v1Points v1ToPoints -- |> Debug.log "v1LineSegs"
+        v2LineSegs = List.map2 (\from to -> Vec2D from to) v2Points v2ToPoints -- |> Debug.log "v2LineSegs"
 
         path1 = v1LineSegs
                     |> List.map (\(Vec2D x1 x2) -> 
@@ -359,7 +359,7 @@ iterateSymbolTableTwoVariables v1 v2 =
         -- lookups = v1Points |> List.map (\(p1, p2) -> (Dict.fromList [(v1.variable, p1)], Dict.fromList [(v1.variable, p2)]))
     in
         -- List.append v1Values v2Values
-        lookups |> Debug.log "iterateSymbolTableTwoVariables Result"
+        lookups -- |> Debug.log "iterateSymbolTableTwoVariables Result"
 
 generateVariableRange : SymbolTableEntry -> List (Float)
 generateVariableRange v1 =

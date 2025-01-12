@@ -24,7 +24,7 @@ plot model panelEntry =
             [ Html.Attributes.id "plot-body" ]
             [ let
                 lineSegments =
-                    panelEntry.evaluatedPlotValues |> Debug.log "evaluatedPlotValues"
+                    panelEntry.evaluatedPlotValues -- |> Debug.log "evaluatedPlotValues"
               in
               case Utils.getVaryingVariableCount panelEntry of
                 1 ->

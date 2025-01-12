@@ -346,7 +346,7 @@ build2DPathFromLineSegments yAdjust lineSegments =
     lineSegments 
         |> List.map (build2DPathFromLineSegment yAdjust)
         |> String.join " "
-        |> Debug.log "2D Path"
+        -- |> Debug.log "2D Path"
 
 build2DPathFromLineSegment : (Float -> Float) -> LineSegment -> String
 build2DPathFromLineSegment yAdjust lineSegment =

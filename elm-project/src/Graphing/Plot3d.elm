@@ -20,11 +20,11 @@ plot3d model panelEntry lineSegments =
         _ =
             Debug.log "Plot3D points to plot" (List.length lineSegments)
 
-        _ =
-            Debug.log "Ordered Pairs" lineSegments
+        -- _ =
+        --     Debug.log "Ordered Pairs" lineSegments
 
         rotatedPairs =
-             rotateData panelEntry lineSegments |> Debug.log "Rotated pairs"
+             rotateData panelEntry lineSegments -- |> Debug.log "Rotated pairs"
 
         projection =
              rotatedPairs
@@ -35,7 +35,7 @@ plot3d model panelEntry lineSegments =
                                 in
                                     (projectedFrom, projectedTo)
                             )
-            |> Debug.log "Projection"
+            -- |> Debug.log "Projection"
     in
     div
         [ Html.Attributes.id "plot-3d" ]
@@ -65,11 +65,11 @@ rotateData panelEntry lineSegments =
 plotProjectedPoints : Model -> PanelEntry -> List LineSegment -> Html Msg
 plotProjectedPoints model panelEntry lineSegments =
     let
-        _ =
-            Debug.log "Plot2D points to plot" (List.length lineSegments)
+        -- _ =
+        --     Debug.log "Plot2D points to plot" (List.length lineSegments)
 
         (v1Points, v2Points) = lineSegments |> List.unzip
-        allPoints = List.append v1Points v2Points |> Debug.log "all points"
+        allPoints = List.append v1Points v2Points -- |> Debug.log "all points"
 
         minX =
             List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "minX"
@@ -112,7 +112,7 @@ plotProjectedPoints model panelEntry lineSegments =
             adjustYValue maxY minY
 
         functionPath =
-            build2DPathFromLineSegments yTransform lineSegments |> Debug.log "Function Path"
+            build2DPathFromLineSegments yTransform lineSegments -- |> Debug.log "Function Path"
 
         elements =
             [ Svg.path
@@ -188,7 +188,7 @@ build2DPathFromLineSegments yAdjust lineSegments =
     lineSegments 
         |> List.map (build2DPathFromLineSegment yAdjust)
         |> String.join " "
-        |> Debug.log "2D Path"
+        -- |> Debug.log "2D Path"
 
 build2DPathFromLineSegment : (Float -> Float) -> LineSegment -> String
 build2DPathFromLineSegment yAdjust lineSegment =
