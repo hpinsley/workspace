@@ -81,35 +81,38 @@ displayAxisInfo panelEntry =
     div [ id "axes-info" ]
         [ fieldset []
             [ legend [] [ text "Axis Rotation" ]
-            , panelEntrySingleAxisView panelEntry panelEntry.xAxis
-            , panelEntrySingleAxisView panelEntry panelEntry.yAxis
-            , panelEntrySingleAxisView panelEntry panelEntry.zAxis
+            , panelEntrySingleAxisView panelEntry.xAxis (IncrementXAxisRotation panelEntry) (DecrementXAxisRotation panelEntry)
+            , panelEntrySingleAxisView panelEntry.yAxis (IncrementYAxisRotation panelEntry) (DecrementYAxisRotation panelEntry)
+            , panelEntrySingleAxisView panelEntry.zAxis (IncrementZAxisRotation panelEntry) (DecrementZAxisRotation panelEntry)
             ]
         ]
 
 
-panelEntrySingleAxisView : PanelEntry -> Axis -> Html Msg
-panelEntrySingleAxisView panelEntry axis =
+panelEntrySingleAxisView : Axis -> Msg -> Msg -> Html Msg
+panelEntrySingleAxisView axis incrementMessage decrementMessage =
     div [ class "axis-info" ]
         [ 
-              floatUpDownControl axis.axisName { min=0.0, max=2*pi, increment=pi/16.0 } axis.rotationAngle
-        ]
-
-floatUpDownControl : String -> MinMaxIncrement -> Float -> Html Msg
-floatUpDownControl controlLabel range currentValue =
-    div [
-            class "min-max-increment"
-        ]
-        [
-            fieldset []
+            div [
+                    class "min-max-increment"
+                ]
                 [
-                      legend [] [ text controlLabel ]
-                    , currentValue |> Utils.roundFloat 2 |> String.fromFloat |> text
-                    , button [class "inc-button inc-up"][text "+"]
-                    , button [class "inc-button inc-down"][text "-"]
+                    fieldset []
+                        [
+                            legend [] [ text axis.axisName ]
+                            , axis.rotationAngle |> Utils.roundFloat 2 |> String.fromFloat |> text
+                            , button    [
+                                              class "inc-button inc-up"
+                                            , onClick incrementMessage
+                                        ]
+                                    [text "+"]
+                            , button [
+                                              class "inc-button inc-down"
+                                            , onClick decrementMessage
+                                    ]
+                                    [text "-"]
+                        ]
                 ]
         ]
-
 
 panelEntryAlignmentBehaviorView : (SvgAlignmentBehavor -> Msg) -> Html Msg
 panelEntryAlignmentBehaviorView msgFunc =

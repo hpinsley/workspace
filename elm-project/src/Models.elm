@@ -46,6 +46,12 @@ type Msg
     | SetXAlignment PanelEntry SvgAlignment
     | SetYAlignment PanelEntry SvgAlignment
     | SetAlignmentBehavior PanelEntry SvgAlignmentBehavor
+    | IncrementXAxisRotation PanelEntry 
+    | IncrementYAxisRotation PanelEntry 
+    | IncrementZAxisRotation PanelEntry 
+    | DecrementXAxisRotation PanelEntry 
+    | DecrementYAxisRotation PanelEntry 
+    | DecrementZAxisRotation PanelEntry 
 
 
 type alias SymbolTableEntry =
@@ -66,6 +72,7 @@ type alias Axis =
     { 
           axisName: String
         , rotationAngle : Float
+        , minMaxIncrement: MinMaxIncrement
     }
 
 
