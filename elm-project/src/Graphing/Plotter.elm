@@ -23,15 +23,15 @@ plot model panelEntry =
         , div
             [ Html.Attributes.id "plot-body" ]
             [ let
-                vectors =
+                lineSegments =
                     panelEntry.evaluatedPlotValues |> Debug.log "evaluatedPlotValues"
               in
               case Utils.getVaryingVariableCount panelEntry of
                 1 ->
-                    plot2d model panelEntry vectors
+                    plot2d model panelEntry lineSegments
 
                 2 ->
-                    plot3d model panelEntry vectors
+                    plot3d model panelEntry lineSegments
 
                 _ ->
                     div
