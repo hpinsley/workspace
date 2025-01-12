@@ -249,7 +249,7 @@ plotPanelEntry panelEntry =
 
     else
         let
-            nonVaryingLookup =
+            constantsLookup =
                 panelEntry.variables
                     |> Dict.values
                     |> List.filter (\v -> not v.mayVary)
@@ -263,38 +263,36 @@ plotPanelEntry panelEntry =
             evaluated =
                 named
                     |> List.map
-                        (\dict ->
-                            ( dict
-                            , evaluateExpression panelEntry.parsedExpression
-                                (\variable ->
-                                    case Dict.get variable dict of
-                                        Just v ->
-                                            Ok v
-
-                                        Nothing ->
-                                            case Dict.get variable nonVaryingLookup of
-                                                Just v ->
-                                                    Ok v
-
-                                                Nothing ->
-                                                    Err "Variable or constant not found."
-                                )
-                            )
-                        )
-                    |> List.map
-                        (\( varlookup, floatResult ) ->
-                            case floatResult of
-                                Ok v ->
-                                    ( varlookup, v )
-
-                                Err msg ->
-                                    ( varlookup, 0.0 ) |> Debug.log ("ERROR: Evaluation failure: " ++ msg)
-                        )
-                    |> List.map (\( varlookup, f ) -> List.append (Dict.values varlookup) [ f ])
+                        (\(startDict, endDict) ->
+                            (evaluateExpressionWithVariableDictionaries panelEntry.parsedExpression constantsLookup startDict,
+                            evaluateExpressionWithVariableDictionaries panelEntry.parsedExpression constantsLookup endDict))
         in
             { panelEntry | evaluatedPlotValues = evaluated, panelError = Nothing }
 
+evaluateExpressionWithVariableDictionaries : Expression -> VariableLookup -> VariableLookup -> Vector
+evaluateExpressionWithVariableDictionaries expression constantsLookup variableLookup =
+    let
+        computedResult = evaluateExpression expression
+                                            (\variable ->
+                                                case Dict.get variable variableLookup of
+                                                    Just v ->
+                                                        Ok v
 
+                                                    Nothing ->
+                                                        case Dict.get variable constantsLookup of
+                                                            Just v ->
+                                                                Ok v
+
+                                                            Nothing ->
+                                                                Err "Variable or constant not found."
+                                            )
+
+        functionValue = case computedResult of
+                            Ok v -> v
+                            Err msg -> 0.0 |> Debug.log ("ERROR: " ++ msg)
+        indepentVariableValues = Dict.values variableLookup
+    in
+        indepentVariableValues |> List.append [functionValue]
 
 -- Create a list of Dictionary lookups for the VARYING variables
 
