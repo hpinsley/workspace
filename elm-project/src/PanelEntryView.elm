@@ -61,7 +61,7 @@ viewPanelEntry model panelEntry =
         , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         , Button.text (Button.config |> Button.setOnClick (Plot panelEntry)) "Plot"
 
-        -- , div [ id "plot-values" ] [ displayPlotValues panelEntry ]
+        , div [ id "plot-values" ] [ displayPlotValues panelEntry ]
         , displayAxisInfo panelEntry
         , displayViewportScaling panelEntry
         ]
@@ -237,24 +237,29 @@ displayPlotValues panelEntry =
             [] ->
                 div [] [ text "No plot values" ]
 
-            head :: tail ->
+            lineSegment :: tail ->
                 case tail of
                     [] ->
-                        div [] [ showPlotValue head ]
+                        div [] [ showLineSegment lineSegment ]
 
                     _ ->
                         case List.reverse tail |> List.head of
                             Just lastEntry ->
-                                div [] [ showPlotValue head, showPlotValue lastEntry ]
+                                div [] [ showLineSegment lineSegment, showLineSegment lastEntry ]
 
                             Nothing ->
-                                div [] [ showPlotValue head ]
+                                div [] [ showLineSegment lineSegment ]
         ]
 
 
-showPlotValue : Vector -> Html Msg
-showPlotValue plotValue =
-    div [] [ toString plotValue |> text ]
+showLineSegment : LineSegment -> Html Msg
+showLineSegment (p1, p2) =
+    let
+        point1 = toString p1
+        point2 = toString p2
+        display = "(" ++ point1 ++ ";" ++ point2 ++ ")"
+    in
+        div [] [ text display ]
 
 
 showSymbolTableEntry : PanelEntry -> SymbolTableEntry -> Html Msg

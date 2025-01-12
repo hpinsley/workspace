@@ -9,6 +9,7 @@ import Time
 type alias Vector =
     List Float
 
+type alias LineSegment = (Vector,Vector)
 
 type alias FloatMatrix =
     Matrix Float
@@ -82,7 +83,7 @@ type alias PanelEntry =
     , variables : SymbolTableDictionary
     , isCollapsed : Bool
     , evaluation : Maybe Float
-    , evaluatedPlotValues : List Vector
+    , evaluatedPlotValues : List LineSegment
     , panelError : Maybe String
     , alignmentX : SvgAlignment
     , alignmentY : SvgAlignment

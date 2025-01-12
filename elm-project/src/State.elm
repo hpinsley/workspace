@@ -13,6 +13,7 @@ import Parsing.VariableExtraction exposing (extractVariablesFromExpression)
 import Set exposing (Set)
 import Time exposing (..)
 import Utils
+import Parser exposing (variable)
 
 
 defaultXAxisRotation = pi / 4.0
@@ -298,50 +299,35 @@ plotPanelEntry panelEntry =
 -- Create a list of Dictionary lookups for the VARYING variables
 
 
-iterateSymbolTable : PanelEntry -> List VariableLookup
+iterateSymbolTable : PanelEntry -> List (VariableLookup, VariableLookup)
 iterateSymbolTable panelEntry =
-    let
-        vars =
-            Dict.values panelEntry.variables
-
-        varyingVars =
-            vars |> List.filter (\e -> e.mayVary)
-
-        varyingVarNames =
-            varyingVars |> List.filter (\e -> e.mayVary) |> List.map .variable
-
-        values1 =
-            iterateVariables [ [] ] varyingVars
-                |> List.map reverse
-                |> Debug.log "Value1"
-
-        values2 =
-            iterateVariables [ [] ] (List.reverse varyingVars) |> Debug.log "Value2"
-
-        named1 =
-            values1 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray |> Dict.fromList) |> Debug.log "named1"
-
-        named2 =
-            values2 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray |> Dict.fromList) |> Debug.log "named2"
-
-        named3 =
-            named1 ++ named2 |> Debug.log "named3"
-
-        x1 =
-            values1 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray) |> Debug.log "x1"
-
-        x2 =
-            values2 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray) |> Debug.log "x2"
-
-        x3 =
-            x1 ++ x2 |> Debug.log "x3"
+    let 
+        varying = panelEntry.variables |> Dict.values |> List.filter (\e -> e.mayVary)
+        varyingCount = varying |> List.length
     in
-    named3 |> Debug.log "final"
+        case varying of
+            firstVariable :: secondVariable :: [] -> iterateSymbolTableTwoVariables firstVariable secondVariable
+            singleVariable :: [] -> iterateSymbolTableSingleVariable singleVariable
+            _ -> [] |> Debug.log ("ERROR: Unable to iterate " ++ String.fromInt varyingCount ++ "variables.")
 
+iterateSymbolTableSingleVariable : SymbolTableEntry -> List (VariableLookup, VariableLookup)
+iterateSymbolTableSingleVariable variable =
+    let
+        width = variable.endValue - variable.startValue
+        steps = width / variable.incrementValue |> ceiling
+        stepRange = List.range 0 (steps - 1) |> List.map toFloat
 
+        startStop = stepRange |> List.map (\step -> (step, step + 1))
+        pairs = startStop |> List.map (\(from, to ) -> (variable.startValue + variable.incrementValue * from,  variable.startValue + variable.incrementValue * to))
+        lookups = pairs |> List.map (\(p1, p2) -> (Dict.fromList [(variable.variable, p1)], Dict.fromList [(variable.variable, p2)]))
+    in
+        lookups
+
+iterateSymbolTableTwoVariables : SymbolTableEntry -> SymbolTableEntry -> List (VariableLookup, VariableLookup)
+iterateSymbolTableTwoVariables v1 v2 =
+    []
 
 -- TODO: I think this recursive method is the one that can blow the stack
-
 
 iterateVariables : List Vector -> List SymbolTableEntry -> List Vector
 iterateVariables sofar variables =
