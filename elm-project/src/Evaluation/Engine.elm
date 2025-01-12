@@ -90,7 +90,7 @@ evaluateFactor factor symbolLookup =
                     evaluateFactor factor2 symbolLookup
 
                 final =
-                    Result.map2 (^) result1 result2 |> Debug.log ("Raising " ++ (Debug.toString result1) ++ " to the power of " ++ (Debug.toString result2))
+                    Result.map2 (^) result1 result2 |> Debug.log ("Raising " ++ Debug.toString result1 ++ " to the power of " ++ Debug.toString result2)
             in
             final
 
@@ -109,17 +109,17 @@ applyMulOp mulOp x y =
     in
     case mulOp of
         Times ->
-            x * y |> Debug.log ("Multiplied " ++ (String.fromFloat x) ++ " to " ++ (String.fromFloat y))
+            x * y
 
         Divide ->
-            x / y |> Debug.log ("Divided " ++ (String.fromFloat x) ++ " by " ++ (String.fromFloat y))
+            x / y
 
 
 applyAddOp : AddOp -> Float -> Float -> Float
 applyAddOp addOp x y =
     case addOp of
         Plus ->
-            x + y |> Debug.log ("Added " ++ (String.fromFloat x) ++ " to " ++ (String.fromFloat y))
+            x + y
 
         Minus ->
-            x - y |> Debug.log ("Subtracted " ++ (String.fromFloat y) ++ " from " ++ (String.fromFloat x))
+            x - y

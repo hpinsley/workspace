@@ -12,6 +12,22 @@ import Parsing.ExpressionParsers as ExpressionParsers
 import Parsing.VariableExtraction exposing (extractVariablesFromExpression)
 import Set exposing (Set)
 import Time exposing (..)
+import Utils
+import Parser exposing (variable)
+
+
+defaultXAxisRotation = pi / 4.0
+defaultYAxisRotation = 0.0
+defaultZAxisRotation = pi / 4.0
+defaultConstantValue = 1.0
+defaultStartValue = -pi
+defaultEndValue = pi
+defaultIncrementValue = 0.12 -- 0.1 can block the stack for some reason.
+
+defaultRotationMinValue = 0.0
+defaultRotationMaxValue = 2*pi
+defaultRotations = 32.0
+defaultRotationIncrement = (defaultRotationMaxValue - defaultRotationMinValue) / defaultRotations
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -40,66 +56,180 @@ update msg model =
         EvaluateExpression expr ->
             let
                 m =
-                    updatePanelEntry expr evaluatePanel model
+                    Utils.updatePanelEntry expr evaluatePanel model
             in
             ( m, Cmd.none )
 
         TogglePanelEntry panelEntry ->
             let
                 m =
-                    updatePanelEntry panelEntry.expression (\pe -> { pe | isCollapsed = not pe.isCollapsed }) model
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | isCollapsed = not pe.isCollapsed }) model
+            in
+                ( m, Cmd.none )
+
+        IncrementXAxisRotation panelEntry ->
+            let
+                newValue = min panelEntry.xAxis.minMaxIncrement.max (panelEntry.xAxis.rotationAngle + panelEntry.xAxis.minMaxIncrement.increment)
+                axis = panelEntry.xAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | xAxis = newAxis } |> plotPanelEntry
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none) |> Debug.log "Returned from IncrementXAxisRotation"
+
+        IncrementYAxisRotation panelEntry ->
+            let
+                newValue = min panelEntry.yAxis.minMaxIncrement.max (panelEntry.yAxis.rotationAngle + panelEntry.yAxis.minMaxIncrement.increment)
+                axis = panelEntry.yAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | yAxis = newAxis } |> plotPanelEntry
+
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
+
+        IncrementZAxisRotation panelEntry ->
+            let
+                newValue = min panelEntry.zAxis.minMaxIncrement.max (panelEntry.zAxis.rotationAngle + panelEntry.zAxis.minMaxIncrement.increment)
+                axis = panelEntry.zAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | zAxis = newAxis } |> plotPanelEntry
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
+
+        DecrementXAxisRotation panelEntry ->
+            let
+                newValue = max panelEntry.xAxis.minMaxIncrement.min (panelEntry.xAxis.rotationAngle - panelEntry.xAxis.minMaxIncrement.increment)
+                axis = panelEntry.xAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | xAxis = newAxis } |> plotPanelEntry
+
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none ) |> Debug.log "Returned from IncrementXAxisRotation"
+
+        DecrementYAxisRotation panelEntry ->
+            let
+                newValue = max panelEntry.yAxis.minMaxIncrement.min (panelEntry.yAxis.rotationAngle - panelEntry.yAxis.minMaxIncrement.increment)
+                axis = panelEntry.yAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | yAxis = newAxis } |> plotPanelEntry
+
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
+
+        DecrementZAxisRotation panelEntry ->
+            let
+                newValue = max panelEntry.zAxis.minMaxIncrement.min (panelEntry.zAxis.rotationAngle - panelEntry.zAxis.minMaxIncrement.increment)
+                axis = panelEntry.zAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | zAxis = newAxis } |> plotPanelEntry
+
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
+
+        ToggleVarMayVary panelEntry symbolTableEntry ->
+            let
+                m =
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | mayVary = not e.mayVary }) model
             in
             ( m, Cmd.none )
 
         UpdateVarStartValueBuffer panelEntry symbolTableEntry value ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | startValueBuffer = value }) model
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | startValueBuffer = value }) model
             in
             ( m, Cmd.none )
 
         UpdateVarStartValue panelEntry symbolTableEntry _ ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryStartValue model
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryStartValue model
             in
             ( m, Cmd.none )
 
         UpdateVarEndValueBuffer panelEntry symbolTableEntry value ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | endValueBuffer = value }) model
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | endValueBuffer = value }) model
             in
             ( m, Cmd.none )
 
         UpdateVarEndValue panelEntry symbolTableEntry _ ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryEndValue model
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryEndValue model
             in
             ( m, Cmd.none )
 
         UpdateVarIncrementValueBuffer panelEntry symbolTableEntry value ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | incrementValueBuffer = value }) model
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | incrementValueBuffer = value }) model
             in
-                ( m, Cmd.none )
+            ( m, Cmd.none )
 
         UpdateVarIncrementValue panelEntry symbolTableEntry _ ->
             let
                 m =
-                    updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryIncrementValue model
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryIncrementValue model
             in
             ( m, Cmd.none )
 
         Plot panelEntry ->
             let
+                m2 = updatePlotModel panelEntry model
+            in
+                ( m2, Cmd.none )
+
+
+        SetXAlignment panelEntry alignment ->
+            let
                 m =
-                    updatePanelEntry panelEntry.expression plotPanelEntry model
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentX = alignment }) model
+            in
+            -- ( m, Cmd.none )
+            update (Plot panelEntry) m
+
+        SetYAlignment panelEntry alignment ->
+            let
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentY = alignment }) model
+            in
+            update (Plot panelEntry) m
+
+        SetAlignmentBehavior panelEntry alignmentBehavior ->
+            let
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | meetOrSlice = alignmentBehavior }) model
+            in
+            update (Plot panelEntry) m
+
+updatePlotModel: PanelEntry -> Model -> Model
+updatePlotModel panelEntry model =
+            let
+                _ = Debug.log "Plotting" panelEntry.expression
+                m =
+                    Utils.updatePanelEntry panelEntry.expression plotPanelEntry model
 
                 m2 =
-                    case findPanelEntry m panelEntry.expression of
+                    case Utils.findPanelEntry m panelEntry.expression of
                         Just pe ->
                             if List.length pe.evaluatedPlotValues > 0 then
                                 { m | activePlotEntry = Just pe }
@@ -110,116 +240,136 @@ update msg model =
                         Nothing ->
                             m
             in
-                ( m2, Cmd.none )
-
-        SetXAlignment panelEntry alignment ->
-            let
-                m =
-                    updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentX = alignment }) model
-            in
-                -- ( m, Cmd.none )
-                (update (Plot panelEntry) m)
-
-        SetYAlignment panelEntry alignment ->
-            let
-                m =
-                    updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentY = alignment }) model
-            in
-                (update (Plot panelEntry) m)
-
-        SetAlignmentBehavior panelEntry alignmentBehavior ->
-            let
-                m =
-                    updatePanelEntry panelEntry.expression (\pe -> { pe | meetOrSlice = alignmentBehavior }) model
-            in
-                (update (Plot panelEntry) m)
-
-findPanelEntry : Model -> String -> Maybe PanelEntry
-findPanelEntry model expression =
-    case List.filter (\pe -> pe.expression == expression) model.panelEntries of
-        [ pe ] ->
-            Just pe
-
-        _ ->
-            Nothing
-
+                m2
 
 plotPanelEntry : PanelEntry -> PanelEntry
 plotPanelEntry panelEntry =
-    if Dict.size panelEntry.variables > 2 then
-        { panelEntry | panelError = Just "At most two variables can be plotted." }
+    if Utils.getVaryingVariableCount panelEntry > 2 then
+        { panelEntry | panelError = Just "At most two VARYING variables can be plotted." }
 
     else
         let
-            named =
-                iterateSymbolTable panelEntry
+            constantsLookup =
+                panelEntry.variables
+                    |> Dict.values
+                    |> List.filter (\v -> not v.mayVary)
+                    |> List.map (\e -> ( e.variable, e.currentValue ))
+                    |> Dict.fromList
+                    |> Debug.log "Constant lookup dict"
 
-            evalutated =
-                List.map
-                    (\dict ->
-                        ( dict
-                        , evaluateExpression panelEntry.parsedExpression
-                            (\variable ->
-                                case Dict.get variable dict of
-                                    Just v ->
-                                        Ok v
+            fromToVaryingDicts = iterateSymbolTable panelEntry -- |> Debug.log "FromToVaryingDicts"
 
-                                    Nothing ->
-                                        Err "Variable not found."
-                            )
-                        )
-                    )
-                    named
+            evaluated =
+                fromToVaryingDicts
+                    |> List.map
+                        (\(startDict, endDict) ->
+                            (evaluateExpressionWithVariableDictionaries panelEntry.parsedExpression constantsLookup startDict,
+                            evaluateExpressionWithVariableDictionaries panelEntry.parsedExpression constantsLookup endDict))
         in
-        { panelEntry | plotValues = named, evaluatedPlotValues = evalutated }
+            { panelEntry | evaluatedPlotValues = evaluated, panelError = Nothing }
 
-
-iterateSymbolTable : PanelEntry -> List (Dict.Dict String Float)
-iterateSymbolTable panelEntry =
+evaluateExpressionWithVariableDictionaries : Expression -> VariableLookup -> VariableLookup -> Vector
+evaluateExpressionWithVariableDictionaries expression constantsLookup variableLookup =
     let
-        varialbeNames =
-            panelEntry.variables |> Dict.values |> List.map .variable
+        computedResult = evaluateExpression expression
+                                            (\variable ->
+                                                case Dict.get variable variableLookup of
+                                                    Just v ->
+                                                        Ok v
 
-        values =
-            iterateVariables [ [] ] (Dict.values panelEntry.variables)
-                |> List.map reverse
+                                                    Nothing ->
+                                                        case Dict.get variable constantsLookup of
+                                                            Just v ->
+                                                                Ok v
 
-        named =
-            values |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varialbeNames vArray |> Dict.fromList)
+                                                            Nothing ->
+                                                                Err "Variable or constant not found."
+                                            )
+
+        functionValue = case computedResult of
+                            Ok v -> v
+                            Err msg -> 0.0 |> Debug.log ("ERROR: " ++ msg)
+        indepentVariableValues = Dict.values variableLookup
     in
-    named
+        List.append indepentVariableValues [functionValue]
+
+-- Create a list of Dictionary lookups for the VARYING variables
 
 
-iterateVariables : List (List Float) -> List SymbolTableEntry -> List (List Float)
-iterateVariables sofar variables =
-    case variables of
-        [] ->
-            sofar
+iterateSymbolTable : PanelEntry -> List (VariableLookup, VariableLookup)
+iterateSymbolTable panelEntry =
+    let 
+        varying = panelEntry.variables |> Dict.values |> List.filter (\e -> e.mayVary)
+        varyingCount = varying |> List.length
+    in
+        case varying of
+            firstVariable :: secondVariable :: [] -> iterateSymbolTableTwoVariables firstVariable secondVariable
+            singleVariable :: [] -> iterateSymbolTableSingleVariable singleVariable
+            _ -> [] |> Debug.log ("ERROR: Unable to iterate " ++ String.fromInt varyingCount ++ "variables.")
 
-        variable :: rest ->
-            let
-                width =
-                    variable.endValue - variable.startValue
+iterateSymbolTableSingleVariable : SymbolTableEntry -> List (VariableLookup, VariableLookup)
+iterateSymbolTableSingleVariable variable =
+    let
+        width = variable.endValue - variable.startValue
+        steps = width / variable.incrementValue |> ceiling
+        stepRange = List.range 0 (steps - 1) |> List.map toFloat
 
-                steps =
-                    width / variable.incrementValue |> ceiling
+        startStop = stepRange |> List.map (\step -> (step, step + 1))
+        pairs = startStop |> List.map (\(from, to ) -> (variable.startValue + variable.incrementValue * from,  variable.startValue + variable.incrementValue * to))
+        lookups = pairs |> List.map (\(p1, p2) -> (Dict.fromList [(variable.variable, p1)], Dict.fromList [(variable.variable, p2)]))
+    in
+        lookups |> Debug.log "Lookups"
 
-                multipliers =
-                    List.range 0 steps |> List.map toFloat
+iterateSymbolTableTwoVariables : SymbolTableEntry -> SymbolTableEntry -> List (VariableLookup, VariableLookup)
+iterateSymbolTableTwoVariables v1 v2 =
+    let
+        v1Points = generateVariableRange v1 -- |> Debug.log "v1Points"
+        v2Points = generateVariableRange v2 -- |> Debug.log "v2Points"
+        v1ToPoints = v1Points |> List.drop 1
+        v2ToPoints = v2Points |> List.drop 1
+        v1LineSegs = List.map2 (\from to -> Vec2D from to) v1Points v1ToPoints -- |> Debug.log "v1LineSegs"
+        v2LineSegs = List.map2 (\from to -> Vec2D from to) v2Points v2ToPoints -- |> Debug.log "v2LineSegs"
 
-                values =
-                    List.map (\m -> variable.startValue + (m * variable.incrementValue)) multipliers
+        path1 = v1LineSegs
+                    |> List.map (\(Vec2D x1 x2) -> 
+                                    v2Points |> List.map (\y -> (Vec2D x1 y, Vec2D x2 y))
+                                )
+                    |> List.concat
+        
+        path2 = v2LineSegs
+                    |> List.map (\(Vec2D y1 y2) -> 
+                                    v1Points |> List.map (\x -> (Vec2D x y1, Vec2D x y2))
+                                )
+                    |> List.concat
+        
+        path = path1 ++ path2
 
-                permuated =
-                    case sofar of
-                        [] ->
-                            [ [] ]
+        lookups = path
+                    |> List.map (
+                                    \((Vec2D x1 y1), (Vec2D x2 y2)) ->
+                                        let
+                                            fromLookup = Dict.fromList [(v1.variable, x1), (v2.variable, y1)]
+                                            toLookup = Dict.fromList [ (v1.variable, x2), (v2.variable, y2)]
+                                        in
+                                            (fromLookup, toLookup)
+                                )
 
-                        _ ->
-                            List.Cartesian.map2 (::) values sofar
-            in
-            iterateVariables permuated rest
 
+
+        -- lookups = v1Points |> List.map (\(p1, p2) -> (Dict.fromList [(v1.variable, p1)], Dict.fromList [(v1.variable, p2)]))
+    in
+        -- List.append v1Values v2Values
+        lookups -- |> Debug.log "iterateSymbolTableTwoVariables Result"
+
+generateVariableRange : SymbolTableEntry -> List (Float)
+generateVariableRange v1 =
+    let
+        width = v1.endValue - v1.startValue
+        steps = width / v1.incrementValue |> ceiling
+        zeroToN = List.range 0 steps |> List.map toFloat
+        v1PointRange = zeroToN |> List.map (\multiplier -> v1.startValue + v1.incrementValue * multiplier)
+    in
+        v1PointRange
 
 evaluatePanel : PanelEntry -> PanelEntry
 evaluatePanel panelEntry =
@@ -241,57 +391,6 @@ evaluatePanel panelEntry =
 
         Err _ ->
             panelEntry
-
-
-
--- This function updates a specific PanelEntry in the model's panelEntries list.
--- It takes three arguments:
--- 1. expressionToMatch: A String representing the expression to match.
--- 2. mapFunc: A function that takes a PanelEntry and returns an updated PanelEntry.
--- 3. model: The current state of the model.
--- The function returns a new model with the updated panelEntries list.
-
-
-updatePanelEntry : String -> (PanelEntry -> PanelEntry) -> Model -> Model
-updatePanelEntry expressionToMatch mapFunc model =
-    let
-        panelEntries =
-            model.panelEntries
-                |> List.map
-                    (\pe ->
-                        if pe.expression == expressionToMatch then
-                            mapFunc pe
-
-                        else
-                            pe
-                    )
-    in
-    { model | panelEntries = panelEntries }
-
-
-updateSymbolTableEntry : String -> Variable -> (SymbolTableEntry -> SymbolTableEntry) -> Model -> Model
-updateSymbolTableEntry expressionToMatch variableToMatch mapFunc model =
-    let
-        mapper =
-            \pe ->
-                { pe
-                    | variables =
-                        Dict.map
-                            (\k ->
-                                \v ->
-                                    if k == variableToMatch then
-                                        mapFunc v
-
-                                    else
-                                        v
-                            )
-                            pe.variables
-                }
-
-        m =
-            updatePanelEntry expressionToMatch mapper model
-    in
-    m
 
 
 parseAndEvaluateRangeExpression : String -> Result String Float
@@ -356,28 +455,39 @@ addCurrentExpressionToPanel model =
                             |> Dict.map
                                 (\_ ->
                                     \v ->
-                                        { variable = v
-                                        , errMsg = Nothing
-                                        , currentValue = 0.0
-                                        , startValue = 0.0
-                                        , startValueBuffer = ""
-                                        , endValue = 0.0
-                                        , endValueBuffer = ""
-                                        , incrementValue = 0.0
-                                        , incrementValueBuffer = ""
-                                        }
+                                        let
+                                            mayVary = not (Utils.isPascalCased v)
+                                            startValue = if mayVary then defaultStartValue else defaultConstantValue
+                                            endValue = defaultEndValue
+                                            incValue = defaultIncrementValue
+
+                                            entry = { variable = v
+                                                    , errMsg = Nothing
+                                                    , currentValue = startValue
+                                                    , startValue = startValue
+                                                    , startValueBuffer = if startValue == -pi then "-pi" else String.fromFloat startValue
+                                                    , endValue = endValue
+                                                    , endValueBuffer = if endValue == pi then "pi" else String.fromFloat endValue
+                                                    , incrementValue = incValue
+                                                    , incrementValueBuffer = String.fromFloat incValue
+                                                    , mayVary = not (Utils.isPascalCased v)
+                                                    }
+                                        in
+                                            entry
                                 )
                     , isCollapsed = False
                     , evaluation = Nothing
-                    , plotValues = []
                     , evaluatedPlotValues = []
                     , panelError = Nothing
                     , alignmentX = AlignMid
                     , alignmentY = AlignMid
                     , meetOrSlice = Meet
+                    , xAxis = { axisName = "X", rotationAngle = defaultXAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement } }
+                    , yAxis = { axisName = "Y", rotationAngle = defaultYAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement} }
+                    , zAxis = { axisName = "Z", rotationAngle = defaultZAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement }}
                     }
             in
-            { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
+                { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
 
 
 tickModel : Model -> Time.Posix -> Model

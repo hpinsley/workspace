@@ -1,9 +1,36 @@
 module Models exposing (..)
 
 import Dict exposing (..)
+import Matrix exposing (..)
 import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
 
+
+type alias Vector =
+    List Float
+
+type Vector2D = Vec2D Float Float
+type Vector3D = Vec3D Float Float Float
+
+type alias LineSegment = (Vector,Vector)
+
+type alias FloatMatrix =
+    Matrix Float
+
+
+type alias VariableLookup =
+    Dict String Float
+
+
+type alias SymbolTableDictionary =
+    Dict String SymbolTableEntry
+
+type alias MinMaxIncrement =
+    {
+          min: Float
+        , max: Float
+        , increment: Float
+    }
 
 type Msg
     = Tick Time.Posix
@@ -17,11 +44,18 @@ type Msg
     | UpdateVarStartValue PanelEntry SymbolTableEntry String
     | UpdateVarEndValue PanelEntry SymbolTableEntry String
     | UpdateVarIncrementValue PanelEntry SymbolTableEntry String
+    | ToggleVarMayVary PanelEntry SymbolTableEntry
     | TogglePanelEntry PanelEntry
     | Plot PanelEntry
     | SetXAlignment PanelEntry SvgAlignment
     | SetYAlignment PanelEntry SvgAlignment
     | SetAlignmentBehavior PanelEntry SvgAlignmentBehavor
+    | IncrementXAxisRotation PanelEntry 
+    | IncrementYAxisRotation PanelEntry 
+    | IncrementZAxisRotation PanelEntry 
+    | DecrementXAxisRotation PanelEntry 
+    | DecrementYAxisRotation PanelEntry 
+    | DecrementZAxisRotation PanelEntry 
 
 
 type alias SymbolTableEntry =
@@ -34,21 +68,32 @@ type alias SymbolTableEntry =
     , incrementValue : Float
     , incrementValueBuffer : String
     , errMsg : Maybe String
+    , mayVary : Bool
+    }
+
+
+type alias Axis =
+    { 
+          axisName: String
+        , rotationAngle : Float
+        , minMaxIncrement: MinMaxIncrement
     }
 
 
 type alias PanelEntry =
     { expression : String
     , parsedExpression : Expression
-    , variables : Dict String SymbolTableEntry
+    , variables : SymbolTableDictionary
     , isCollapsed : Bool
     , evaluation : Maybe Float
-    , plotValues : List (Dict String Float)
-    , evaluatedPlotValues : List ( Dict.Dict String Float, Result String Float )
+    , evaluatedPlotValues : List LineSegment
     , panelError : Maybe String
     , alignmentX : SvgAlignment
     , alignmentY : SvgAlignment
     , meetOrSlice : SvgAlignmentBehavor
+    , xAxis : Axis
+    , yAxis : Axis
+    , zAxis : Axis
     }
 
 

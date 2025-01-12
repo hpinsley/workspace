@@ -121,7 +121,7 @@ div#variables {
 div#plot {
     font-size: 10pt;
 
-    div#svg-container {
+    div.svg-container {
         border: 1px solid black;
         height: 85vh;
         width: 70vw;
@@ -138,4 +138,20 @@ div#viewport-scaling {
         width: 100px;
     }
     font-size: 8pt;
+}
+
+div#axes-info {
+    font-size: 8pt;
+    width: 400px;
+    div.axis-info {
+        float: left;
+        display: block;
+        width: 120px;
+    }
+}
+
+button.inc-button {
+    font-size: 6pt;
+    font-weight: bold;
+    margin-left: 10px;
 }
