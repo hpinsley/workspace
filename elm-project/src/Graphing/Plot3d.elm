@@ -21,14 +21,21 @@ plot3d model panelEntry lineSegments =
             Debug.log "Plot3D points to plot" (List.length lineSegments)
 
         _ =
-            Debug.log "Line Segments" lineSegments
+            Debug.log "Ordered Pairs" lineSegments
 
-        -- rotatedPairs =
-        --     rotateData panelEntry lineSegments
+        rotatedPairs =
+             rotateData panelEntry lineSegments |> Debug.log "Rotated pairs"
 
-        -- projection =
-        --     rotatedPairs
-        --         |> List.map Utils.dropYComponent
+        projection =
+             rotatedPairs
+                 |> List.map (\(from, to) -> 
+                                let
+                                    projectedFrom = Utils.dropYComponent from
+                                    projectedTo = Utils.dropYComponent to
+                                in
+                                    (projectedFrom, projectedTo)
+                            )
+            |> Debug.log "Projection"
     in
     div
         [ Html.Attributes.id "plot-3d" ]
@@ -37,14 +44,22 @@ plot3d model panelEntry lineSegments =
         ]
 
 
-rotateData : PanelEntry -> List Vector -> List Vector
-rotateData panelEntry vectors =
+rotateData : PanelEntry -> List LineSegment -> List LineSegment
+rotateData panelEntry lineSegments =
     let
-        -- rotationMatrix = Utils.xyzRotation (pi/2) 0 0    -- Good for looking at the grid?
         rotationMatrix =
             Utils.xyzRotation panelEntry.xAxis.rotationAngle panelEntry.yAxis.rotationAngle panelEntry.zAxis.rotationAngle
+
+        fromVectors = lineSegments |> List.map (\(from, _) -> from)
+        toVectors = lineSegments |> List.map (\(_, to) -> to)
+
+        rotatedFromVectors = fromVectors |> Utils.multiply3DData rotationMatrix
+        rotatedToVectors = toVectors |> Utils.multiply3DData rotationMatrix
+
+        rotatedLineSegments = List.map2 (\vfrom vTo -> (vfrom, vTo)) rotatedFromVectors rotatedToVectors
+        
     in
-        vectors |> Utils.multiply3DData rotationMatrix
+        rotatedLineSegments
 
 
 plotProjectedPoints : Model -> PanelEntry -> List LineSegment -> Html Msg

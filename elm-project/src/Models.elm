@@ -9,6 +9,9 @@ import Time
 type alias Vector =
     List Float
 
+type Vector2D = Vec2D Float Float
+type Vector3D = Vec3D Float Float Float
+
 type alias LineSegment = (Vector,Vector)
 
 type alias FloatMatrix =

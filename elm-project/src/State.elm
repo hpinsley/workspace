@@ -323,24 +323,51 @@ iterateSymbolTableSingleVariable variable =
 iterateSymbolTableTwoVariables : SymbolTableEntry -> SymbolTableEntry -> List (VariableLookup, VariableLookup)
 iterateSymbolTableTwoVariables v1 v2 =
     let
-        v1PointRange = generateVariableRange v1
-        v2PointRange = generateVariableRange v1
+        v1Points = generateVariableRange v1 |> Debug.log "v1Points"
+        v2Points = generateVariableRange v2 |> Debug.log "v2Points"
+        v1ToPoints = v1Points |> List.drop 1
+        v2ToPoints = v2Points |> List.drop 1
+        v1LineSegs = List.map2 (\from to -> Vec2D from to) v1Points v1ToPoints |> Debug.log "v1LineSegs"
+        v2LineSegs = List.map2 (\from to -> Vec2D from to) v2Points v2ToPoints |> Debug.log "v2LineSegs"
 
+        path1 = v1LineSegs
+                    |> List.map (\(Vec2D x1 x2) -> 
+                                    v2Points |> List.map (\y -> (Vec2D x1 y, Vec2D x2 y))
+                                )
+                    |> List.concat
         
+        path2 = v2LineSegs
+                    |> List.map (\(Vec2D y1 y2) -> 
+                                    v1Points |> List.map (\x -> (Vec2D x y1, Vec2D x y2))
+                                )
+                    |> List.concat
+        
+        path = path1 ++ path2
 
-        lookups = v1PointRange |> List.map (\(p1, p2) -> (Dict.fromList [(v1.variable, p1)], Dict.fromList [(v1.variable, p2)]))
+        lookups = path
+                    |> List.map (
+                                    \((Vec2D x1 y1), (Vec2D x2 y2)) ->
+                                        let
+                                            fromLookup = Dict.fromList [(v1.variable, x1), (v2.variable, y1)]
+                                            toLookup = Dict.fromList [ (v1.variable, x2), (v2.variable, y2)]
+                                        in
+                                            (fromLookup, toLookup)
+                                )
+
+
+
+        -- lookups = v1Points |> List.map (\(p1, p2) -> (Dict.fromList [(v1.variable, p1)], Dict.fromList [(v1.variable, p2)]))
     in
-        List.append v1Values v2Values
+        -- List.append v1Values v2Values
+        lookups |> Debug.log "iterateSymbolTableTwoVariables Result"
 
-generateVariableRange : SymbolTableEntry -> List (Float, Float)
+generateVariableRange : SymbolTableEntry -> List (Float)
 generateVariableRange v1 =
     let
-        v1Width = v1.endValue - v1.startValue
-        v1Steps = v1Width / v1.incrementValue |> ceiling
-        v1stepRange = List.range 0 (v1Steps - 1) |> List.map toFloat
-
-        v1StartStop = v1stepRange |> List.map (\step -> (step, step + 1))
-        v1PointRange = v1StartStop |> List.map (\(from, to ) -> (v1.startValue + v1.incrementValue * from,  v1.startValue + v1.incrementValue * to))
+        width = v1.endValue - v1.startValue
+        steps = width / v1.incrementValue |> ceiling
+        zeroToN = List.range 0 steps |> List.map toFloat
+        v1PointRange = zeroToN |> List.map (\multiplier -> v1.startValue + v1.incrementValue * multiplier)
     in
         v1PointRange
 
