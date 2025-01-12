@@ -14,55 +14,74 @@ strokeWidth =
     0.006
 
 
-plot3d : Model -> PanelEntry -> List Vector -> Html Msg
-plot3d model panelEntry orderedPairs =
+plot3d : Model -> PanelEntry -> List LineSegment -> Html Msg
+plot3d model panelEntry lineSegments =
     let
         _ =
-            Debug.log "Plot3D points to plot" (List.length orderedPairs)
+            Debug.log "Plot3D points to plot" (List.length lineSegments)
 
-        _ =
-            Debug.log "Ordered Pairs" orderedPairs
+        -- _ =
+        --     Debug.log "Ordered Pairs" lineSegments
 
         rotatedPairs =
-            rotateData panelEntry orderedPairs
+             rotateData panelEntry lineSegments -- |> Debug.log "Rotated pairs"
 
         projection =
-            rotatedPairs
-                |> List.map Utils.dropYComponent
+             rotatedPairs
+                 |> List.map (\(from, to) -> 
+                                let
+                                    projectedFrom = Utils.dropYComponent from
+                                    projectedTo = Utils.dropYComponent to
+                                in
+                                    (projectedFrom, projectedTo)
+                            )
+            -- |> Debug.log "Projection"
     in
     div
         [ Html.Attributes.id "plot-3d" ]
-        [ div [] [ plotProjectedPoints model panelEntry projection ]
+        [ 
+            div [] [ plotProjectedPoints model panelEntry projection ]
         ]
 
 
-rotateData : PanelEntry -> List Vector -> List Vector
-rotateData panelEntry vectors =
+rotateData : PanelEntry -> List LineSegment -> List LineSegment
+rotateData panelEntry lineSegments =
     let
-        -- rotationMatrix = Utils.xyzRotation (pi/2) 0 0    -- Good for looking at the grid?
         rotationMatrix =
             Utils.xyzRotation panelEntry.xAxis.rotationAngle panelEntry.yAxis.rotationAngle panelEntry.zAxis.rotationAngle
+
+        fromVectors = lineSegments |> List.map (\(from, _) -> from)
+        toVectors = lineSegments |> List.map (\(_, to) -> to)
+
+        rotatedFromVectors = fromVectors |> Utils.multiply3DData rotationMatrix
+        rotatedToVectors = toVectors |> Utils.multiply3DData rotationMatrix
+
+        rotatedLineSegments = List.map2 (\vfrom vTo -> (vfrom, vTo)) rotatedFromVectors rotatedToVectors
+        
     in
-    vectors |> Utils.multiply3DData rotationMatrix
+        rotatedLineSegments
 
 
-plotProjectedPoints : Model -> PanelEntry -> List Vector -> Html Msg
-plotProjectedPoints model panelEntry orderedPairs =
+plotProjectedPoints : Model -> PanelEntry -> List LineSegment -> Html Msg
+plotProjectedPoints model panelEntry lineSegments =
     let
-        _ =
-            Debug.log "Plot2D points to plot" (List.length orderedPairs)
+        -- _ =
+        --     Debug.log "Plot2D points to plot" (List.length lineSegments)
+
+        (v1Points, v2Points) = lineSegments |> List.unzip
+        allPoints = List.append v1Points v2Points -- |> Debug.log "all points"
 
         minX =
-            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minX"
+            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "minX"
 
         maxX =
-            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "maxX"
+            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "maxX"
 
         minY =
-            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minY"
+            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "minY"
 
         maxY =
-            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "maxY"
+            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "maxY"
 
         xWidth =
             maxX - minX |> Debug.log "xWidth"
@@ -93,7 +112,7 @@ plotProjectedPoints model panelEntry orderedPairs =
             adjustYValue maxY minY
 
         functionPath =
-            build2DPath yTransform orderedPairs |> Debug.log "Function Path"
+            build2DPathFromLineSegments yTransform lineSegments -- |> Debug.log "Function Path"
 
         elements =
             [ Svg.path
@@ -164,22 +183,24 @@ adjustYValue maxY minY y =
     (maxY + minY) - y
 
 
-build2DPath : (Float -> Float) -> List Vector -> String
-build2DPath yAdjust orderedPairs =
+build2DPathFromLineSegments : (Float -> Float) -> List LineSegment -> String
+build2DPathFromLineSegments yAdjust lineSegments =
+    lineSegments 
+        |> List.map (build2DPathFromLineSegment yAdjust)
+        |> String.join " "
+        -- |> Debug.log "2D Path"
+
+build2DPathFromLineSegment : (Float -> Float) -> LineSegment -> String
+build2DPathFromLineSegment yAdjust lineSegment =
     let
-        xValues =
-            List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs
-
-        yValues =
-            List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs
-
-        adjustedYValues =
-            List.map yAdjust yValues
-
-        points =
-            List.map2 (\x y -> String.fromFloat x ++ "," ++ String.fromFloat y) xValues adjustedYValues
-
-        path =
-            "M " ++ (List.head points |> Maybe.withDefault "0,0") ++ " L " ++ (List.tail points |> Maybe.withDefault [] |> String.join " L ")
+        (from, to) = lineSegment
+        (xFrom, yFrom) = case from of
+                            x :: y :: [] -> (x, yAdjust y)
+                            _ -> (0,0) |> Debug.log "Unexpected vector length"
+        (xTo, yTo) = case to of
+                            x :: y :: [] -> (x, yAdjust y)
+                            _ -> (0,0) |> Debug.log "Unexpected vector length"
     in
-    path
+        "M " ++ String.fromFloat xFrom ++ "," ++ String.fromFloat yFrom ++
+            " " ++ 
+        "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat yTo

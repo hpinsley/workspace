@@ -9,6 +9,10 @@ import Time
 type alias Vector =
     List Float
 
+type Vector2D = Vec2D Float Float
+type Vector3D = Vec3D Float Float Float
+
+type alias LineSegment = (Vector,Vector)
 
 type alias FloatMatrix =
     Matrix Float
@@ -82,8 +86,7 @@ type alias PanelEntry =
     , variables : SymbolTableDictionary
     , isCollapsed : Bool
     , evaluation : Maybe Float
-    , plotValues : List VariableLookup
-    , evaluatedPlotValues : List Vector
+    , evaluatedPlotValues : List LineSegment
     , panelError : Maybe String
     , alignmentX : SvgAlignment
     , alignmentY : SvgAlignment

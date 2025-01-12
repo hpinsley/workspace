@@ -28,23 +28,25 @@ yTICK_LABEL_OFFSET_WIDTH_PCT =
     -2.0
 
 
-plot2d : Model -> PanelEntry -> List Vector -> Html Msg
-plot2d model panelEntry orderedPairs =
+plot2d : Model -> PanelEntry -> List LineSegment -> Html Msg
+plot2d model panelEntry lineSegments =
     let
         _ =
-            Debug.log "Plot2D points to plot" (List.length orderedPairs)
+            Debug.log "Plot2D points to plot" (List.length lineSegments)
+        (v1Points, v2Points) = lineSegments |> List.unzip
+        allPoints = List.append v1Points v2Points |> Debug.log "all points"
 
         minX =
-            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minX"
+            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "minX"
 
         maxX =
-            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "maxX"
+            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "maxX"
 
         minY =
-            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "minY"
+            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "minY"
 
         maxY =
-            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs) |> Maybe.withDefault 0.0 |> Debug.log "maxY"
+            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "maxY"
 
         xWidth =
             maxX - minX |> Debug.log "xWidth"
@@ -66,7 +68,7 @@ plot2d model panelEntry orderedPairs =
             adjustYValue maxY minY
 
         functionPath =
-            build2DPath yTransform orderedPairs
+            build2DPathFromLineSegments yTransform lineSegments
 
         ( xAxisPath, xLabels ) =
             buildXAxisPath minX maxX minY maxY yTransform |> Debug.log "xAxisPath"
@@ -338,3 +340,25 @@ build2DPath yAdjust orderedPairs =
             "M " ++ (List.head points |> Maybe.withDefault "0,0") ++ " L " ++ (List.tail points |> Maybe.withDefault [] |> String.join " L ")
     in
     path
+
+build2DPathFromLineSegments : (Float -> Float) -> List LineSegment -> String
+build2DPathFromLineSegments yAdjust lineSegments =
+    lineSegments 
+        |> List.map (build2DPathFromLineSegment yAdjust)
+        |> String.join " "
+        -- |> Debug.log "2D Path"
+
+build2DPathFromLineSegment : (Float -> Float) -> LineSegment -> String
+build2DPathFromLineSegment yAdjust lineSegment =
+    let
+        (from, to) = lineSegment
+        (xFrom, yFrom) = case from of
+                            x :: y :: [] -> (x, yAdjust y)
+                            _ -> (0,0) |> Debug.log "Unexpected vector length"
+        (xTo, yTo) = case to of
+                            x :: y :: [] -> (x, yAdjust y)
+                            _ -> (0,0) |> Debug.log "Unexpected vector length"
+    in
+        "M " ++ String.fromFloat xFrom ++ "," ++ String.fromFloat yFrom ++
+            " " ++ 
+        "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat yTo

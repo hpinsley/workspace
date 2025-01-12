@@ -13,15 +13,16 @@ import Parsing.VariableExtraction exposing (extractVariablesFromExpression)
 import Set exposing (Set)
 import Time exposing (..)
 import Utils
+import Parser exposing (variable)
 
 
 defaultXAxisRotation = pi / 4.0
 defaultYAxisRotation = 0.0
 defaultZAxisRotation = pi / 4.0
 defaultConstantValue = 1.0
-defaultStartValue = 0.0
+defaultStartValue = -pi
 defaultEndValue = pi
-defaultIncrementValue = 0.1
+defaultIncrementValue = 0.12 -- 0.1 can block the stack for some reason.
 
 defaultRotationMinValue = 0.0
 defaultRotationMaxValue = 2*pi
@@ -248,7 +249,7 @@ plotPanelEntry panelEntry =
 
     else
         let
-            nonVaryingLookup =
+            constantsLookup =
                 panelEntry.variables
                     |> Dict.values
                     |> List.filter (\v -> not v.mayVary)
@@ -256,127 +257,119 @@ plotPanelEntry panelEntry =
                     |> Dict.fromList
                     |> Debug.log "Constant lookup dict"
 
-            named =
-                iterateSymbolTable panelEntry
+            fromToVaryingDicts = iterateSymbolTable panelEntry -- |> Debug.log "FromToVaryingDicts"
 
             evaluated =
-                named
+                fromToVaryingDicts
                     |> List.map
-                        (\dict ->
-                            ( dict
-                            , evaluateExpression panelEntry.parsedExpression
-                                (\variable ->
-                                    case Dict.get variable dict of
-                                        Just v ->
-                                            Ok v
-
-                                        Nothing ->
-                                            case Dict.get variable nonVaryingLookup of
-                                                Just v ->
-                                                    Ok v
-
-                                                Nothing ->
-                                                    Err "Variable or constant not found."
-                                )
-                            )
-                        )
-                    |> List.map
-                        (\( varlookup, floatResult ) ->
-                            case floatResult of
-                                Ok v ->
-                                    ( varlookup, v )
-
-                                Err msg ->
-                                    ( varlookup, 0.0 ) |> Debug.log ("ERROR: Evaluation failure: " ++ msg)
-                        )
-                    |> List.map (\( varlookup, f ) -> List.append (Dict.values varlookup) [ f ])
+                        (\(startDict, endDict) ->
+                            (evaluateExpressionWithVariableDictionaries panelEntry.parsedExpression constantsLookup startDict,
+                            evaluateExpressionWithVariableDictionaries panelEntry.parsedExpression constantsLookup endDict))
         in
-            { panelEntry | plotValues = named, evaluatedPlotValues = evaluated, panelError = Nothing }
+            { panelEntry | evaluatedPlotValues = evaluated, panelError = Nothing }
 
+evaluateExpressionWithVariableDictionaries : Expression -> VariableLookup -> VariableLookup -> Vector
+evaluateExpressionWithVariableDictionaries expression constantsLookup variableLookup =
+    let
+        computedResult = evaluateExpression expression
+                                            (\variable ->
+                                                case Dict.get variable variableLookup of
+                                                    Just v ->
+                                                        Ok v
 
+                                                    Nothing ->
+                                                        case Dict.get variable constantsLookup of
+                                                            Just v ->
+                                                                Ok v
+
+                                                            Nothing ->
+                                                                Err "Variable or constant not found."
+                                            )
+
+        functionValue = case computedResult of
+                            Ok v -> v
+                            Err msg -> 0.0 |> Debug.log ("ERROR: " ++ msg)
+        indepentVariableValues = Dict.values variableLookup
+    in
+        List.append indepentVariableValues [functionValue]
 
 -- Create a list of Dictionary lookups for the VARYING variables
 
 
-iterateSymbolTable : PanelEntry -> List VariableLookup
+iterateSymbolTable : PanelEntry -> List (VariableLookup, VariableLookup)
 iterateSymbolTable panelEntry =
-    let
-        vars =
-            Dict.values panelEntry.variables
-
-        varyingVars =
-            vars |> List.filter (\e -> e.mayVary)
-
-        varyingVarNames =
-            varyingVars |> List.filter (\e -> e.mayVary) |> List.map .variable
-
-        values1 =
-            iterateVariables [ [] ] varyingVars
-                |> List.map reverse
-                |> Debug.log "Value1"
-
-        values2 =
-            iterateVariables [ [] ] (List.reverse varyingVars) |> Debug.log "Value2"
-
-        named1 =
-            values1 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray |> Dict.fromList) |> Debug.log "named1"
-
-        named2 =
-            values2 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray |> Dict.fromList) |> Debug.log "named2"
-
-        named3 =
-            named1 ++ named2 |> Debug.log "named3"
-
-        x1 =
-            values1 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray) |> Debug.log "x1"
-
-        x2 =
-            values2 |> List.map (\vArray -> List.map2 (\n v -> ( n, v )) varyingVarNames vArray) |> Debug.log "x2"
-
-        x3 =
-            x1 ++ x2 |> Debug.log "x3"
+    let 
+        varying = panelEntry.variables |> Dict.values |> List.filter (\e -> e.mayVary)
+        varyingCount = varying |> List.length
     in
-    named3 |> Debug.log "final"
+        case varying of
+            firstVariable :: secondVariable :: [] -> iterateSymbolTableTwoVariables firstVariable secondVariable
+            singleVariable :: [] -> iterateSymbolTableSingleVariable singleVariable
+            _ -> [] |> Debug.log ("ERROR: Unable to iterate " ++ String.fromInt varyingCount ++ "variables.")
+
+iterateSymbolTableSingleVariable : SymbolTableEntry -> List (VariableLookup, VariableLookup)
+iterateSymbolTableSingleVariable variable =
+    let
+        width = variable.endValue - variable.startValue
+        steps = width / variable.incrementValue |> ceiling
+        stepRange = List.range 0 (steps - 1) |> List.map toFloat
+
+        startStop = stepRange |> List.map (\step -> (step, step + 1))
+        pairs = startStop |> List.map (\(from, to ) -> (variable.startValue + variable.incrementValue * from,  variable.startValue + variable.incrementValue * to))
+        lookups = pairs |> List.map (\(p1, p2) -> (Dict.fromList [(variable.variable, p1)], Dict.fromList [(variable.variable, p2)]))
+    in
+        lookups |> Debug.log "Lookups"
+
+iterateSymbolTableTwoVariables : SymbolTableEntry -> SymbolTableEntry -> List (VariableLookup, VariableLookup)
+iterateSymbolTableTwoVariables v1 v2 =
+    let
+        v1Points = generateVariableRange v1 -- |> Debug.log "v1Points"
+        v2Points = generateVariableRange v2 -- |> Debug.log "v2Points"
+        v1ToPoints = v1Points |> List.drop 1
+        v2ToPoints = v2Points |> List.drop 1
+        v1LineSegs = List.map2 (\from to -> Vec2D from to) v1Points v1ToPoints -- |> Debug.log "v1LineSegs"
+        v2LineSegs = List.map2 (\from to -> Vec2D from to) v2Points v2ToPoints -- |> Debug.log "v2LineSegs"
+
+        path1 = v1LineSegs
+                    |> List.map (\(Vec2D x1 x2) -> 
+                                    v2Points |> List.map (\y -> (Vec2D x1 y, Vec2D x2 y))
+                                )
+                    |> List.concat
+        
+        path2 = v2LineSegs
+                    |> List.map (\(Vec2D y1 y2) -> 
+                                    v1Points |> List.map (\x -> (Vec2D x y1, Vec2D x y2))
+                                )
+                    |> List.concat
+        
+        path = path1 ++ path2
+
+        lookups = path
+                    |> List.map (
+                                    \((Vec2D x1 y1), (Vec2D x2 y2)) ->
+                                        let
+                                            fromLookup = Dict.fromList [(v1.variable, x1), (v2.variable, y1)]
+                                            toLookup = Dict.fromList [ (v1.variable, x2), (v2.variable, y2)]
+                                        in
+                                            (fromLookup, toLookup)
+                                )
 
 
 
--- TODO: I think this recursive method is the one that can blow the stack
+        -- lookups = v1Points |> List.map (\(p1, p2) -> (Dict.fromList [(v1.variable, p1)], Dict.fromList [(v1.variable, p2)]))
+    in
+        -- List.append v1Values v2Values
+        lookups -- |> Debug.log "iterateSymbolTableTwoVariables Result"
 
-
-iterateVariables : List Vector -> List SymbolTableEntry -> List Vector
-iterateVariables sofar variables =
-    case variables of
-        [] ->
-            sofar
-
-        variable :: rest ->
-            let
-                width =
-                    variable.endValue - variable.startValue
-
-                steps =
-                    width / variable.incrementValue |> ceiling
-
-                multipliers =
-                    List.range 0 steps |> List.map toFloat
-
-                values =
-                    if variable.mayVary then
-                        List.map (\m -> variable.startValue + (m * variable.incrementValue)) multipliers
-
-                    else
-                        [ variable.currentValue ]
-
-                permuated =
-                    case sofar of
-                        [] ->
-                            [ [] ]
-
-                        _ ->
-                            List.Cartesian.map2 (::) values sofar
-            in
-            iterateVariables permuated rest
-
+generateVariableRange : SymbolTableEntry -> List (Float)
+generateVariableRange v1 =
+    let
+        width = v1.endValue - v1.startValue
+        steps = width / v1.incrementValue |> ceiling
+        zeroToN = List.range 0 steps |> List.map toFloat
+        v1PointRange = zeroToN |> List.map (\multiplier -> v1.startValue + v1.incrementValue * multiplier)
+    in
+        v1PointRange
 
 evaluatePanel : PanelEntry -> PanelEntry
 evaluatePanel panelEntry =
@@ -472,7 +465,7 @@ addCurrentExpressionToPanel model =
                                                     , errMsg = Nothing
                                                     , currentValue = startValue
                                                     , startValue = startValue
-                                                    , startValueBuffer = String.fromFloat startValue
+                                                    , startValueBuffer = if startValue == -pi then "-pi" else String.fromFloat startValue
                                                     , endValue = endValue
                                                     , endValueBuffer = if endValue == pi then "pi" else String.fromFloat endValue
                                                     , incrementValue = incValue
@@ -484,7 +477,6 @@ addCurrentExpressionToPanel model =
                                 )
                     , isCollapsed = False
                     , evaluation = Nothing
-                    , plotValues = []
                     , evaluatedPlotValues = []
                     , panelError = Nothing
                     , alignmentX = AlignMid
@@ -495,7 +487,7 @@ addCurrentExpressionToPanel model =
                     , zAxis = { axisName = "Z", rotationAngle = defaultZAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement }}
                     }
             in
-            { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
+                { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
 
 
 tickModel : Model -> Time.Posix -> Model
