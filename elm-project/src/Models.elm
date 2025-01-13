@@ -6,17 +6,19 @@ import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
 
 
-type alias Vector =
+-- General vector is of unspecified length
+type alias GeneralVector =
     List Float
 
 type Vector2D = Vec2D Float Float
 type Vector3D = Vec3D Float Float Float
 
-type alias LineSegment = (Vector,Vector)
+type alias GeneralLineSegment = (GeneralVector, GeneralVector)
+type ThreeDLineSegment = LineSeg3D Vector3D Vector3D
+type TwoDLineSegment = LineSeg2D Vector2D
 
 type alias FloatMatrix =
     Matrix Float
-
 
 type alias VariableLookup =
     Dict String Float
