@@ -15,7 +15,7 @@ type Vector3D = Vec3D Float Float Float
 
 type alias GeneralLineSegment = (GeneralVector, GeneralVector)
 type ThreeDLineSegment = LineSeg3D Vector3D Vector3D
-type TwoDLineSegment = LineSeg2D Vector2D
+type TwoDLineSegment = LineSeg2D Vector2D Vector2D
 
 type alias FloatMatrix =
     Matrix Float
@@ -88,7 +88,7 @@ type alias PanelEntry =
     , variables : SymbolTableDictionary
     , isCollapsed : Bool
     , evaluation : Maybe Float
-    , evaluatedPlotValues : List LineSegment
+    , evaluatedPlotValues : List GeneralLineSegment
     , panelError : Maybe String
     , alignmentX : SvgAlignment
     , alignmentY : SvgAlignment
