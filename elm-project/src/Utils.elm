@@ -7,7 +7,6 @@ import Models exposing (..)
 import Parsing.ExpressionModels exposing (..)
 import Time exposing (..)
 
-
 findPanelEntry : Model -> String -> Maybe PanelEntry
 findPanelEntry model expression =
     case List.filter (\pe -> pe.expression == expression) model.panelEntries of
@@ -170,7 +169,7 @@ matrixMultiply leftMatrix rightMatrix =
             Matrix.identity 3 |> Debug.log "Failed matrix multiply"
 
 
-transposeVector : FloatMatrix -> Vector -> Vector
+transposeVector : FloatMatrix -> GeneralVector -> GeneralVector
 transposeVector m v =
     let
         vectorAsMatrix =
@@ -182,7 +181,7 @@ transposeVector m v =
     product |> matrixToVector
 
 
-multiply3DData : FloatMatrix -> List Vector -> List Vector
+multiply3DData : FloatMatrix -> List GeneralVector -> List GeneralVector
 multiply3DData m vectorList =
     vectorList |> List.map (transposeVector m)
 
@@ -197,7 +196,7 @@ isPascalCased s =
             False
 
 
-vectorToMatrix : Vector -> FloatMatrix
+vectorToMatrix : GeneralVector -> FloatMatrix
 vectorToMatrix values =
     case
         values
@@ -210,7 +209,7 @@ vectorToMatrix values =
             Matrix.identity 3 |> Debug.log "Failed to create column vector"
 
 
-matrixToVector : FloatMatrix -> Vector
+matrixToVector : FloatMatrix -> GeneralVector
 matrixToVector m =
     m |> Matrix.toList
 
@@ -243,3 +242,17 @@ dropZComponent v =
 
         _ ->
             [] |> Debug.log "Nothing to drop in dropZComponent"
+
+dropYFrom3DVector: Vector3D -> Vector2D
+dropYFrom3DVector (Vec3D x y z) = Vec2D x z
+
+dropYFrom3DLineSegment: ThreeDLineSegment -> TwoDLineSegment
+dropYFrom3DLineSegment (LineSeg3D from to) = 
+    let
+        (Vec3D x1 y1 z1) = from
+        (Vec3D x2 y2 z2) = to
+        newFrom = Vec2D x1 z1
+        newTo = Vec2D x2 z2
+    in
+        LineSeg2D newFrom newTo
+        

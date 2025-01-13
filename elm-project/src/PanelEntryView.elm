@@ -60,8 +60,6 @@ viewPanelEntry model panelEntry =
         , Button.text (Button.config |> Button.setOnClick (DeleteExpression panelEntry.expression)) "Delete"
         , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         , Button.text (Button.config |> Button.setOnClick (Plot panelEntry)) "Plot"
-
-        -- , div [ id "plot-values" ] [ displayPlotValues panelEntry ]
         , displayAxisInfo panelEntry
         , displayViewportScaling panelEntry
         ]
@@ -227,39 +225,6 @@ getPanelEntryErrors panelEntry =
                 |> String.join ", "
     in
     Maybe.withDefault "" panelEntry.panelError ++ errors
-
-
-displayPlotValues : PanelEntry -> Html Msg
-displayPlotValues panelEntry =
-    div []
-        [ div [] [ "Value Count: " ++ (panelEntry.evaluatedPlotValues |> List.length |> toString) |> text ]
-        , case panelEntry.evaluatedPlotValues of
-            [] ->
-                div [] [ text "No plot values" ]
-
-            lineSegment :: tail ->
-                case tail of
-                    [] ->
-                        div [] [ showLineSegment lineSegment ]
-
-                    _ ->
-                        case List.reverse tail |> List.head of
-                            Just lastEntry ->
-                                div [] [ showLineSegment lineSegment, showLineSegment lastEntry ]
-
-                            Nothing ->
-                                div [] [ showLineSegment lineSegment ]
-        ]
-
-
-showLineSegment : LineSegment -> Html Msg
-showLineSegment (p1, p2) =
-    let
-        point1 = toString p1
-        point2 = toString p2
-        display = "(" ++ point1 ++ ";" ++ point2 ++ ")"
-    in
-        div [] [ text display ]
 
 
 showSymbolTableEntry : PanelEntry -> SymbolTableEntry -> Html Msg

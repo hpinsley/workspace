@@ -14,7 +14,7 @@ strokeWidth =
     0.006
 
 
-plot3d : Model -> PanelEntry -> List LineSegment -> Html Msg
+plot3d : Model -> PanelEntry -> List ThreeDLineSegment -> Html Msg
 plot3d model panelEntry lineSegments =
     let
         _ =
@@ -44,15 +44,17 @@ plot3d model panelEntry lineSegments =
         ]
 
 
-rotateData : PanelEntry -> List LineSegment -> List LineSegment
+rotateData : PanelEntry -> List ThreeDLineSegment -> List ThreeDLineSegment
 rotateData panelEntry lineSegments =
     let
         rotationMatrix =
             Utils.xyzRotation panelEntry.xAxis.rotationAngle panelEntry.yAxis.rotationAngle panelEntry.zAxis.rotationAngle
 
-        fromVectors = lineSegments |> List.map (\(from, _) -> from)
-        toVectors = lineSegments |> List.map (\(_, to) -> to)
+        fromVectors = lineSegments |> List.map (\(LineSeg3D from _) -> from)
+        toVectors = lineSegments |> List.map (\(LineSeg3D _ to) -> to)
 
+        -- You left off here.alias
+        
         rotatedFromVectors = fromVectors |> Utils.multiply3DData rotationMatrix
         rotatedToVectors = toVectors |> Utils.multiply3DData rotationMatrix
 
@@ -62,7 +64,7 @@ rotateData panelEntry lineSegments =
         rotatedLineSegments
 
 
-plotProjectedPoints : Model -> PanelEntry -> List LineSegment -> Html Msg
+plotProjectedPoints : Model -> PanelEntry -> List TwoDLineSegment -> Html Msg
 plotProjectedPoints model panelEntry lineSegments =
     let
         -- _ =
@@ -183,24 +185,22 @@ adjustYValue maxY minY y =
     (maxY + minY) - y
 
 
-build2DPathFromLineSegments : (Float -> Float) -> List LineSegment -> String
+build2DPathFromLineSegments : (Float -> Float) -> List TwoDLineSegment -> String
 build2DPathFromLineSegments yAdjust lineSegments =
     lineSegments 
         |> List.map (build2DPathFromLineSegment yAdjust)
         |> String.join " "
         -- |> Debug.log "2D Path"
 
-build2DPathFromLineSegment : (Float -> Float) -> LineSegment -> String
+-- This method takes a list of 2D line segments to plot and adjusts the y component using the
+-- given method
+build2DPathFromLineSegment : (Float -> Float) -> TwoDLineSegment -> String
 build2DPathFromLineSegment yAdjust lineSegment =
     let
-        (from, to) = lineSegment
-        (xFrom, yFrom) = case from of
-                            x :: y :: [] -> (x, yAdjust y)
-                            _ -> (0,0) |> Debug.log "Unexpected vector length"
-        (xTo, yTo) = case to of
-                            x :: y :: [] -> (x, yAdjust y)
-                            _ -> (0,0) |> Debug.log "Unexpected vector length"
+        (LineSeg2D from to) = lineSegment
+        (Vec2D xFrom yFrom) = from
+        (Vec2D xTo yTo) = to
     in
-        "M " ++ String.fromFloat xFrom ++ "," ++ String.fromFloat yFrom ++
+        "M " ++ String.fromFloat xFrom ++ "," ++ String.fromFloat (yAdjust yFrom) ++
             " " ++ 
-        "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat yTo
+        "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat (yAdjust yTo)

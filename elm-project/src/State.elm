@@ -268,7 +268,7 @@ plotPanelEntry panelEntry =
         in
             { panelEntry | evaluatedPlotValues = evaluated, panelError = Nothing }
 
-evaluateExpressionWithVariableDictionaries : Expression -> VariableLookup -> VariableLookup -> Vector
+evaluateExpressionWithVariableDictionaries : Expression -> VariableLookup -> VariableLookup -> GeneralVector
 evaluateExpressionWithVariableDictionaries expression constantsLookup variableLookup =
     let
         computedResult = evaluateExpression expression

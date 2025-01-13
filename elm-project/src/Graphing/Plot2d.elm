@@ -28,7 +28,7 @@ yTICK_LABEL_OFFSET_WIDTH_PCT =
     -2.0
 
 
-plot2d : Model -> PanelEntry -> List LineSegment -> Html Msg
+plot2d : Model -> PanelEntry -> List TwoDLineSegment -> Html Msg
 plot2d model panelEntry lineSegments =
     let
         _ =
