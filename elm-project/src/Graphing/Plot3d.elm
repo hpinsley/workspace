@@ -24,18 +24,15 @@ plot3d model panelEntry lineSegments =
         -- _ =
         --     Debug.log "Ordered Pairs" lineSegments
 
-        rotatedData =
-             rotateData panelEntry lineSegments -- |> Debug.log "Rotated pairs"
-
-        rotatedAxes = rotateAxes panelEntry (buildAxes panelEntry lineSegments)
-
-        projectedData = rotatedData |> List.map Utils.dropYFrom3DLineSegment
+        rotationMatrix = Utils.xyzRotation panelEntry.xAxis.rotationAngle panelEntry.yAxis.rotationAngle panelEntry.zAxis.rotationAngle
+        rotatedData = rotateData rotationMatrix lineSegments -- |> Debug.log "Rotated pairs"
+        rotatedAxes = rotateAxes rotationMatrix (buildAxes panelEntry lineSegments)
     in
     div
         [ Html.Attributes.id "plot-3d" ]
         [ 
             div [] [ 
-                        plotProjectedPoints model panelEntry projectedData 
+                        projectAndPlotPoints model panelEntry rotatedData rotatedAxes 
                 ]
         ]
 
@@ -48,12 +45,9 @@ buildAxes panelEntry data =
     in
         (xAxis, yAxis, zAxis)
 
-rotateData : PanelEntry -> List ThreeDLineSegment -> List ThreeDLineSegment
-rotateData panelEntry lineSegments =
+rotateData : FloatMatrix -> List ThreeDLineSegment -> List ThreeDLineSegment
+rotateData rotationMatrix lineSegments =
     let
-        rotationMatrix =
-            Utils.xyzRotation panelEntry.xAxis.rotationAngle panelEntry.yAxis.rotationAngle panelEntry.zAxis.rotationAngle
-
         fromVectors = lineSegments |> List.map (\(LineSeg3D from _) -> from)
         toVectors = lineSegments |> List.map (\(LineSeg3D _ to) -> to)
         
@@ -64,16 +58,22 @@ rotateData panelEntry lineSegments =
     in
         rotatedLineSegments
 
-rotateAxes : PanelEntry -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment) 
+rotateAxes : FloatMatrix -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment) 
                 -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment)
-rotateAxes panelEntry (x, y, z) =
-    (x, y, z)
+rotateAxes rotationMatrix (x, y, z) =
+      (
+            Utils.multiply3DLineSegment rotationMatrix x
+        ,   Utils.multiply3DLineSegment rotationMatrix y
+        ,   Utils.multiply3DLineSegment rotationMatrix z
+      )
 
-plotProjectedPoints : Model -> PanelEntry -> List TwoDLineSegment -> Html Msg
-plotProjectedPoints model panelEntry lineSegments =
+projectAndPlotPoints : Model -> PanelEntry -> List ThreeDLineSegment -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment) -> Html Msg
+projectAndPlotPoints model panelEntry lineSegments3d axes =
     let
         -- _ =
         --     Debug.log "Plot2D points to plot" (List.length lineSegments)
+
+        lineSegments = lineSegments3d |> List.map Utils.dropYFrom3DLineSegment
 
         (v1Points, v2Points) = lineSegments 
                                     |> List.map (\(LineSeg2D from to) -> (from, to))

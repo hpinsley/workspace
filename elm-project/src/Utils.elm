@@ -222,6 +222,10 @@ multiply3DSingleVector m vector =
         |> transposeVector m
         |> generalVectorToVector3D
 
+multiply3DLineSegment : FloatMatrix -> ThreeDLineSegment -> ThreeDLineSegment
+multiply3DLineSegment m (LineSeg3D from to) =
+    LineSeg3D (multiply3DSingleVector m from) (multiply3DSingleVector m to)
+
 multiply3DDataGeneralVectors : FloatMatrix -> List GeneralVector -> List GeneralVector
 multiply3DDataGeneralVectors m vectorList =
     vectorList |> List.map (transposeVector m)
