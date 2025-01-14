@@ -28,12 +28,12 @@ plot3d model panelEntry lineSegments =
 
         projection =
              rotatedPairs
-                 |> List.map (\(from, to) -> 
+                 |> List.map (\(LineSeg3D from to) -> 
                                 let
-                                    projectedFrom = Utils.dropYComponent from
-                                    projectedTo = Utils.dropYComponent to
+                                    projectedFrom = Utils.dropYFrom3DVector from
+                                    projectedTo = Utils.dropYFrom3DVector to
                                 in
-                                    (projectedFrom, projectedTo)
+                                    LineSeg2D projectedFrom projectedTo
                             )
             -- |> Debug.log "Projection"
     in
@@ -52,14 +52,11 @@ rotateData panelEntry lineSegments =
 
         fromVectors = lineSegments |> List.map (\(LineSeg3D from _) -> from)
         toVectors = lineSegments |> List.map (\(LineSeg3D _ to) -> to)
-
-        -- You left off here.alias
         
         rotatedFromVectors = fromVectors |> Utils.multiply3DData rotationMatrix
         rotatedToVectors = toVectors |> Utils.multiply3DData rotationMatrix
 
-        rotatedLineSegments = List.map2 (\vfrom vTo -> (vfrom, vTo)) rotatedFromVectors rotatedToVectors
-        
+        rotatedLineSegments = List.map2 (\vfrom vTo -> LineSeg3D vfrom vTo) rotatedFromVectors rotatedToVectors
     in
         rotatedLineSegments
 
@@ -70,21 +67,21 @@ plotProjectedPoints model panelEntry lineSegments =
         -- _ =
         --     Debug.log "Plot2D points to plot" (List.length lineSegments)
 
-        (v1Points, v2Points) = lineSegments |> List.unzip
+        (v1Points, v2Points) = lineSegments 
+                                    |> List.map (\(LineSeg2D from to) -> (from, to))
+                                    |> List.unzip
         allPoints = List.append v1Points v2Points -- |> Debug.log "all points"
 
         minX =
-            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "minX"
-
+            List.minimum (List.map (\(Vec2D x _) -> x) allPoints) |> Maybe.withDefault 0.0
         maxX =
-            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "maxX"
+            List.maximum (List.map (\(Vec2D x _) -> x) allPoints) |> Maybe.withDefault 0.0
 
         minY =
-            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "minY"
+            List.minimum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
 
         maxY =
-            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "maxY"
-
+            List.minimum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
         xWidth =
             maxX - minX |> Debug.log "xWidth"
 
