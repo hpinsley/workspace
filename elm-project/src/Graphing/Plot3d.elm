@@ -13,6 +13,7 @@ import Utils
 strokeWidth =
     0.006
 
+axisScalar = 10.0
 
 plot3d : Model -> PanelEntry -> List ThreeDLineSegment -> Html Msg
 plot3d model panelEntry lineSegments =
@@ -23,11 +24,14 @@ plot3d model panelEntry lineSegments =
         -- _ =
         --     Debug.log "Ordered Pairs" lineSegments
 
-        rotatedPairs =
+        rotatedData =
              rotateData panelEntry lineSegments -- |> Debug.log "Rotated pairs"
 
+        rotatedAxes = rotateData panelEntry (buildAxes panelEntry lineSegments)
+        allLineSegments = rotatedData ++ rotatedAxes
+
         projection =
-             rotatedPairs
+             allLineSegments
                  |> List.map (\(LineSeg3D from to) -> 
                                 let
                                     projectedFrom = Utils.dropYFrom3DVector from
@@ -40,9 +44,19 @@ plot3d model panelEntry lineSegments =
     div
         [ Html.Attributes.id "plot-3d" ]
         [ 
-            div [] [ plotProjectedPoints model panelEntry projection ]
+            div [] [ 
+                        plotProjectedPoints model panelEntry projection 
+                ]
         ]
 
+buildAxes: PanelEntry -> List ThreeDLineSegment -> List ThreeDLineSegment
+buildAxes panelEntry data =
+    let
+        xAxis = LineSeg3D (Vec3D -axisScalar 0 0) (Vec3D axisScalar 0 0)
+        yAxis = LineSeg3D (Vec3D 0 -axisScalar 0) (Vec3D 0 axisScalar 0)
+        zAxis = LineSeg3D (Vec3D 0 0 -axisScalar) (Vec3D 0 0 axisScalar)
+    in
+        [xAxis, yAxis, zAxis]
 
 rotateData : PanelEntry -> List ThreeDLineSegment -> List ThreeDLineSegment
 rotateData panelEntry lineSegments =
