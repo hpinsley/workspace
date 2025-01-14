@@ -180,9 +180,19 @@ transposeVector m v =
     in
     product |> matrixToVector
 
+vector2DToGeneralVector: Vector2D -> GeneralVector
+vector2DToGeneralVector (Vec2D x y) =
+    [x,y]
+
 vector3DToGeneralVector: Vector3D -> GeneralVector
 vector3DToGeneralVector (Vec3D x y z) =
     [x,y,z]
+
+generalVectorToVector2D: GeneralVector -> Vector2D
+generalVectorToVector2D vector =
+    case vector of 
+        x :: y :: [] -> Vec2D x y
+        _ -> Vec2D 0 0  |> Debug.log ("ERROR: generalVectorToVector2D invoked for a GeneralVector of length " ++ (vector |> List.length |> String.fromInt) ++ ".  Was expecting 2 items only")
 
 generalVectorToVector3D: GeneralVector -> Vector3D
 generalVectorToVector3D vector =
@@ -190,6 +200,13 @@ generalVectorToVector3D vector =
         x :: y :: z :: [] -> Vec3D x y z
         _ -> Vec3D 0 0 0 |> Debug.log ("ERROR: generalVectorToVector3D invoked for a GeneralVector of length " ++ (vector |> List.length |> String.fromInt) ++ ".  Was expecting 3 items only")
 
+generalLineSegmentToLineSegment3D : GeneralLineSegment -> ThreeDLineSegment
+generalLineSegmentToLineSegment3D (vector1, vector2) =
+    LineSeg3D (generalVectorToVector3D vector1) (generalVectorToVector3D vector2)
+
+generalLineSegmentToLineSegment2D : GeneralLineSegment -> TwoDLineSegment
+generalLineSegmentToLineSegment2D (vector1, vector2) =
+    LineSeg2D (generalVectorToVector2D vector1) (generalVectorToVector2D vector2)
 
 multiply3DData : FloatMatrix -> List Vector3D -> List Vector3D
 multiply3DData m vectorList =

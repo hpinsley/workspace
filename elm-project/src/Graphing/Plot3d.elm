@@ -81,7 +81,7 @@ plotProjectedPoints model panelEntry lineSegments =
             List.minimum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
 
         maxY =
-            List.minimum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
+            List.maximum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
         xWidth =
             maxX - minX |> Debug.log "xWidth"
 
@@ -182,6 +182,8 @@ adjustYValue maxY minY y =
     (maxY + minY) - y
 
 
+-- This method takes a list of 2D line segments to plot and adjusts the y component using the
+-- given method
 build2DPathFromLineSegments : (Float -> Float) -> List TwoDLineSegment -> String
 build2DPathFromLineSegments yAdjust lineSegments =
     lineSegments 
@@ -189,8 +191,6 @@ build2DPathFromLineSegments yAdjust lineSegments =
         |> String.join " "
         -- |> Debug.log "2D Path"
 
--- This method takes a list of 2D line segments to plot and adjusts the y component using the
--- given method
 build2DPathFromLineSegment : (Float -> Float) -> TwoDLineSegment -> String
 build2DPathFromLineSegment yAdjust lineSegment =
     let

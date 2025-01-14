@@ -31,7 +31,8 @@ plot2d : Model -> PanelEntry -> List TwoDLineSegment -> Html Msg
 plot2d model panelEntry lineSegments =
     let
         _ =
-            Debug.log "Plot2D points to plot" (List.length lineSegments)
+            Debug.log "Plot2D number of segments to plot" (List.length lineSegments)
+        _ = Debug.log "Segments to plot" lineSegments
 
         (v1Points, v2Points) = lineSegments 
                                     |> List.map (\(LineSeg2D from to) -> (from, to))
@@ -49,7 +50,7 @@ plot2d model panelEntry lineSegments =
             List.minimum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
 
         maxY =
-            List.minimum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
+            List.maximum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
         xWidth =
             maxX - minX |> Debug.log "xWidth"
 
@@ -70,7 +71,7 @@ plot2d model panelEntry lineSegments =
             adjustYValue maxY minY
 
         functionPath =
-            build2DPathFromLineSegments yTransform lineSegments
+            build2DPathFromLineSegments yTransform lineSegments |> Debug.log "Function path"
 
         ( xAxisPath, xLabels ) =
             buildXAxisPath minX maxX minY maxY yTransform |> Debug.log "xAxisPath"
@@ -162,10 +163,10 @@ buildXAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> ( Strin
 buildXAxisPath minX maxX minY maxY yTransform =
     let
         points =
-            [ [ minX, 0.0 ], [ maxX, 0.0 ] ] |> Debug.log "x-axis-points"
+            [ LineSeg2D (Vec2D minX 0.0) (Vec2D maxX 0.0)  ] |> Debug.log "x-axis-points"
 
         axisLine =
-            build2DPath yTransform points
+            build2DPathFromLineSegments yTransform points
 
         ( tickMarks, labels ) =
             buildXAxisTickMarks minX maxX minY maxY yTransform |> Debug.log "x-axis ticks"
@@ -177,10 +178,10 @@ buildYAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> ( Strin
 buildYAxisPath minX maxX minY maxY yTransform =
     let
         points =
-            [ [ 0.0, minY ], [ 0.0, maxY ] ] |> Debug.log "y-axis-points"
+            [ LineSeg2D (Vec2D 0.0 minY) (Vec2D 0.0 maxY)  ] |> Debug.log "y-axis-points"
 
         axisLine =
-            build2DPath yTransform points
+            build2DPathFromLineSegments yTransform points
 
         ( tickMarks, labels ) =
             buildYAxisTickMarks minX maxX minY maxY yTransform |> Debug.log "y-axis ticks"
@@ -322,45 +323,20 @@ adjustYValue : Float -> Float -> Float -> Float
 adjustYValue maxY minY y =
     (maxY + minY) - y
 
-
-build2DPath : (Float -> Float) -> List Vector -> String
-build2DPath yAdjust orderedPairs =
-    let
-        xValues =
-            List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) orderedPairs
-
-        yValues =
-            List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) orderedPairs
-
-        adjustedYValues =
-            List.map yAdjust yValues
-
-        points =
-            List.map2 (\x y -> String.fromFloat x ++ "," ++ String.fromFloat y) xValues adjustedYValues
-
-        path =
-            "M " ++ (List.head points |> Maybe.withDefault "0,0") ++ " L " ++ (List.tail points |> Maybe.withDefault [] |> String.join " L ")
-    in
-    path
-
-build2DPathFromLineSegments : (Float -> Float) -> List LineSegment -> String
+build2DPathFromLineSegments : (Float -> Float) -> List TwoDLineSegment -> String
 build2DPathFromLineSegments yAdjust lineSegments =
     lineSegments 
         |> List.map (build2DPathFromLineSegment yAdjust)
         |> String.join " "
         -- |> Debug.log "2D Path"
 
-build2DPathFromLineSegment : (Float -> Float) -> LineSegment -> String
+build2DPathFromLineSegment : (Float -> Float) -> TwoDLineSegment -> String
 build2DPathFromLineSegment yAdjust lineSegment =
     let
-        (from, to) = lineSegment
-        (xFrom, yFrom) = case from of
-                            x :: y :: [] -> (x, yAdjust y)
-                            _ -> (0,0) |> Debug.log "Unexpected vector length"
-        (xTo, yTo) = case to of
-                            x :: y :: [] -> (x, yAdjust y)
-                            _ -> (0,0) |> Debug.log "Unexpected vector length"
+        (LineSeg2D from to) = lineSegment
+        (Vec2D xFrom yFrom) = from
+        (Vec2D xTo yTo) = to
     in
-        "M " ++ String.fromFloat xFrom ++ "," ++ String.fromFloat yFrom ++
+        "M " ++ String.fromFloat xFrom ++ "," ++ String.fromFloat (yAdjust yFrom) ++
             " " ++ 
-        "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat yTo
+        "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat (yAdjust yTo)
