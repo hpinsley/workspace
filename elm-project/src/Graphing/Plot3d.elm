@@ -27,36 +27,26 @@ plot3d model panelEntry lineSegments =
         rotatedData =
              rotateData panelEntry lineSegments -- |> Debug.log "Rotated pairs"
 
-        rotatedAxes = rotateData panelEntry (buildAxes panelEntry lineSegments)
-        allLineSegments = rotatedData ++ rotatedAxes
+        rotatedAxes = rotateAxes panelEntry (buildAxes panelEntry lineSegments)
 
-        projection =
-             allLineSegments
-                 |> List.map (\(LineSeg3D from to) -> 
-                                let
-                                    projectedFrom = Utils.dropYFrom3DVector from
-                                    projectedTo = Utils.dropYFrom3DVector to
-                                in
-                                    LineSeg2D projectedFrom projectedTo
-                            )
-            -- |> Debug.log "Projection"
+        projectedData = rotatedData |> List.map Utils.dropYFrom3DLineSegment
     in
     div
         [ Html.Attributes.id "plot-3d" ]
         [ 
             div [] [ 
-                        plotProjectedPoints model panelEntry projection 
+                        plotProjectedPoints model panelEntry projectedData 
                 ]
         ]
 
-buildAxes: PanelEntry -> List ThreeDLineSegment -> List ThreeDLineSegment
+buildAxes: PanelEntry -> List ThreeDLineSegment -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment)
 buildAxes panelEntry data =
     let
         xAxis = LineSeg3D (Vec3D -axisScalar 0 0) (Vec3D axisScalar 0 0)
         yAxis = LineSeg3D (Vec3D 0 -axisScalar 0) (Vec3D 0 axisScalar 0)
         zAxis = LineSeg3D (Vec3D 0 0 -axisScalar) (Vec3D 0 0 axisScalar)
     in
-        [xAxis, yAxis, zAxis]
+        (xAxis, yAxis, zAxis)
 
 rotateData : PanelEntry -> List ThreeDLineSegment -> List ThreeDLineSegment
 rotateData panelEntry lineSegments =
@@ -74,6 +64,10 @@ rotateData panelEntry lineSegments =
     in
         rotatedLineSegments
 
+rotateAxes : PanelEntry -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment) 
+                -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment)
+rotateAxes panelEntry (x, y, z) =
+    (x, y, z)
 
 plotProjectedPoints : Model -> PanelEntry -> List TwoDLineSegment -> Html Msg
 plotProjectedPoints model panelEntry lineSegments =

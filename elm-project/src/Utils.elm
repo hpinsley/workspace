@@ -215,6 +215,13 @@ multiply3DData m vectorList =
         |> List.map (transposeVector m)
         |> List.map generalVectorToVector3D
 
+multiply3DSingleVector : FloatMatrix -> Vector3D -> Vector3D
+multiply3DSingleVector m vector =
+    vector
+        |> vector3DToGeneralVector 
+        |> transposeVector m
+        |> generalVectorToVector3D
+
 multiply3DDataGeneralVectors : FloatMatrix -> List GeneralVector -> List GeneralVector
 multiply3DDataGeneralVectors m vectorList =
     vectorList |> List.map (transposeVector m)
