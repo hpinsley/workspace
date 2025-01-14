@@ -13,7 +13,7 @@ import Utils
 strokeWidth =
     0.006
 
-axisScalar = 10.0
+axisScalar = 1.0
 
 plot3d : Model -> PanelEntry -> List ThreeDLineSegment -> Html Msg
 plot3d model panelEntry lineSegments =
@@ -68,12 +68,17 @@ rotateAxes rotationMatrix (x, y, z) =
       )
 
 projectAndPlotPoints : Model -> PanelEntry -> List ThreeDLineSegment -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment) -> Html Msg
-projectAndPlotPoints model panelEntry lineSegments3d axes =
+projectAndPlotPoints model panelEntry lineSegments3d (xAxis, yAxis, zAxis) =
     let
         -- _ =
         --     Debug.log "Plot2D points to plot" (List.length lineSegments)
 
+        -- Project down to 2D by dropping the y values
         lineSegments = lineSegments3d |> List.map Utils.dropYFrom3DLineSegment
+        projectedXAxis = Utils.dropYFrom3DLineSegment xAxis  
+        projectedYAxis = Utils.dropYFrom3DLineSegment yAxis  
+        projectedZAxis = Utils.dropYFrom3DLineSegment zAxis  
+
 
         (v1Points, v2Points) = lineSegments 
                                     |> List.map (\(LineSeg2D from to) -> (from, to))
@@ -121,8 +126,33 @@ projectAndPlotPoints model panelEntry lineSegments3d axes =
         functionPath =
             build2DPathFromLineSegments yTransform lineSegments -- |> Debug.log "Function Path"
 
+        xAxisPath = build2DPathFromLineSegment yTransform projectedXAxis
+        yAxisPath = build2DPathFromLineSegment yTransform projectedYAxis
+        zAxisPath = build2DPathFromLineSegment yTransform projectedZAxis
+
         elements =
             [ Svg.path
+                [ Svg.Attributes.d xAxisPath
+                , Svg.Attributes.fill "none"
+                , Svg.Attributes.stroke "red"
+                , Svg.Attributes.strokeWidth (String.fromFloat (2* strokeWidth))
+                ]
+                []
+            , Svg.path
+                [ Svg.Attributes.d yAxisPath
+                , Svg.Attributes.fill "none"
+                , Svg.Attributes.stroke "green"
+                , Svg.Attributes.strokeWidth (String.fromFloat (2 * strokeWidth))
+                ]
+                []
+            , Svg.path
+                [ Svg.Attributes.d zAxisPath
+                , Svg.Attributes.fill "none"
+                , Svg.Attributes.stroke "blue"
+                , Svg.Attributes.strokeWidth (String.fromFloat (2 * strokeWidth))
+                ]
+                []
+            , Svg.path
                 [ Svg.Attributes.d functionPath
                 , Svg.Attributes.fill "none"
                 , Svg.Attributes.stroke "black"
