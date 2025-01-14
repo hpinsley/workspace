@@ -14,7 +14,7 @@ strokeWidth =
     0.006
 
 
-plot3d : Model -> PanelEntry -> List LineSegment -> Html Msg
+plot3d : Model -> PanelEntry -> List ThreeDLineSegment -> Html Msg
 plot3d model panelEntry lineSegments =
     let
         _ =
@@ -28,12 +28,12 @@ plot3d model panelEntry lineSegments =
 
         projection =
              rotatedPairs
-                 |> List.map (\(from, to) -> 
+                 |> List.map (\(LineSeg3D from to) -> 
                                 let
-                                    projectedFrom = Utils.dropYComponent from
-                                    projectedTo = Utils.dropYComponent to
+                                    projectedFrom = Utils.dropYFrom3DVector from
+                                    projectedTo = Utils.dropYFrom3DVector to
                                 in
-                                    (projectedFrom, projectedTo)
+                                    LineSeg2D projectedFrom projectedTo
                             )
             -- |> Debug.log "Projection"
     in
@@ -44,45 +44,44 @@ plot3d model panelEntry lineSegments =
         ]
 
 
-rotateData : PanelEntry -> List LineSegment -> List LineSegment
+rotateData : PanelEntry -> List ThreeDLineSegment -> List ThreeDLineSegment
 rotateData panelEntry lineSegments =
     let
         rotationMatrix =
             Utils.xyzRotation panelEntry.xAxis.rotationAngle panelEntry.yAxis.rotationAngle panelEntry.zAxis.rotationAngle
 
-        fromVectors = lineSegments |> List.map (\(from, _) -> from)
-        toVectors = lineSegments |> List.map (\(_, to) -> to)
-
+        fromVectors = lineSegments |> List.map (\(LineSeg3D from _) -> from)
+        toVectors = lineSegments |> List.map (\(LineSeg3D _ to) -> to)
+        
         rotatedFromVectors = fromVectors |> Utils.multiply3DData rotationMatrix
         rotatedToVectors = toVectors |> Utils.multiply3DData rotationMatrix
 
-        rotatedLineSegments = List.map2 (\vfrom vTo -> (vfrom, vTo)) rotatedFromVectors rotatedToVectors
-        
+        rotatedLineSegments = List.map2 (\vfrom vTo -> LineSeg3D vfrom vTo) rotatedFromVectors rotatedToVectors
     in
         rotatedLineSegments
 
 
-plotProjectedPoints : Model -> PanelEntry -> List LineSegment -> Html Msg
+plotProjectedPoints : Model -> PanelEntry -> List TwoDLineSegment -> Html Msg
 plotProjectedPoints model panelEntry lineSegments =
     let
         -- _ =
         --     Debug.log "Plot2D points to plot" (List.length lineSegments)
 
-        (v1Points, v2Points) = lineSegments |> List.unzip
+        (v1Points, v2Points) = lineSegments 
+                                    |> List.map (\(LineSeg2D from to) -> (from, to))
+                                    |> List.unzip
         allPoints = List.append v1Points v2Points -- |> Debug.log "all points"
 
         minX =
-            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "minX"
-
+            List.minimum (List.map (\(Vec2D x _) -> x) allPoints) |> Maybe.withDefault 0.0
         maxX =
-            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "maxX"
+            List.maximum (List.map (\(Vec2D x _) -> x) allPoints) |> Maybe.withDefault 0.0
 
         minY =
-            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "minY"
+            List.minimum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
 
         maxY =
-            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "maxY"
-
+            List.maximum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
         xWidth =
             maxX - minX |> Debug.log "xWidth"
 
@@ -183,24 +182,22 @@ adjustYValue maxY minY y =
     (maxY + minY) - y
 
 
-build2DPathFromLineSegments : (Float -> Float) -> List LineSegment -> String
+-- This method takes a list of 2D line segments to plot and adjusts the y component using the
+-- given method
+build2DPathFromLineSegments : (Float -> Float) -> List TwoDLineSegment -> String
 build2DPathFromLineSegments yAdjust lineSegments =
     lineSegments 
         |> List.map (build2DPathFromLineSegment yAdjust)
         |> String.join " "
         -- |> Debug.log "2D Path"
 
-build2DPathFromLineSegment : (Float -> Float) -> LineSegment -> String
+build2DPathFromLineSegment : (Float -> Float) -> TwoDLineSegment -> String
 build2DPathFromLineSegment yAdjust lineSegment =
     let
-        (from, to) = lineSegment
-        (xFrom, yFrom) = case from of
-                            x :: y :: [] -> (x, yAdjust y)
-                            _ -> (0,0) |> Debug.log "Unexpected vector length"
-        (xTo, yTo) = case to of
-                            x :: y :: [] -> (x, yAdjust y)
-                            _ -> (0,0) |> Debug.log "Unexpected vector length"
+        (LineSeg2D from to) = lineSegment
+        (Vec2D xFrom yFrom) = from
+        (Vec2D xTo yTo) = to
     in
-        "M " ++ String.fromFloat xFrom ++ "," ++ String.fromFloat yFrom ++
+        "M " ++ String.fromFloat xFrom ++ "," ++ String.fromFloat (yAdjust yFrom) ++
             " " ++ 
-        "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat yTo
+        "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat (yAdjust yTo)

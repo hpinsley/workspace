@@ -7,7 +7,6 @@ import Models exposing (..)
 import Parsing.ExpressionModels exposing (..)
 import Time exposing (..)
 
-
 findPanelEntry : Model -> String -> Maybe PanelEntry
 findPanelEntry model expression =
     case List.filter (\pe -> pe.expression == expression) model.panelEntries of
@@ -170,7 +169,7 @@ matrixMultiply leftMatrix rightMatrix =
             Matrix.identity 3 |> Debug.log "Failed matrix multiply"
 
 
-transposeVector : FloatMatrix -> Vector -> Vector
+transposeVector : FloatMatrix -> GeneralVector -> GeneralVector
 transposeVector m v =
     let
         vectorAsMatrix =
@@ -181,11 +180,44 @@ transposeVector m v =
     in
     product |> matrixToVector
 
+vector2DToGeneralVector: Vector2D -> GeneralVector
+vector2DToGeneralVector (Vec2D x y) =
+    [x,y]
 
-multiply3DData : FloatMatrix -> List Vector -> List Vector
+vector3DToGeneralVector: Vector3D -> GeneralVector
+vector3DToGeneralVector (Vec3D x y z) =
+    [x,y,z]
+
+generalVectorToVector2D: GeneralVector -> Vector2D
+generalVectorToVector2D vector =
+    case vector of 
+        x :: y :: [] -> Vec2D x y
+        _ -> Vec2D 0 0  |> Debug.log ("ERROR: generalVectorToVector2D invoked for a GeneralVector of length " ++ (vector |> List.length |> String.fromInt) ++ ".  Was expecting 2 items only")
+
+generalVectorToVector3D: GeneralVector -> Vector3D
+generalVectorToVector3D vector =
+    case vector of 
+        x :: y :: z :: [] -> Vec3D x y z
+        _ -> Vec3D 0 0 0 |> Debug.log ("ERROR: generalVectorToVector3D invoked for a GeneralVector of length " ++ (vector |> List.length |> String.fromInt) ++ ".  Was expecting 3 items only")
+
+generalLineSegmentToLineSegment3D : GeneralLineSegment -> ThreeDLineSegment
+generalLineSegmentToLineSegment3D (vector1, vector2) =
+    LineSeg3D (generalVectorToVector3D vector1) (generalVectorToVector3D vector2)
+
+generalLineSegmentToLineSegment2D : GeneralLineSegment -> TwoDLineSegment
+generalLineSegmentToLineSegment2D (vector1, vector2) =
+    LineSeg2D (generalVectorToVector2D vector1) (generalVectorToVector2D vector2)
+
+multiply3DData : FloatMatrix -> List Vector3D -> List Vector3D
 multiply3DData m vectorList =
-    vectorList |> List.map (transposeVector m)
+    vectorList
+        |> List.map vector3DToGeneralVector 
+        |> List.map (transposeVector m)
+        |> List.map generalVectorToVector3D
 
+multiply3DDataGeneralVectors : FloatMatrix -> List GeneralVector -> List GeneralVector
+multiply3DDataGeneralVectors m vectorList =
+    vectorList |> List.map (transposeVector m)
 
 isPascalCased : String -> Bool
 isPascalCased s =
@@ -197,7 +229,7 @@ isPascalCased s =
             False
 
 
-vectorToMatrix : Vector -> FloatMatrix
+vectorToMatrix : GeneralVector -> FloatMatrix
 vectorToMatrix values =
     case
         values
@@ -210,7 +242,7 @@ vectorToMatrix values =
             Matrix.identity 3 |> Debug.log "Failed to create column vector"
 
 
-matrixToVector : FloatMatrix -> Vector
+matrixToVector : FloatMatrix -> GeneralVector
 matrixToVector m =
     m |> Matrix.toList
 
@@ -243,3 +275,17 @@ dropZComponent v =
 
         _ ->
             [] |> Debug.log "Nothing to drop in dropZComponent"
+
+dropYFrom3DVector: Vector3D -> Vector2D
+dropYFrom3DVector (Vec3D x y z) = Vec2D x z
+
+dropYFrom3DLineSegment: ThreeDLineSegment -> TwoDLineSegment
+dropYFrom3DLineSegment (LineSeg3D from to) = 
+    let
+        (Vec3D x1 y1 z1) = from
+        (Vec3D x2 y2 z2) = to
+        newFrom = Vec2D x1 z1
+        newTo = Vec2D x2 z2
+    in
+        LineSeg2D newFrom newTo
+        
