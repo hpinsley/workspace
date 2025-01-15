@@ -58,7 +58,7 @@ rightSide model =
                     plot model activePanelEntry
 
                 Nothing ->
-                    text "No active expression"
+                    text ""
             ]
         ]
 

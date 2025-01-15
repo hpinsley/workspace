@@ -163,18 +163,18 @@ projectAndPlotPoints model panelEntry lineSegments3d (xAxis, yAxis, zAxis) =
     in
     div
         [ Html.Attributes.id "projection" ]
-        [ Html.text "Projection"
-        , div [ Html.Attributes.class "svg-container" ]
-            [ svg
-                [ Svg.Attributes.width "100%"
-                , Svg.Attributes.height "100%"
-                , viewBox viewboxAttribte
+        [ 
+            div [ Html.Attributes.class "svg-container" ]
+                [ svg
+                    [ Svg.Attributes.width "100%"
+                    , Svg.Attributes.height "100%"
+                    , viewBox viewboxAttribte
 
-                -- , Svg.Attributes.preserveAspectRatio "xMidYMid meet"
-                , Svg.Attributes.preserveAspectRatio (buildPreserveAspectRatioString panelEntry |> Debug.log "preserveAspectRatio")
+                    -- , Svg.Attributes.preserveAspectRatio "xMidYMid meet"
+                    , Svg.Attributes.preserveAspectRatio (buildPreserveAspectRatioString panelEntry |> Debug.log "preserveAspectRatio")
+                    ]
+                    elements
                 ]
-                elements
-            ]
         ]
 
 
