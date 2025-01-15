@@ -22,7 +22,7 @@ defaultZAxisRotation = pi / 4.0
 defaultConstantValue = 1.0
 defaultStartValue = -pi
 defaultEndValue = pi
-defaultIncrementValue = 0.12 -- 0.1 can block the stack for some reason.
+defaultIncrementValue = 0.08 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
 defaultRotationMinValue = 0.0
 defaultRotationMaxValue = 2*pi
@@ -77,8 +77,8 @@ update msg model =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
                 m2 = updatePlotModel newPanelEntry m
             in
-                ( m2, Cmd.none) |> Debug.log "Returned from IncrementXAxisRotation"
-
+                ( m2, Cmd.none)
+                
         IncrementYAxisRotation panelEntry ->
             let
                 newValue = min panelEntry.yAxis.minMaxIncrement.max (panelEntry.yAxis.rotationAngle + panelEntry.yAxis.minMaxIncrement.increment)
