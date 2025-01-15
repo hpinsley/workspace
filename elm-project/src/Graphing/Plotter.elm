@@ -18,11 +18,12 @@ plot model panelEntry =
     div
         [ Html.Attributes.id "plot" ]
         [ 
+            -- div
+            --     [ Html.Attributes.id "plot-header" ]
+            --     [ h2 [] [ Html.text panelEntry.expression ]
+            --     ], 
+            
             div
-                [ Html.Attributes.id "plot-header" ]
-                [ h2 [] [ Html.text panelEntry.expression ]
-                ]
-        , div
             [ Html.Attributes.id "plot-body" ]
             [ let
                 lineSegments =
