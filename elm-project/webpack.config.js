@@ -3,7 +3,7 @@ const path = require('path');
 
 // console.log(path.resolve(__dirname, "src"));
 
-USE_ELM_DEBUGGER = true;
+USE_ELM_DEBUGGER = false;
 
 module.exports = {
   mode: 'development',
