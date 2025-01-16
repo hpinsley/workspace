@@ -60,8 +60,6 @@ viewPanelEntry model panelEntry =
         , Button.text (Button.config |> Button.setOnClick (DeleteExpression panelEntry.expression)) "Delete"
         , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         , Button.text (Button.config |> Button.setOnClick (Plot panelEntry)) "Plot"
-
-        -- , div [ id "plot-values" ] [ displayPlotValues panelEntry ]
         , displayAxisInfo panelEntry
         , displayViewportScaling panelEntry
         ]
@@ -79,12 +77,30 @@ displayViewportScaling panelEntry =
 displayAxisInfo : PanelEntry -> Html Msg
 displayAxisInfo panelEntry =
     div [ id "axes-info" ]
-        [ fieldset []
-            [ legend [] [ text "Axis Rotation" ]
-            , panelEntrySingleAxisView panelEntry.xAxis (IncrementXAxisRotation panelEntry) (DecrementXAxisRotation panelEntry)
-            , panelEntrySingleAxisView panelEntry.yAxis (IncrementYAxisRotation panelEntry) (DecrementYAxisRotation panelEntry)
-            , panelEntrySingleAxisView panelEntry.zAxis (IncrementZAxisRotation panelEntry) (DecrementZAxisRotation panelEntry)
-            ]
+        [ 
+            fieldset []
+                [ legend [] [ text "Axis Rotation" ]
+                , panelEntrySingleAxisView panelEntry.xAxis (IncrementXAxisRotation panelEntry) (DecrementXAxisRotation panelEntry)
+                , panelEntrySingleAxisView panelEntry.yAxis (IncrementYAxisRotation panelEntry) (DecrementYAxisRotation panelEntry)
+                , panelEntrySingleAxisView panelEntry.zAxis (IncrementZAxisRotation panelEntry) (DecrementZAxisRotation panelEntry)
+
+                , fieldset [] [
+                                legend [] [ text "Auto Rotation Setting" ]
+                                , div []
+                                        [ input
+                                            [ Html.Attributes.id "set-x-rotate"
+                                            , Html.Attributes.type_ "radio"
+                                            , Html.Attributes.name "auto-rotate"
+                                            , Html.Attributes.value "X"
+                                            , Html.Attributes.selected False
+                                            , Html.Events.onClick (UpdatePanelEntryAutoRotate panelEntry RotateX)
+                                            ]
+                                            []
+                                        , label [ Html.Attributes.for "set-x-rotate" ] [ text "X`" ]
+                                        ]
+
+                    ]
+                ]
         ]
 
 
@@ -227,39 +243,6 @@ getPanelEntryErrors panelEntry =
                 |> String.join ", "
     in
     Maybe.withDefault "" panelEntry.panelError ++ errors
-
-
-displayPlotValues : PanelEntry -> Html Msg
-displayPlotValues panelEntry =
-    div []
-        [ div [] [ "Value Count: " ++ (panelEntry.evaluatedPlotValues |> List.length |> toString) |> text ]
-        , case panelEntry.evaluatedPlotValues of
-            [] ->
-                div [] [ text "No plot values" ]
-
-            lineSegment :: tail ->
-                case tail of
-                    [] ->
-                        div [] [ showLineSegment lineSegment ]
-
-                    _ ->
-                        case List.reverse tail |> List.head of
-                            Just lastEntry ->
-                                div [] [ showLineSegment lineSegment, showLineSegment lastEntry ]
-
-                            Nothing ->
-                                div [] [ showLineSegment lineSegment ]
-        ]
-
-
-showLineSegment : LineSegment -> Html Msg
-showLineSegment (p1, p2) =
-    let
-        point1 = toString p1
-        point2 = toString p2
-        display = "(" ++ point1 ++ ";" ++ point2 ++ ")"
-    in
-        div [] [ text display ]
 
 
 showSymbolTableEntry : PanelEntry -> SymbolTableEntry -> Html Msg

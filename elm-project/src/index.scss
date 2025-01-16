@@ -15,9 +15,9 @@ label {
 }
 
 div#screen {
-    border: 1px solid green;
+    // border: 1px solid green;
     width: 98vw;
-    height: 98vh;
+    height: 96vh;
     padding: 5px;
 }
 
@@ -29,7 +29,7 @@ div#left-side {
 }
 
 div#right-side {
-    border: 1px solid blue;
+    // border: 1px solid blue;
     height: 95vh;
     width: 70vw;
     float: left;
@@ -52,7 +52,9 @@ div#panel {
     padding: $defaultPadding;
     background-color: $backgroundColor; // Changed background color to light gray
     border: 5px inset $insetColor;
-    width: 20vw;
+    width: 25vw;
+    height: 87vh;
+    overflow-y: scroll;
 
     input {
         background-color: $backgroundColor;
@@ -123,7 +125,7 @@ div#plot {
 
     div.svg-container {
         border: 1px solid black;
-        height: 85vh;
+        height: 90vh;
         width: 70vw;
     }
 }

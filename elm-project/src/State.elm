@@ -22,7 +22,8 @@ defaultZAxisRotation = pi / 4.0
 defaultConstantValue = 1.0
 defaultStartValue = -pi
 defaultEndValue = pi
-defaultIncrementValue = 0.12 -- 0.1 can block the stack for some reason.
+-- defaultIncrementValue = 0.08 -- Low values can cause stack overflow in Elm debugger if you have it enabled
+defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
 
 defaultRotationMinValue = 0.0
 defaultRotationMaxValue = 2*pi
@@ -33,6 +34,13 @@ defaultRotationIncrement = (defaultRotationMaxValue - defaultRotationMinValue) /
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        
+        AutoRotateActivePanel ->
+            let
+                _ = Debug.log "Message" msg
+            in         
+                (autoRotateActivePanel model, Cmd.none)
+
         Tick currentTime ->
             ( tickModel model currentTime, Cmd.none )
 
@@ -66,82 +74,6 @@ update msg model =
                     Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | isCollapsed = not pe.isCollapsed }) model
             in
                 ( m, Cmd.none )
-
-        IncrementXAxisRotation panelEntry ->
-            let
-                newValue = min panelEntry.xAxis.minMaxIncrement.max (panelEntry.xAxis.rotationAngle + panelEntry.xAxis.minMaxIncrement.increment)
-                axis = panelEntry.xAxis
-                newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | xAxis = newAxis } |> plotPanelEntry
-                m =
-                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = updatePlotModel newPanelEntry m
-            in
-                ( m2, Cmd.none) |> Debug.log "Returned from IncrementXAxisRotation"
-
-        IncrementYAxisRotation panelEntry ->
-            let
-                newValue = min panelEntry.yAxis.minMaxIncrement.max (panelEntry.yAxis.rotationAngle + panelEntry.yAxis.minMaxIncrement.increment)
-                axis = panelEntry.yAxis
-                newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | yAxis = newAxis } |> plotPanelEntry
-
-                m =
-                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = updatePlotModel newPanelEntry m
-            in
-                ( m2, Cmd.none )
-
-        IncrementZAxisRotation panelEntry ->
-            let
-                newValue = min panelEntry.zAxis.minMaxIncrement.max (panelEntry.zAxis.rotationAngle + panelEntry.zAxis.minMaxIncrement.increment)
-                axis = panelEntry.zAxis
-                newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | zAxis = newAxis } |> plotPanelEntry
-                m =
-                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = updatePlotModel newPanelEntry m
-            in
-                ( m2, Cmd.none )
-
-        DecrementXAxisRotation panelEntry ->
-            let
-                newValue = max panelEntry.xAxis.minMaxIncrement.min (panelEntry.xAxis.rotationAngle - panelEntry.xAxis.minMaxIncrement.increment)
-                axis = panelEntry.xAxis
-                newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | xAxis = newAxis } |> plotPanelEntry
-
-                m =
-                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = updatePlotModel newPanelEntry m
-            in
-                ( m2, Cmd.none ) |> Debug.log "Returned from IncrementXAxisRotation"
-
-        DecrementYAxisRotation panelEntry ->
-            let
-                newValue = max panelEntry.yAxis.minMaxIncrement.min (panelEntry.yAxis.rotationAngle - panelEntry.yAxis.minMaxIncrement.increment)
-                axis = panelEntry.yAxis
-                newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | yAxis = newAxis } |> plotPanelEntry
-
-                m =
-                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = updatePlotModel newPanelEntry m
-            in
-                ( m2, Cmd.none )
-
-        DecrementZAxisRotation panelEntry ->
-            let
-                newValue = max panelEntry.zAxis.minMaxIncrement.min (panelEntry.zAxis.rotationAngle - panelEntry.zAxis.minMaxIncrement.increment)
-                axis = panelEntry.zAxis
-                newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | zAxis = newAxis } |> plotPanelEntry
-
-                m =
-                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = updatePlotModel newPanelEntry m
-            in
-                ( m2, Cmd.none )
 
         ToggleVarMayVary panelEntry symbolTableEntry ->
             let
@@ -221,6 +153,109 @@ update msg model =
             in
             update (Plot panelEntry) m
 
+        IncrementXAxisRotation panelEntry ->
+            ( rotateXUp model panelEntry, Cmd.none)
+                
+        IncrementYAxisRotation panelEntry ->
+            let
+                newValue = min panelEntry.yAxis.minMaxIncrement.max (panelEntry.yAxis.rotationAngle + panelEntry.yAxis.minMaxIncrement.increment)
+                axis = panelEntry.yAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | yAxis = newAxis } |> plotPanelEntry
+
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
+
+        IncrementZAxisRotation panelEntry ->
+            let
+                newValue = min panelEntry.zAxis.minMaxIncrement.max (panelEntry.zAxis.rotationAngle + panelEntry.zAxis.minMaxIncrement.increment)
+                axis = panelEntry.zAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | zAxis = newAxis } |> plotPanelEntry
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
+
+        DecrementXAxisRotation panelEntry ->
+            let
+                newValue = max panelEntry.xAxis.minMaxIncrement.min (panelEntry.xAxis.rotationAngle - panelEntry.xAxis.minMaxIncrement.increment)
+                axis = panelEntry.xAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | xAxis = newAxis } |> plotPanelEntry
+
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none ) |> Debug.log "Returned from IncrementXAxisRotation"
+
+        DecrementYAxisRotation panelEntry ->
+            let
+                newValue = max panelEntry.yAxis.minMaxIncrement.min (panelEntry.yAxis.rotationAngle - panelEntry.yAxis.minMaxIncrement.increment)
+                axis = panelEntry.yAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | yAxis = newAxis } |> plotPanelEntry
+
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
+
+        DecrementZAxisRotation panelEntry ->
+            let
+                newValue = max panelEntry.zAxis.minMaxIncrement.min (panelEntry.zAxis.rotationAngle - panelEntry.zAxis.minMaxIncrement.increment)
+                axis = panelEntry.zAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | zAxis = newAxis } |> plotPanelEntry
+
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
+
+        UpdatePanelEntryAutoRotate panelEntry autoRotateType ->
+                (updatePanelEntryAutoRotate model panelEntry autoRotateType, Cmd.none)
+
+updatePanelEntryAutoRotate : Model -> PanelEntry -> AutoRotate -> Model
+updatePanelEntryAutoRotate model panelEntry autoRotateType =
+    let
+        m2 = Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | autoRotate = autoRotateType }) model
+    in
+        m2 |> Debug.log ("After updating to " ++ (toString autoRotateType))
+
+autoRotateActivePanel : Model -> Model
+autoRotateActivePanel model =
+    case model.activePlotEntry of
+        Nothing -> model
+        Just panelEntry -> 
+            let
+                updatedModel = case panelEntry.autoRotate of
+                                    NoAutoRotate -> model
+                                    RotateX -> rotateXUp model panelEntry
+                                    _ -> model
+            in
+                updatedModel
+
+rotateXUp: Model -> PanelEntry -> Model
+rotateXUp model panelEntry =
+    let
+        newValue = min panelEntry.xAxis.minMaxIncrement.max (panelEntry.xAxis.rotationAngle + panelEntry.xAxis.minMaxIncrement.increment)
+        axis = panelEntry.xAxis
+        newAxis = ({ axis | rotationAngle = newValue })
+        newPanelEntry = { panelEntry | xAxis = newAxis } |> plotPanelEntry
+        m =
+            Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+        m2 = updatePlotModel newPanelEntry m
+    in
+        m2
+
 updatePlotModel: PanelEntry -> Model -> Model
 updatePlotModel panelEntry model =
             let
@@ -268,7 +303,7 @@ plotPanelEntry panelEntry =
         in
             { panelEntry | evaluatedPlotValues = evaluated, panelError = Nothing }
 
-evaluateExpressionWithVariableDictionaries : Expression -> VariableLookup -> VariableLookup -> Vector
+evaluateExpressionWithVariableDictionaries : Expression -> VariableLookup -> VariableLookup -> GeneralVector
 evaluateExpressionWithVariableDictionaries expression constantsLookup variableLookup =
     let
         computedResult = evaluateExpression expression
@@ -485,7 +520,7 @@ addCurrentExpressionToPanel model =
                     , xAxis = { axisName = "X", rotationAngle = defaultXAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement } }
                     , yAxis = { axisName = "Y", rotationAngle = defaultYAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement} }
                     , zAxis = { axisName = "Z", rotationAngle = defaultZAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement }}
-                    }
+                    , autoRotate = NoAutoRotate }
             in
                 { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
 
@@ -497,9 +532,10 @@ tickModel model theTime =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
-
-
+    let
+        sub1 = every 5000.0 (\_ -> AutoRotateActivePanel)
+    in
+        sub1
 
 -- 1every 1000.0 Tick
 

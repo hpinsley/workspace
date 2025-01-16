@@ -10,17 +10,20 @@ import Models exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Utils
+import String exposing (lines)
 
 
 plot : Model -> PanelEntry -> Html Msg
 plot model panelEntry =
     div
         [ Html.Attributes.id "plot" ]
-        [ div
-            [ Html.Attributes.id "plot-header" ]
-            [ h2 [] [ Html.text panelEntry.expression ]
-            ]
-        , div
+        [ 
+            -- div
+            --     [ Html.Attributes.id "plot-header" ]
+            --     [ h2 [] [ Html.text panelEntry.expression ]
+            --     ], 
+            
+            div
             [ Html.Attributes.id "plot-body" ]
             [ let
                 lineSegments =
@@ -28,10 +31,13 @@ plot model panelEntry =
               in
               case Utils.getVaryingVariableCount panelEntry of
                 1 ->
-                    plot2d model panelEntry lineSegments
-
+                    lineSegments
+                        |> List.map Utils.generalLineSegmentToLineSegment2D
+                        |> plot2d model panelEntry
                 2 ->
-                    plot3d model panelEntry lineSegments
+                    lineSegments
+                        |> List.map Utils.generalLineSegmentToLineSegment3D
+                        |> plot3d model panelEntry
                     -- div []
                     --     [ Html.text "3-D Plot note ready" ]
 

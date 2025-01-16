@@ -13,8 +13,9 @@ import Utils
 strokeWidth =
     0.006
 
+axisScalar = 1.0
 
-plot3d : Model -> PanelEntry -> List LineSegment -> Html Msg
+plot3d : Model -> PanelEntry -> List ThreeDLineSegment -> Html Msg
 plot3d model panelEntry lineSegments =
     let
         _ =
@@ -23,66 +24,77 @@ plot3d model panelEntry lineSegments =
         -- _ =
         --     Debug.log "Ordered Pairs" lineSegments
 
-        rotatedPairs =
-             rotateData panelEntry lineSegments -- |> Debug.log "Rotated pairs"
-
-        projection =
-             rotatedPairs
-                 |> List.map (\(from, to) -> 
-                                let
-                                    projectedFrom = Utils.dropYComponent from
-                                    projectedTo = Utils.dropYComponent to
-                                in
-                                    (projectedFrom, projectedTo)
-                            )
-            -- |> Debug.log "Projection"
+        rotationMatrix = Utils.xyzRotation panelEntry.xAxis.rotationAngle panelEntry.yAxis.rotationAngle panelEntry.zAxis.rotationAngle
+        rotatedData = rotateData rotationMatrix lineSegments -- |> Debug.log "Rotated pairs"
+        rotatedAxes = rotateAxes rotationMatrix (buildAxes panelEntry lineSegments)
     in
     div
         [ Html.Attributes.id "plot-3d" ]
         [ 
-            div [] [ plotProjectedPoints model panelEntry projection ]
+            div [] [ 
+                        projectAndPlotPoints model panelEntry rotatedData rotatedAxes 
+                ]
         ]
 
-
-rotateData : PanelEntry -> List LineSegment -> List LineSegment
-rotateData panelEntry lineSegments =
+buildAxes: PanelEntry -> List ThreeDLineSegment -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment)
+buildAxes panelEntry data =
     let
-        rotationMatrix =
-            Utils.xyzRotation panelEntry.xAxis.rotationAngle panelEntry.yAxis.rotationAngle panelEntry.zAxis.rotationAngle
+        xAxis = LineSeg3D (Vec3D -axisScalar 0 0) (Vec3D axisScalar 0 0)
+        yAxis = LineSeg3D (Vec3D 0 -axisScalar 0) (Vec3D 0 axisScalar 0)
+        zAxis = LineSeg3D (Vec3D 0 0 -axisScalar) (Vec3D 0 0 axisScalar)
+    in
+        (xAxis, yAxis, zAxis)
 
-        fromVectors = lineSegments |> List.map (\(from, _) -> from)
-        toVectors = lineSegments |> List.map (\(_, to) -> to)
-
+rotateData : FloatMatrix -> List ThreeDLineSegment -> List ThreeDLineSegment
+rotateData rotationMatrix lineSegments =
+    let
+        fromVectors = lineSegments |> List.map (\(LineSeg3D from _) -> from)
+        toVectors = lineSegments |> List.map (\(LineSeg3D _ to) -> to)
+        
         rotatedFromVectors = fromVectors |> Utils.multiply3DData rotationMatrix
         rotatedToVectors = toVectors |> Utils.multiply3DData rotationMatrix
 
-        rotatedLineSegments = List.map2 (\vfrom vTo -> (vfrom, vTo)) rotatedFromVectors rotatedToVectors
-        
+        rotatedLineSegments = List.map2 (\vfrom vTo -> LineSeg3D vfrom vTo) rotatedFromVectors rotatedToVectors
     in
         rotatedLineSegments
 
+rotateAxes : FloatMatrix -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment) 
+                -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment)
+rotateAxes rotationMatrix (x, y, z) =
+      (
+            Utils.multiply3DLineSegment rotationMatrix x
+        ,   Utils.multiply3DLineSegment rotationMatrix y
+        ,   Utils.multiply3DLineSegment rotationMatrix z
+      )
 
-plotProjectedPoints : Model -> PanelEntry -> List LineSegment -> Html Msg
-plotProjectedPoints model panelEntry lineSegments =
+projectAndPlotPoints : Model -> PanelEntry -> List ThreeDLineSegment -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment) -> Html Msg
+projectAndPlotPoints model panelEntry lineSegments3d (xAxis, yAxis, zAxis) =
     let
         -- _ =
         --     Debug.log "Plot2D points to plot" (List.length lineSegments)
 
-        (v1Points, v2Points) = lineSegments |> List.unzip
+        -- Project down to 2D by dropping the y values
+        lineSegments = lineSegments3d |> List.map Utils.dropYFrom3DLineSegment
+        projectedXAxis = Utils.dropYFrom3DLineSegment xAxis  
+        projectedYAxis = Utils.dropYFrom3DLineSegment yAxis  
+        projectedZAxis = Utils.dropYFrom3DLineSegment zAxis  
+
+
+        (v1Points, v2Points) = lineSegments 
+                                    |> List.map (\(LineSeg2D from to) -> (from, to))
+                                    |> List.unzip
         allPoints = List.append v1Points v2Points -- |> Debug.log "all points"
 
         minX =
-            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "minX"
-
+            List.minimum (List.map (\(Vec2D x _) -> x) allPoints) |> Maybe.withDefault 0.0
         maxX =
-            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head pair)) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "maxX"
+            List.maximum (List.map (\(Vec2D x _) -> x) allPoints) |> Maybe.withDefault 0.0
 
         minY =
-            List.minimum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "minY"
+            List.minimum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
 
         maxY =
-            List.maximum (List.map (\pair -> Maybe.withDefault 0.0 (List.head (Maybe.withDefault [] (List.tail pair)))) allPoints) |> Maybe.withDefault 0.0 |> Debug.log "maxY"
-
+            List.maximum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
         xWidth =
             maxX - minX |> Debug.log "xWidth"
 
@@ -114,8 +126,33 @@ plotProjectedPoints model panelEntry lineSegments =
         functionPath =
             build2DPathFromLineSegments yTransform lineSegments -- |> Debug.log "Function Path"
 
+        xAxisPath = build2DPathFromLineSegment yTransform projectedXAxis
+        yAxisPath = build2DPathFromLineSegment yTransform projectedYAxis
+        zAxisPath = build2DPathFromLineSegment yTransform projectedZAxis
+
         elements =
             [ Svg.path
+                [ Svg.Attributes.d xAxisPath
+                , Svg.Attributes.fill "none"
+                , Svg.Attributes.stroke "red"
+                , Svg.Attributes.strokeWidth (String.fromFloat (2* strokeWidth))
+                ]
+                []
+            , Svg.path
+                [ Svg.Attributes.d yAxisPath
+                , Svg.Attributes.fill "none"
+                , Svg.Attributes.stroke "green"
+                , Svg.Attributes.strokeWidth (String.fromFloat (2 * strokeWidth))
+                ]
+                []
+            , Svg.path
+                [ Svg.Attributes.d zAxisPath
+                , Svg.Attributes.fill "none"
+                , Svg.Attributes.stroke "blue"
+                , Svg.Attributes.strokeWidth (String.fromFloat (2 * strokeWidth))
+                ]
+                []
+            , Svg.path
                 [ Svg.Attributes.d functionPath
                 , Svg.Attributes.fill "none"
                 , Svg.Attributes.stroke "black"
@@ -126,18 +163,18 @@ plotProjectedPoints model panelEntry lineSegments =
     in
     div
         [ Html.Attributes.id "projection" ]
-        [ Html.text "Projection"
-        , div [ Html.Attributes.class "svg-container" ]
-            [ svg
-                [ Svg.Attributes.width "100%"
-                , Svg.Attributes.height "100%"
-                , viewBox viewboxAttribte
+        [ 
+            div [ Html.Attributes.class "svg-container" ]
+                [ svg
+                    [ Svg.Attributes.width "100%"
+                    , Svg.Attributes.height "100%"
+                    , viewBox viewboxAttribte
 
-                -- , Svg.Attributes.preserveAspectRatio "xMidYMid meet"
-                , Svg.Attributes.preserveAspectRatio (buildPreserveAspectRatioString panelEntry |> Debug.log "preserveAspectRatio")
+                    -- , Svg.Attributes.preserveAspectRatio "xMidYMid meet"
+                    , Svg.Attributes.preserveAspectRatio (buildPreserveAspectRatioString panelEntry |> Debug.log "preserveAspectRatio")
+                    ]
+                    elements
                 ]
-                elements
-            ]
         ]
 
 
@@ -183,24 +220,22 @@ adjustYValue maxY minY y =
     (maxY + minY) - y
 
 
-build2DPathFromLineSegments : (Float -> Float) -> List LineSegment -> String
+-- This method takes a list of 2D line segments to plot and adjusts the y component using the
+-- given method
+build2DPathFromLineSegments : (Float -> Float) -> List TwoDLineSegment -> String
 build2DPathFromLineSegments yAdjust lineSegments =
     lineSegments 
         |> List.map (build2DPathFromLineSegment yAdjust)
         |> String.join " "
         -- |> Debug.log "2D Path"
 
-build2DPathFromLineSegment : (Float -> Float) -> LineSegment -> String
+build2DPathFromLineSegment : (Float -> Float) -> TwoDLineSegment -> String
 build2DPathFromLineSegment yAdjust lineSegment =
     let
-        (from, to) = lineSegment
-        (xFrom, yFrom) = case from of
-                            x :: y :: [] -> (x, yAdjust y)
-                            _ -> (0,0) |> Debug.log "Unexpected vector length"
-        (xTo, yTo) = case to of
-                            x :: y :: [] -> (x, yAdjust y)
-                            _ -> (0,0) |> Debug.log "Unexpected vector length"
+        (LineSeg2D from to) = lineSegment
+        (Vec2D xFrom yFrom) = from
+        (Vec2D xTo yTo) = to
     in
-        "M " ++ String.fromFloat xFrom ++ "," ++ String.fromFloat yFrom ++
+        "M " ++ String.fromFloat xFrom ++ "," ++ String.fromFloat (yAdjust yFrom) ++
             " " ++ 
-        "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat yTo
+        "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat (yAdjust yTo)
