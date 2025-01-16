@@ -38,7 +38,7 @@ update msg model =
             let
                 _ = Debug.log "Message" msg
             in         
-                (model, Cmd.none)
+                (autoRotateActivePanel model, Cmd.none)
 
         Tick currentTime ->
             ( tickModel model currentTime, Cmd.none )
@@ -219,6 +219,16 @@ update msg model =
             in
                 ( m2, Cmd.none )
 
+autoRotateActivePanel : Model -> Model
+autoRotateActivePanel model =
+    case model.activePlotEntry of
+        Nothing -> model
+        Just panelEntry -> 
+            let
+                updatedModel = rotateXUp model panelEntry
+            in
+                updatedModel
+                
 rotateXUp: Model -> PanelEntry -> Model
 rotateXUp model panelEntry =
     let
