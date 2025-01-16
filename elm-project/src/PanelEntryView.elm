@@ -77,12 +77,30 @@ displayViewportScaling panelEntry =
 displayAxisInfo : PanelEntry -> Html Msg
 displayAxisInfo panelEntry =
     div [ id "axes-info" ]
-        [ fieldset []
-            [ legend [] [ text "Axis Rotation" ]
-            , panelEntrySingleAxisView panelEntry.xAxis (IncrementXAxisRotation panelEntry) (DecrementXAxisRotation panelEntry)
-            , panelEntrySingleAxisView panelEntry.yAxis (IncrementYAxisRotation panelEntry) (DecrementYAxisRotation panelEntry)
-            , panelEntrySingleAxisView panelEntry.zAxis (IncrementZAxisRotation panelEntry) (DecrementZAxisRotation panelEntry)
-            ]
+        [ 
+            fieldset []
+                [ legend [] [ text "Axis Rotation" ]
+                , panelEntrySingleAxisView panelEntry.xAxis (IncrementXAxisRotation panelEntry) (DecrementXAxisRotation panelEntry)
+                , panelEntrySingleAxisView panelEntry.yAxis (IncrementYAxisRotation panelEntry) (DecrementYAxisRotation panelEntry)
+                , panelEntrySingleAxisView panelEntry.zAxis (IncrementZAxisRotation panelEntry) (DecrementZAxisRotation panelEntry)
+
+                , fieldset [] [
+                                legend [] [ text "Auto Rotation Setting" ]
+                                , div []
+                                        [ input
+                                            [ Html.Attributes.id "set-x-rotate"
+                                            , Html.Attributes.type_ "radio"
+                                            , Html.Attributes.name "auto-rotate"
+                                            , Html.Attributes.value "X"
+                                            , Html.Attributes.selected False
+                                            , Html.Events.onClick (UpdatePanelEntryAutoRotate panelEntry RotateX)
+                                            ]
+                                            []
+                                        , label [ Html.Attributes.for "set-x-rotate" ] [ text "X`" ]
+                                        ]
+
+                    ]
+                ]
         ]
 
 

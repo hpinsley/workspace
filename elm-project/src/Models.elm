@@ -58,6 +58,7 @@ type Msg
     | DecrementYAxisRotation PanelEntry 
     | DecrementZAxisRotation PanelEntry 
     | AutoRotateActivePanel
+    | UpdatePanelEntryAutoRotate PanelEntry AutoRotate
 
 type alias SymbolTableEntry =
     { variable : Variable

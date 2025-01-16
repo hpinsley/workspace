@@ -22,7 +22,8 @@ defaultZAxisRotation = pi / 4.0
 defaultConstantValue = 1.0
 defaultStartValue = -pi
 defaultEndValue = pi
-defaultIncrementValue = 0.08 -- Low values can cause stack overflow in Elm debugger if you have it enabled
+-- defaultIncrementValue = 0.08 -- Low values can cause stack overflow in Elm debugger if you have it enabled
+defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
 
 defaultRotationMinValue = 0.0
 defaultRotationMaxValue = 2*pi
@@ -218,6 +219,16 @@ update msg model =
                 m2 = updatePlotModel newPanelEntry m
             in
                 ( m2, Cmd.none )
+
+        UpdatePanelEntryAutoRotate panelEntry autoRotateType ->
+                (updatePanelEntryAutoRotate model panelEntry autoRotateType, Cmd.none)
+
+updatePanelEntryAutoRotate : Model -> PanelEntry -> AutoRotate -> Model
+updatePanelEntryAutoRotate model panelEntry autoRotateType =
+    let
+        m2 = Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | autoRotate = autoRotateType }) model
+    in
+        m2 |> Debug.log ("After updating to " ++ (toString autoRotateType))
 
 autoRotateActivePanel : Model -> Model
 autoRotateActivePanel model =
