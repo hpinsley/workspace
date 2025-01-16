@@ -5,7 +5,6 @@ import Matrix exposing (..)
 import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
 
-
 -- General vector is of unspecified length
 type alias GeneralVector =
     List Float
@@ -73,6 +72,11 @@ type alias SymbolTableEntry =
     , mayVary : Bool
     }
 
+type AutoRotate
+    = NoAutoRotate
+    | RotateX
+    | RotateY
+    | RotateZ
 
 type alias Axis =
     { 
@@ -96,8 +100,8 @@ type alias PanelEntry =
     , xAxis : Axis
     , yAxis : Axis
     , zAxis : Axis
+    , autoRotate: AutoRotate
     }
-
 
 type SvgAlignment
     = AlignMin

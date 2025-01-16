@@ -225,10 +225,13 @@ autoRotateActivePanel model =
         Nothing -> model
         Just panelEntry -> 
             let
-                updatedModel = rotateXUp model panelEntry
+                updatedModel = case panelEntry.autoRotate of
+                                    NoAutoRotate -> model
+                                    RotateX -> rotateXUp model panelEntry
+                                    _ -> model
             in
                 updatedModel
-                
+
 rotateXUp: Model -> PanelEntry -> Model
 rotateXUp model panelEntry =
     let
@@ -506,7 +509,7 @@ addCurrentExpressionToPanel model =
                     , xAxis = { axisName = "X", rotationAngle = defaultXAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement } }
                     , yAxis = { axisName = "Y", rotationAngle = defaultYAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement} }
                     , zAxis = { axisName = "Z", rotationAngle = defaultZAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement }}
-                    }
+                    , autoRotate = NoAutoRotate }
             in
                 { model | panelEntries = newPanelEntry :: model.panelEntries, expression = Nothing, parsedExpression = Nothing, variables = Dict.empty }
 
