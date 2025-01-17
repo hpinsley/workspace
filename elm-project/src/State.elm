@@ -34,207 +34,199 @@ defaultRotationIncrement = (defaultRotationMaxValue - defaultRotationMinValue) /
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    let
-        _ = Debug.log "Got A msg.  AutoRotate" (case Utils.findActivePanelEntry model of 
-                                                            Nothing -> "no active panel" 
-                                                            Just p -> (toString p.autoRotate))
-    in
-        case msg  of
-            
-            AutoRotateActivePanel ->
-                let
-                    _ = True -- Debug.log "Message" msg
-                in         
-                    (autoRotateActivePanel model, Cmd.none)
+    case msg  of
+        
+        AutoRotateActivePanel ->
+            (autoRotateActivePanel model, Cmd.none)
 
-            Tick currentTime ->
-                ( tickModel model currentTime, Cmd.none )
+        Tick currentTime ->
+            ( tickModel model currentTime, Cmd.none )
 
-            UpdateExpression expr ->
-                let
-                    m =
-                        { model | expression = Just expr }
-                in
-                parseModelExpression m
+        UpdateExpression expr ->
+            let
+                m =
+                    { model | expression = Just expr }
+            in
+            parseModelExpression m
 
-            AddToPanel ->
-                let
-                    m =
-                        addCurrentExpressionToPanel model
-                in
+        AddToPanel ->
+            let
+                m =
+                    addCurrentExpressionToPanel model
+            in
+            ( m, Cmd.none )
+
+        DeleteExpression expr ->
+            ( { model | panelEntries = List.filter (\pe -> pe.expression /= expr) model.panelEntries }, Cmd.none )
+
+        EvaluateExpression expr ->
+            let
+                m =
+                    Utils.updatePanelEntry expr evaluatePanel model
+            in
+            ( m, Cmd.none )
+
+        TogglePanelEntry panelEntry ->
+            let
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | isCollapsed = not pe.isCollapsed }) model
+            in
                 ( m, Cmd.none )
 
-            DeleteExpression expr ->
-                ( { model | panelEntries = List.filter (\pe -> pe.expression /= expr) model.panelEntries }, Cmd.none )
+        ToggleVarMayVary panelEntry symbolTableEntry ->
+            let
+                m =
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | mayVary = not e.mayVary }) model
+            in
+            ( m, Cmd.none )
 
-            EvaluateExpression expr ->
-                let
-                    m =
-                        Utils.updatePanelEntry expr evaluatePanel model
-                in
-                ( m, Cmd.none )
+        UpdateVarStartValueBuffer panelEntry symbolTableEntry value ->
+            let
+                m =
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | startValueBuffer = value }) model
+            in
+            ( m, Cmd.none )
 
-            TogglePanelEntry panelEntry ->
-                let
-                    m =
-                        Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | isCollapsed = not pe.isCollapsed }) model
-                in
-                    ( m, Cmd.none )
+        UpdateVarStartValue panelEntry symbolTableEntry _ ->
+            let
+                m =
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryStartValue model
+            in
+            ( m, Cmd.none )
 
-            ToggleVarMayVary panelEntry symbolTableEntry ->
-                let
-                    m =
-                        Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | mayVary = not e.mayVary }) model
-                in
-                ( m, Cmd.none )
+        UpdateVarEndValueBuffer panelEntry symbolTableEntry value ->
+            let
+                m =
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | endValueBuffer = value }) model
+            in
+            ( m, Cmd.none )
 
-            UpdateVarStartValueBuffer panelEntry symbolTableEntry value ->
-                let
-                    m =
-                        Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | startValueBuffer = value }) model
-                in
-                ( m, Cmd.none )
+        UpdateVarEndValue panelEntry symbolTableEntry _ ->
+            let
+                m =
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryEndValue model
+            in
+            ( m, Cmd.none )
 
-            UpdateVarStartValue panelEntry symbolTableEntry _ ->
-                let
-                    m =
-                        Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryStartValue model
-                in
-                ( m, Cmd.none )
+        UpdateVarIncrementValueBuffer panelEntry symbolTableEntry value ->
+            let
+                m =
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | incrementValueBuffer = value }) model
+            in
+            ( m, Cmd.none )
 
-            UpdateVarEndValueBuffer panelEntry symbolTableEntry value ->
-                let
-                    m =
-                        Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | endValueBuffer = value }) model
-                in
-                ( m, Cmd.none )
+        UpdateVarIncrementValue panelEntry symbolTableEntry _ ->
+            let
+                m =
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryIncrementValue model
+            in
+            ( m, Cmd.none )
 
-            UpdateVarEndValue panelEntry symbolTableEntry _ ->
-                let
-                    m =
-                        Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryEndValue model
-                in
-                ( m, Cmd.none )
-
-            UpdateVarIncrementValueBuffer panelEntry symbolTableEntry value ->
-                let
-                    m =
-                        Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | incrementValueBuffer = value }) model
-                in
-                ( m, Cmd.none )
-
-            UpdateVarIncrementValue panelEntry symbolTableEntry _ ->
-                let
-                    m =
-                        Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable updateSymbolTableEntryIncrementValue model
-                in
-                ( m, Cmd.none )
-
-            Plot panelEntry ->
-                let
-                    m2 = updatePlotModel panelEntry model
-                in
-                    ( m2, Cmd.none )
+        Plot panelEntry ->
+            let
+                m2 = updatePlotModel panelEntry model
+            in
+                ( m2, Cmd.none )
 
 
-            SetXAlignment panelEntry alignment ->
-                let
-                    m =
-                        Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentX = alignment }) model
-                in
-                -- ( m, Cmd.none )
-                update (Plot panelEntry) m
+        SetXAlignment panelEntry alignment ->
+            let
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentX = alignment }) model
+            in
+            -- ( m, Cmd.none )
+            update (Plot panelEntry) m
 
-            SetYAlignment panelEntry alignment ->
-                let
-                    m =
-                        Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentY = alignment }) model
-                in
-                update (Plot panelEntry) m
+        SetYAlignment panelEntry alignment ->
+            let
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | alignmentY = alignment }) model
+            in
+            update (Plot panelEntry) m
 
-            SetAlignmentBehavior panelEntry alignmentBehavior ->
-                let
-                    m =
-                        Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | meetOrSlice = alignmentBehavior }) model
-                in
-                update (Plot panelEntry) m
+        SetAlignmentBehavior panelEntry alignmentBehavior ->
+            let
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | meetOrSlice = alignmentBehavior }) model
+            in
+            update (Plot panelEntry) m
 
-            IncrementXAxisRotation panelEntry ->
-                ( rotateXUp model panelEntry, Cmd.none)
-                    
-            IncrementYAxisRotation panelEntry ->
-                let
-                    newValue = min panelEntry.yAxis.minMaxIncrement.max (panelEntry.yAxis.rotationAngle + panelEntry.yAxis.minMaxIncrement.increment)
-                    axis = panelEntry.yAxis
-                    newAxis = ({ axis | rotationAngle = newValue })
-                    newPanelEntry = { panelEntry | yAxis = newAxis } |> plotPanelEntry
+        IncrementXAxisRotation panelEntry ->
+            ( rotateXUp model panelEntry, Cmd.none)
+                
+        IncrementYAxisRotation panelEntry ->
+            let
+                newValue = min panelEntry.yAxis.minMaxIncrement.max (panelEntry.yAxis.rotationAngle + panelEntry.yAxis.minMaxIncrement.increment)
+                axis = panelEntry.yAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | yAxis = newAxis } |> plotPanelEntry
 
-                    m =
-                        Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                    m2 = updatePlotModel newPanelEntry m
-                in
-                    ( m2, Cmd.none )
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
 
-            IncrementZAxisRotation panelEntry ->
-                let
-                    newValue = min panelEntry.zAxis.minMaxIncrement.max (panelEntry.zAxis.rotationAngle + panelEntry.zAxis.minMaxIncrement.increment)
-                    axis = panelEntry.zAxis
-                    newAxis = ({ axis | rotationAngle = newValue })
-                    newPanelEntry = { panelEntry | zAxis = newAxis } |> plotPanelEntry
-                    m =
-                        Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                    m2 = updatePlotModel newPanelEntry m
-                in
-                    ( m2, Cmd.none )
+        IncrementZAxisRotation panelEntry ->
+            let
+                newValue = min panelEntry.zAxis.minMaxIncrement.max (panelEntry.zAxis.rotationAngle + panelEntry.zAxis.minMaxIncrement.increment)
+                axis = panelEntry.zAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | zAxis = newAxis } |> plotPanelEntry
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
 
-            DecrementXAxisRotation panelEntry ->
-                let
-                    newValue = max panelEntry.xAxis.minMaxIncrement.min (panelEntry.xAxis.rotationAngle - panelEntry.xAxis.minMaxIncrement.increment)
-                    axis = panelEntry.xAxis
-                    newAxis = ({ axis | rotationAngle = newValue })
-                    newPanelEntry = { panelEntry | xAxis = newAxis } |> plotPanelEntry
+        DecrementXAxisRotation panelEntry ->
+            let
+                newValue = max panelEntry.xAxis.minMaxIncrement.min (panelEntry.xAxis.rotationAngle - panelEntry.xAxis.minMaxIncrement.increment)
+                axis = panelEntry.xAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | xAxis = newAxis } |> plotPanelEntry
 
-                    m =
-                        Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                    m2 = updatePlotModel newPanelEntry m
-                in
-                    ( m2, Cmd.none ) |> Debug.log "Returned from IncrementXAxisRotation"
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none ) -- |> Debug.log "Returned from IncrementXAxisRotation"
 
-            DecrementYAxisRotation panelEntry ->
-                let
-                    newValue = max panelEntry.yAxis.minMaxIncrement.min (panelEntry.yAxis.rotationAngle - panelEntry.yAxis.minMaxIncrement.increment)
-                    axis = panelEntry.yAxis
-                    newAxis = ({ axis | rotationAngle = newValue })
-                    newPanelEntry = { panelEntry | yAxis = newAxis } |> plotPanelEntry
+        DecrementYAxisRotation panelEntry ->
+            let
+                newValue = max panelEntry.yAxis.minMaxIncrement.min (panelEntry.yAxis.rotationAngle - panelEntry.yAxis.minMaxIncrement.increment)
+                axis = panelEntry.yAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | yAxis = newAxis } |> plotPanelEntry
 
-                    m =
-                        Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                    m2 = updatePlotModel newPanelEntry m
-                in
-                    ( m2, Cmd.none )
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
 
-            DecrementZAxisRotation panelEntry ->
-                let
-                    newValue = max panelEntry.zAxis.minMaxIncrement.min (panelEntry.zAxis.rotationAngle - panelEntry.zAxis.minMaxIncrement.increment)
-                    axis = panelEntry.zAxis
-                    newAxis = ({ axis | rotationAngle = newValue })
-                    newPanelEntry = { panelEntry | zAxis = newAxis } |> plotPanelEntry
+        DecrementZAxisRotation panelEntry ->
+            let
+                newValue = max panelEntry.zAxis.minMaxIncrement.min (panelEntry.zAxis.rotationAngle - panelEntry.zAxis.minMaxIncrement.increment)
+                axis = panelEntry.zAxis
+                newAxis = ({ axis | rotationAngle = newValue })
+                newPanelEntry = { panelEntry | zAxis = newAxis } |> plotPanelEntry
 
-                    m =
-                        Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                    m2 = updatePlotModel newPanelEntry m
-                in
-                    ( m2, Cmd.none )
+                m =
+                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+                m2 = updatePlotModel newPanelEntry m
+            in
+                ( m2, Cmd.none )
 
-            UpdatePanelEntryAutoRotate panelEntry autoRotateType ->
-                    (updatePanelEntryAutoRotate model panelEntry autoRotateType, Cmd.none)
+        UpdatePanelEntryAutoRotate panelEntry autoRotateType ->
+                (updatePanelEntryAutoRotate model panelEntry autoRotateType, Cmd.none)
 
 updatePanelEntryAutoRotate : Model -> PanelEntry -> AutoRotate -> Model
 updatePanelEntryAutoRotate model panelEntry autoRotateType =
     let
         m2 = Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | autoRotate = autoRotateType }) model
     in
-        m2 |> Debug.log ("After updating to " ++ (toString autoRotateType))
+        m2
 
 autoRotateActivePanel : Model -> Model
 autoRotateActivePanel model =
@@ -252,7 +244,6 @@ autoRotateActivePanel model =
 rotateXUp: Model -> PanelEntry -> Model
 rotateXUp model panelEntry =
     let
-        _ = Debug.log "rotateXUp Incoming model" model
         addedValue = panelEntry.xAxis.rotationAngle + panelEntry.xAxis.minMaxIncrement.increment
         newValue = if addedValue > panelEntry.xAxis.minMaxIncrement.max then panelEntry.xAxis.minMaxIncrement.min else addedValue
         axis = panelEntry.xAxis
@@ -261,7 +252,7 @@ rotateXUp model panelEntry =
         m =
             Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
     in
-        m |> Debug.log "rotateXUp Outgoing model"
+        m
 
 updatePlotModel: PanelEntry -> Model -> Model
 updatePlotModel panelEntry model =
@@ -297,7 +288,7 @@ plotPanelEntry panelEntry =
                     |> List.filter (\v -> not v.mayVary)
                     |> List.map (\e -> ( e.variable, e.currentValue ))
                     |> Dict.fromList
-                    |> Debug.log "Constant lookup dict"
+                    -- |> Debug.log "Constant lookup dict"
 
             fromToVaryingDicts = iterateSymbolTable panelEntry -- |> Debug.log "FromToVaryingDicts"
 
@@ -360,7 +351,7 @@ iterateSymbolTableSingleVariable variable =
         pairs = startStop |> List.map (\(from, to ) -> (variable.startValue + variable.incrementValue * from,  variable.startValue + variable.incrementValue * to))
         lookups = pairs |> List.map (\(p1, p2) -> (Dict.fromList [(variable.variable, p1)], Dict.fromList [(variable.variable, p2)]))
     in
-        lookups |> Debug.log "Lookups"
+        lookups -- |> Debug.log "Lookups"
 
 iterateSymbolTableTwoVariables : SymbolTableEntry -> SymbolTableEntry -> List (VariableLookup, VariableLookup)
 iterateSymbolTableTwoVariables v1 v2 =
