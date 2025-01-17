@@ -122,7 +122,7 @@ type alias Model =
     , parseErrors : String
     , variables : Dict String Variable
     , panelEntries : List PanelEntry
-    , activePlotEntry : Maybe PanelEntry
+    , activePlotEntry : Maybe String
     }
 
 

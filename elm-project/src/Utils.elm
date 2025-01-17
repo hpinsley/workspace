@@ -16,6 +16,11 @@ findPanelEntry model expression =
         _ ->
             Nothing
 
+findActivePanelEntry : Model -> Maybe PanelEntry
+findActivePanelEntry model =
+    case model.activePlotEntry of
+        Just activeExpression -> findPanelEntry model activeExpression
+        Nothing -> Nothing
 
 getVaryingVariables : PanelEntry -> List SymbolTableEntry
 getVaryingVariables panelEntry =
@@ -300,3 +305,8 @@ dropYFrom3DLineSegment (LineSeg3D from to) =
     in
         LineSeg2D newFrom newTo
         
+isActivePlotPanel : Model -> PanelEntry -> Bool
+isActivePlotPanel model panelEntry =
+    case model.activePlotEntry of
+        Nothing -> False
+        Just expression -> panelEntry.expression == expression

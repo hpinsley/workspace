@@ -15,10 +15,10 @@ import Time exposing (..)
 import Utils
 import Parser exposing (variable)
 
-rotationMs = 30.0
+rotationMs = 3000.0
 defaultIncrementValue = 0.1 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 -- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
-defaultRotations = 1000.0
+defaultRotations = 16.0
 
 defaultXAxisRotation = pi / 4.0
 defaultYAxisRotation = 0.0
@@ -35,7 +35,7 @@ defaultRotationIncrement = (defaultRotationMaxValue - defaultRotationMinValue) /
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     let
-        _ = Debug.log "Got A msg.  AutoRotate" (case model.activePlotEntry of 
+        _ = Debug.log "Got A msg.  AutoRotate" (case Utils.findActivePanelEntry model of 
                                                             Nothing -> "no active panel" 
                                                             Just p -> (toString p.autoRotate))
     in
@@ -238,7 +238,7 @@ updatePanelEntryAutoRotate model panelEntry autoRotateType =
 
 autoRotateActivePanel : Model -> Model
 autoRotateActivePanel model =
-    case model.activePlotEntry of
+    case Utils.findActivePanelEntry model of
         Nothing -> model
         Just panelEntry -> 
             let
@@ -252,16 +252,16 @@ autoRotateActivePanel model =
 rotateXUp: Model -> PanelEntry -> Model
 rotateXUp model panelEntry =
     let
+        _ = Debug.log "rotateXUp Incoming model" model
         addedValue = panelEntry.xAxis.rotationAngle + panelEntry.xAxis.minMaxIncrement.increment
         newValue = if addedValue > panelEntry.xAxis.minMaxIncrement.max then panelEntry.xAxis.minMaxIncrement.min else addedValue
         axis = panelEntry.xAxis
         newAxis = ({ axis | rotationAngle = newValue })
-        newPanelEntry = { panelEntry | xAxis = newAxis } |> plotPanelEntry
+        newPanelEntry = { panelEntry | xAxis = newAxis } -- |> plotPanelEntry
         m =
             Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-        m2 = updatePlotModel newPanelEntry m
     in
-        m2
+        m |> Debug.log "rotateXUp Outgoing model"
 
 updatePlotModel: PanelEntry -> Model -> Model
 updatePlotModel panelEntry model =
@@ -274,7 +274,7 @@ updatePlotModel panelEntry model =
                     case Utils.findPanelEntry m panelEntry.expression of
                         Just pe ->
                             if List.length pe.evaluatedPlotValues > 0 then
-                                { m | activePlotEntry = Just pe }
+                                { m | activePlotEntry = Just pe.expression }
 
                             else
                                 m
@@ -568,4 +568,4 @@ subscriptions _ =
     in
         sub1
 
--- 1every 1000.0 Tick
+    -- Sub.none

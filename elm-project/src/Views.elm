@@ -12,7 +12,7 @@ import Material.TextField as TextField
 import Models exposing (..)
 import PanelView exposing (viewPanel)
 import Time
-
+import Utils
 
 getFormattedTime : Maybe Time.Posix -> String
 getFormattedTime timeInfo =
@@ -53,7 +53,7 @@ rightSide : Model -> Html Msg
 rightSide model =
     div [ id "right-side" ]
         [ h1 []
-            [ case model.activePlotEntry of
+            [ case Utils.findActivePanelEntry model of
                 Just activePanelEntry ->
                     plot model activePanelEntry
 

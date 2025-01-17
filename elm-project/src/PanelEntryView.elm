@@ -17,17 +17,7 @@ viewPanelEntry model panelEntry =
     div
         [ class "panel-entry"
         , class
-            (case model.activePlotEntry of
-                Just activePanelEntry ->
-                    if activePanelEntry == panelEntry then
-                        "active"
-
-                    else
-                        "inactive"
-
-                Nothing ->
-                    "inactive"
-            )
+            (if Utils.isActivePlotPanel model panelEntry then "active" else "inactive")
         ]
         [ div [ id "expression" ] [ text panelEntry.expression ]
 
