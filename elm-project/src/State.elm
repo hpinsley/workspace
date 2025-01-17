@@ -15,10 +15,10 @@ import Time exposing (..)
 import Utils
 import Parser exposing (variable)
 
-rotationMs = 3000.0
-defaultIncrementValue = 0.1 -- Low values can cause stack overflow in Elm debugger if you have it enabled
+rotationMs = 5.0
+defaultIncrementValue = 0.08 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 -- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
-defaultRotations = 16.0
+defaultRotations = 1000.0
 
 defaultXAxisRotation = pi / 4.0
 defaultYAxisRotation = 0.0
