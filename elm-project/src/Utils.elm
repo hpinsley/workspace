@@ -310,3 +310,14 @@ isActivePlotPanel model panelEntry =
     case model.activePlotEntry of
         Nothing -> False
         Just expression -> panelEntry.expression == expression
+
+applyFunctionToPanelEntryWithExpression: String -> (Model -> PanelEntry -> Model) -> Model -> Model
+applyFunctionToPanelEntryWithExpression expression func model =
+    case findPanelEntry model expression of
+        Just pe ->
+            func model pe
+        Nothing ->
+            let
+                _ = Debug.log "ERROR: Cannot find panel with expression" expression
+            in
+                model

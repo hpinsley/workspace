@@ -156,17 +156,22 @@ update msg model =
             update (Plot panelEntry) m
 
         IncrementXAxisRotation panelEntry ->
-            ( rotateXUp model panelEntry, Cmd.none)
+            let
+
+                m = rotateXUp model panelEntry
+                m2 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression processPlotPanelEntry m
+            in
+                (m2, Cmd.none)
                 
         IncrementYAxisRotation panelEntry ->
             let
                 newValue = min panelEntry.yAxis.minMaxIncrement.max (panelEntry.yAxis.rotationAngle + panelEntry.yAxis.minMaxIncrement.increment)
                 axis = panelEntry.yAxis
                 newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | yAxis = newAxis } |> calculateEnumerateValues
+                newPanelEntry = { panelEntry | yAxis = newAxis } |> recomputeFunctionValuesForAPanel
                 m =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeFunctionValues newPanelEntry m
+                m2 = recomputeFunctionValuesForAPanelAndModel newPanelEntry m
             in
                 ( m2, Cmd.none )
 
@@ -175,9 +180,9 @@ update msg model =
                 newValue = min panelEntry.zAxis.minMaxIncrement.max (panelEntry.zAxis.rotationAngle + panelEntry.zAxis.minMaxIncrement.increment)
                 axis = panelEntry.zAxis
                 newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | zAxis = newAxis } |> calculateEnumerateValues
+                newPanelEntry = { panelEntry | zAxis = newAxis } |> recomputeFunctionValuesForAPanel
                 m = Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeFunctionValues newPanelEntry m
+                m2 = recomputeFunctionValuesForAPanelAndModel newPanelEntry m
             in
                 ( m2, Cmd.none )
 
@@ -186,11 +191,11 @@ update msg model =
                 newValue = max panelEntry.xAxis.minMaxIncrement.min (panelEntry.xAxis.rotationAngle - panelEntry.xAxis.minMaxIncrement.increment)
                 axis = panelEntry.xAxis
                 newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | xAxis = newAxis } |> calculateEnumerateValues
+                newPanelEntry = { panelEntry | xAxis = newAxis } |> recomputeFunctionValuesForAPanel
 
                 m =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeFunctionValues newPanelEntry m
+                m2 = recomputeFunctionValuesForAPanelAndModel newPanelEntry m
             in
                 ( m2, Cmd.none ) -- |> stateLog "Returned from IncrementXAxisRotation"
     
@@ -199,10 +204,10 @@ update msg model =
                 newValue = max panelEntry.yAxis.minMaxIncrement.min (panelEntry.yAxis.rotationAngle - panelEntry.yAxis.minMaxIncrement.increment)
                 axis = panelEntry.yAxis
                 newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | yAxis = newAxis } |> calculateEnumerateValues
+                newPanelEntry = { panelEntry | yAxis = newAxis } |> recomputeFunctionValuesForAPanel
                 m =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeFunctionValues newPanelEntry m
+                m2 = recomputeFunctionValuesForAPanelAndModel newPanelEntry m
             in
                 ( m2, Cmd.none )
 
@@ -211,15 +216,20 @@ update msg model =
                 newValue = max panelEntry.zAxis.minMaxIncrement.min (panelEntry.zAxis.rotationAngle - panelEntry.zAxis.minMaxIncrement.increment)
                 axis = panelEntry.zAxis
                 newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | zAxis = newAxis } |> calculateEnumerateValues
+                newPanelEntry = { panelEntry | zAxis = newAxis } |> recomputeFunctionValuesForAPanel
                 m =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeFunctionValues newPanelEntry m
+                m2 = recomputeFunctionValuesForAPanelAndModel newPanelEntry m
             in
                 ( m2, Cmd.none )
 
         UpdatePanelEntryAutoRotate panelEntry autoRotateType ->
-                (updatePanelEntryAutoRotate model panelEntry autoRotateType, Cmd.none)
+            let
+                m = updatePanelEntryAutoRotate model panelEntry autoRotateType
+                m2 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression processPlotPanelEntry m
+            in
+                                
+                (m2, Cmd.none)
 
 
 updatePanelEntryAutoRotate : Model -> PanelEntry -> AutoRotate -> Model
@@ -252,7 +262,7 @@ autoRotateActivePanel model =
 processPlotPanelEntry: Model -> PanelEntry -> Model
 processPlotPanelEntry model panelEntry =
     let
-        m2 = recomputeFunctionValues panelEntry model
+        m2 = recomputeFunctionValuesForAPanelAndModel panelEntry model
         newPlot = plot m2 panelEntry
         m3 = Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | currentPlot = newPlot }) m2
     in
@@ -265,42 +275,47 @@ rotateXUp model panelEntry =
         newValue = if addedValue > panelEntry.xAxis.minMaxIncrement.max then panelEntry.xAxis.minMaxIncrement.min else addedValue
         axis = panelEntry.xAxis
         newAxis = ({ axis | rotationAngle = newValue })
-        newPanelEntry = { panelEntry | xAxis = newAxis } |> calculateEnumerateValues
+        newPanelEntry = { panelEntry | xAxis = newAxis } -- |> recomputeFunctionValuesForAPanel
         m =
             Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-        m2 = processPlotPanelEntry m panelEntry
     in
-        m2
+        m
 
-recomputeFunctionValues: PanelEntry -> Model -> Model
-recomputeFunctionValues panelEntry model =
-    Utils.updatePanelEntry panelEntry.expression calculateEnumerateValues model
+recomputeFunctionValuesForAPanelAndModel: PanelEntry -> Model -> Model
+recomputeFunctionValuesForAPanelAndModel panelEntry model =
+    let
+        _ = stateLog "recomputeFunctionValuesForAPanelAndModel" ""
+    in
+        Utils.updatePanelEntry panelEntry.expression recomputeFunctionValuesForAPanel model
 
-calculateEnumerateValues : PanelEntry -> PanelEntry
-calculateEnumerateValues panelEntry =
-    if Utils.getVaryingVariableCount panelEntry > 2 then
-        { panelEntry | panelError = Just "At most two VARYING variables can be plotted." }
+recomputeFunctionValuesForAPanel : PanelEntry -> PanelEntry
+recomputeFunctionValuesForAPanel panelEntry =
+    let
+        _ = stateLog "recomputeFunctionValuesForAPanel" ""
+    in
+        if Utils.getVaryingVariableCount panelEntry > 2 then
+            { panelEntry | panelError = Just "At most two VARYING variables can be plotted." }
 
-    else
-        let
-            constantsLookup =
-                panelEntry.variables
-                    |> Dict.values
-                    |> List.filter (\v -> not v.mayVary)
-                    |> List.map (\e -> ( e.variable, e.currentValue ))
-                    |> Dict.fromList
-                    -- |> stateLog "Constant lookup dict"
+        else
+            let
+                constantsLookup =
+                    panelEntry.variables
+                        |> Dict.values
+                        |> List.filter (\v -> not v.mayVary)
+                        |> List.map (\e -> ( e.variable, e.currentValue ))
+                        |> Dict.fromList
+                        -- |> stateLog "Constant lookup dict"
 
-            fromToVaryingDicts = iterateSymbolTable panelEntry -- |> stateLog "FromToVaryingDicts"
+                fromToVaryingDicts = iterateSymbolTable panelEntry -- |> stateLog "FromToVaryingDicts"
 
-            evaluated =
-                fromToVaryingDicts
-                    |> List.map
-                        (\(startDict, endDict) ->
-                            (evaluateExpressionWithVariableDictionaries panelEntry.parsedExpression constantsLookup startDict,
-                            evaluateExpressionWithVariableDictionaries panelEntry.parsedExpression constantsLookup endDict))
-        in
-            { panelEntry | evaluatedPlotValues = evaluated, panelError = Nothing }
+                evaluated =
+                    fromToVaryingDicts
+                        |> List.map
+                            (\(startDict, endDict) ->
+                                (evaluateExpressionWithVariableDictionaries panelEntry.parsedExpression constantsLookup startDict,
+                                evaluateExpressionWithVariableDictionaries panelEntry.parsedExpression constantsLookup endDict))
+            in
+                { panelEntry | evaluatedPlotValues = evaluated, panelError = Nothing }
 
 evaluateExpressionWithVariableDictionaries : Expression -> VariableLookup -> VariableLookup -> GeneralVector
 evaluateExpressionWithVariableDictionaries expression constantsLookup variableLookup =
