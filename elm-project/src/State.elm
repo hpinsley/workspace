@@ -97,6 +97,13 @@ update msg model =
             in
             ( m, Cmd.none )
 
+        UpdateVarEndValueBuffer panelEntry symbolTableEntry value ->
+            let
+                m =
+                    Utils.updateSymbolTableEntry panelEntry.expression symbolTableEntry.variable (\e -> { e | endValueBuffer = value }) model
+            in
+                ( m, Cmd.none )
+
         UpdateVarEndValue panelEntry symbolTableEntry _ ->
             let
                 m =
@@ -205,6 +212,10 @@ update msg model =
                 m2 = updatePlotModel newPanelEntry m
             in
                 ( m2, Cmd.none )
+
+        UpdatePanelEntryAutoRotate panelEntry autoRotateType ->
+                (updatePanelEntryAutoRotate model panelEntry autoRotateType, Cmd.none)
+
 
 updatePanelEntryAutoRotate : Model -> PanelEntry -> AutoRotate -> Model
 updatePanelEntryAutoRotate model panelEntry autoRotateType =
