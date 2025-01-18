@@ -233,7 +233,17 @@ autoRotateActivePanel model =
                                         in
                                             createUpdatedInstructions rotatedModel panelEntry
 
-                                    _ -> model
+                                    RotateY -> 
+                                        let
+                                            rotatedModel = rotateYUp model panelEntry
+                                        in
+                                            createUpdatedInstructions rotatedModel panelEntry
+
+                                    RotateZ -> 
+                                        let
+                                            rotatedModel = rotateZUp model panelEntry
+                                        in
+                                            createUpdatedInstructions rotatedModel panelEntry
             in
                 m
 
