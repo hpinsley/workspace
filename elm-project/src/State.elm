@@ -22,7 +22,6 @@ logEnabled = True
 defaultIncrementValue = 0.06 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
 -- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
-defaultRotations = 50.0
 
 defaultXAxisRotation = pi / 4.0
 defaultYAxisRotation = 0.0
@@ -33,7 +32,6 @@ defaultEndValue = pi
 
 rotationMinValue = 0.0
 rotationMaxValue = 2*pi
-defaultRotationIncrement = (rotationMaxValue - rotationMinValue) / defaultRotations
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -288,9 +286,10 @@ rotateZDown model panelEntry =
 rotateAxisUp: Model -> PanelEntry -> (PanelEntry -> Axis) -> (Axis -> PanelEntry -> PanelEntry) -> Model
 rotateAxisUp model panelEntry getter setter  =
     let
+        increment = getRotationIncrement model
         axis = getter panelEntry
-        addedValue = axis.rotationAngle + axis.minMaxIncrement.increment
-        newValue = if addedValue > axis.minMaxIncrement.max then axis.minMaxIncrement.min else addedValue
+        addedValue = axis.rotationAngle + increment
+        newValue = if addedValue > rotationMaxValue then rotationMinValue else addedValue
         newAxis = ({ axis | rotationAngle = newValue })
         newPanelEntry = setter newAxis panelEntry --{ panelEntry | xAxis = newAxis }
         m =
@@ -301,9 +300,10 @@ rotateAxisUp model panelEntry getter setter  =
 rotateAxisDown: Model -> PanelEntry -> (PanelEntry -> Axis) -> (Axis -> PanelEntry -> PanelEntry) -> Model
 rotateAxisDown model panelEntry getter setter  =
     let
+        increment = getRotationIncrement model
         axis = getter panelEntry
-        addedValue = axis.rotationAngle - axis.minMaxIncrement.increment
-        newValue = if addedValue < axis.minMaxIncrement.min then axis.minMaxIncrement.max else addedValue
+        addedValue = axis.rotationAngle - increment
+        newValue = if addedValue < rotationMinValue then rotationMaxValue else addedValue
         newAxis = ({ axis | rotationAngle = newValue })
         newPanelEntry = setter newAxis panelEntry --{ panelEntry | xAxis = newAxis }
         m =
@@ -511,6 +511,9 @@ updateSymbolTableEntryIncrementValue entry =
         Err msg ->
             { entry | errMsg = Just msg }
 
+getRotationIncrement : Model -> Float
+getRotationIncrement model =
+    (rotationMaxValue - rotationMinValue) / model.rotations
 
 addCurrentExpressionToPanel : Model -> Model
 addCurrentExpressionToPanel model =
@@ -561,9 +564,9 @@ addCurrentExpressionToPanel model =
                     , alignmentX = AlignMid
                     , alignmentY = AlignMid
                     , meetOrSlice = Meet
-                    , xAxis = { axisName = "X", rotationAngle = defaultXAxisRotation, minMaxIncrement = { min=rotationMinValue, max=rotationMaxValue, increment=defaultRotationIncrement } }
-                    , yAxis = { axisName = "Y", rotationAngle = defaultYAxisRotation, minMaxIncrement = { min=rotationMinValue, max=rotationMaxValue, increment=defaultRotationIncrement} }
-                    , zAxis = { axisName = "Z", rotationAngle = defaultZAxisRotation, minMaxIncrement = { min=rotationMinValue, max=rotationMaxValue, increment=defaultRotationIncrement }}
+                    , xAxis = { axisName = "X", rotationAngle = defaultXAxisRotation }
+                    , yAxis = { axisName = "Y", rotationAngle = defaultYAxisRotation }
+                    , zAxis = { axisName = "Z", rotationAngle = defaultZAxisRotation }
                     , autoRotate = NoAutoRotate
                     , currentPlot = div [] [text "no plot"] }
             in

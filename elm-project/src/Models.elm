@@ -6,7 +6,8 @@ import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
 import Html exposing (..)
 
-rotationMs = 1000.0
+defaultRotationMs = 1000.0
+defaultRotations = 50.0
 
 -- General vector is of unspecified length
 type alias GeneralVector =
@@ -88,7 +89,6 @@ type alias Axis =
     { 
           axisName: String
         , rotationAngle : Float
-        , minMaxIncrement: MinMaxIncrement
     }
 
 
@@ -131,6 +131,7 @@ type alias Model =
     , activePlotEntry : Maybe String
     , rotationSpeed: Float
     , defaultRotationSpeed: Float
+    , rotations: Float
     }
 
 
@@ -145,8 +146,9 @@ init _ =
             , variables = Dict.empty
             , panelEntries = []
             , activePlotEntry = Nothing
-            , rotationSpeed = rotationMs
-            , defaultRotationSpeed = rotationMs
+            , rotationSpeed = defaultRotationMs
+            , defaultRotationSpeed = defaultRotationMs
+            , rotations = defaultRotations
             }
     in
     ( inital_model, Cmd.none )
