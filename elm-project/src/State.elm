@@ -27,8 +27,10 @@ defaultXAxisRotation = pi / 4.0
 defaultYAxisRotation = 0.0
 defaultZAxisRotation = pi / 4.0
 defaultConstantValue = 1.0
-defaultStartValue = -pi
-defaultEndValue = pi
+-- defaultStartValue = -pi
+-- defaultEndValue = pi
+defaultStartValue = 1
+defaultEndValue = 2
 
 defaultRotationMinValue = 0.0
 defaultRotationMaxValue = 2*pi
