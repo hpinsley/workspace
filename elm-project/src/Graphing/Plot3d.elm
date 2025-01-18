@@ -9,6 +9,7 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Utils
 
+logEnabled = False
 
 strokeWidth =
     0.006
@@ -19,13 +20,13 @@ plot3d : Model -> PanelEntry -> List ThreeDLineSegment -> Html Msg
 plot3d model panelEntry lineSegments =
     let
         _ =
-            Debug.log "Plot3D points to plot" (List.length lineSegments)
+            log3D "Plot3D points to plot" (List.length lineSegments)
 
         -- _ =
-        --     Debug.log "Ordered Pairs" lineSegments
+        --     log3D "Ordered Pairs" lineSegments
 
         rotationMatrix = Utils.xyzRotation panelEntry.xAxis.rotationAngle panelEntry.yAxis.rotationAngle panelEntry.zAxis.rotationAngle
-        rotatedData = rotateData rotationMatrix lineSegments -- |> Debug.log "Rotated pairs"
+        rotatedData = rotateData rotationMatrix lineSegments -- |> log3D "Rotated pairs"
         rotatedAxes = rotateAxes rotationMatrix (buildAxes panelEntry lineSegments)
     in
     div
@@ -71,7 +72,7 @@ projectAndPlotPoints : Model -> PanelEntry -> List ThreeDLineSegment -> (ThreeDL
 projectAndPlotPoints model panelEntry lineSegments3d (xAxis, yAxis, zAxis) =
     let
         -- _ =
-        --     Debug.log "Plot2D points to plot" (List.length lineSegments)
+        --     log3D "Plot2D points to plot" (List.length lineSegments)
 
         -- Project down to 2D by dropping the y values
         lineSegments = lineSegments3d |> List.map Utils.dropYFrom3DLineSegment
@@ -83,7 +84,7 @@ projectAndPlotPoints model panelEntry lineSegments3d (xAxis, yAxis, zAxis) =
         (v1Points, v2Points) = lineSegments 
                                     |> List.map (\(LineSeg2D from to) -> (from, to))
                                     |> List.unzip
-        allPoints = List.append v1Points v2Points -- |> Debug.log "all points"
+        allPoints = List.append v1Points v2Points -- |> log3D "all points"
 
         minX =
             List.minimum (List.map (\(Vec2D x _) -> x) allPoints) |> Maybe.withDefault 0.0
@@ -96,10 +97,10 @@ projectAndPlotPoints model panelEntry lineSegments3d (xAxis, yAxis, zAxis) =
         maxY =
             List.maximum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
         xWidth =
-            maxX - minX |> Debug.log "xWidth"
+            maxX - minX |> log3D "xWidth"
 
         yWidth =
-            maxY - minY |> Debug.log "yWidth"
+            maxY - minY |> log3D "yWidth"
 
         reduction =
             0.9
@@ -118,13 +119,13 @@ projectAndPlotPoints model panelEntry lineSegments3d (xAxis, yAxis, zAxis) =
                 ++ (expansion * xWidth |> String.fromFloat)
                 ++ " "
                 ++ (expansion * yWidth |> String.fromFloat)
-                |> Debug.log "viewboxAttribte"
+                |> log3D "viewboxAttribte"
 
         yTransform =
             adjustYValue maxY minY
 
         functionPath =
-            build2DPathFromLineSegments yTransform lineSegments -- |> Debug.log "Function Path"
+            build2DPathFromLineSegments yTransform lineSegments -- |> log3D "Function Path"
 
         xAxisPath = build2DPathFromLineSegment yTransform projectedXAxis
         yAxisPath = build2DPathFromLineSegment yTransform projectedYAxis
@@ -171,7 +172,7 @@ projectAndPlotPoints model panelEntry lineSegments3d (xAxis, yAxis, zAxis) =
                     , viewBox viewboxAttribte
 
                     -- , Svg.Attributes.preserveAspectRatio "xMidYMid meet"
-                    , Svg.Attributes.preserveAspectRatio (buildPreserveAspectRatioString panelEntry |> Debug.log "preserveAspectRatio")
+                    , Svg.Attributes.preserveAspectRatio (buildPreserveAspectRatioString panelEntry |> log3D "preserveAspectRatio")
                     ]
                     elements
                 ]
@@ -227,7 +228,7 @@ build2DPathFromLineSegments yAdjust lineSegments =
     lineSegments 
         |> List.map (build2DPathFromLineSegment yAdjust)
         |> String.join " "
-        -- |> Debug.log "2D Path"
+        -- |> log3D "2D Path"
 
 build2DPathFromLineSegment : (Float -> Float) -> TwoDLineSegment -> String
 build2DPathFromLineSegment yAdjust lineSegment =
@@ -239,3 +240,8 @@ build2DPathFromLineSegment yAdjust lineSegment =
         "M " ++ String.fromFloat xFrom ++ "," ++ String.fromFloat (yAdjust yFrom) ++
             " " ++ 
         "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat (yAdjust yTo)
+
+log3D : String -> a -> a
+log3D msg obj =
+    if logEnabled then (Debug.log msg obj) else obj
+

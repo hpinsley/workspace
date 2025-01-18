@@ -4,6 +4,7 @@ import Dict exposing (..)
 import Matrix exposing (..)
 import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
+import Html exposing (..)
 
 -- General vector is of unspecified length
 type alias GeneralVector =
@@ -37,7 +38,7 @@ type Msg
     = Tick Time.Posix
     | UpdateExpression String
     | AddToPanel
-    | DeleteExpression String
+    | DeleteExpression (String)
     | EvaluateExpression String
     | UpdateVarStartValueBuffer PanelEntry SymbolTableEntry String
     | UpdateVarEndValueBuffer PanelEntry SymbolTableEntry String
@@ -102,6 +103,7 @@ type alias PanelEntry =
     , yAxis : Axis
     , zAxis : Axis
     , autoRotate: AutoRotate
+    , currentPlot: Html Msg
     }
 
 type SvgAlignment
@@ -122,7 +124,7 @@ type alias Model =
     , parseErrors : String
     , variables : Dict String Variable
     , panelEntries : List PanelEntry
-    , activePlotEntry : Maybe PanelEntry
+    , activePlotEntry : Maybe String
     }
 
 
