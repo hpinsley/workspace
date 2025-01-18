@@ -19,7 +19,6 @@ import Graphing.Plotter exposing (plot)
 
 logEnabled = True
 
-rotationMs = 10.0
 defaultIncrementValue = 0.06 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
 -- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
@@ -600,9 +599,9 @@ stateLog msg obj =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
+subscriptions model =
     let
-        sub1 = every rotationMs (\_ -> AutoRotateActivePanel)
+        sub1 = every model.rotationSpeed (\_ -> AutoRotateActivePanel)
     in
         sub1
 

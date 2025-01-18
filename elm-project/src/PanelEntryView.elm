@@ -51,7 +51,21 @@ viewPanelEntry model panelEntry =
         , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         , Button.text (Button.config |> Button.setOnClick (Plot panelEntry)) "Plot"
         , displayAxisInfo panelEntry
+        , displayRotationSpeed model
         , displayViewportScaling panelEntry
+        ]
+
+displayRotationSpeed: Model -> Html Msg
+displayRotationSpeed model =
+    div 
+        [id "rotation-speed"]
+        [
+            fieldset 
+                []
+                [
+                      legend [] [ text "Rotation Speed"]
+                    , model.rotationSpeed |> Utils.roundFloat 4 |> String.fromFloat |> (++) "Current: " |> text
+                ]
         ]
 
 

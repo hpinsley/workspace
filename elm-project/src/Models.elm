@@ -6,6 +6,8 @@ import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
 import Html exposing (..)
 
+rotationMs = 100.0
+
 -- General vector is of unspecified length
 type alias GeneralVector =
     List Float
@@ -125,6 +127,8 @@ type alias Model =
     , variables : Dict String Variable
     , panelEntries : List PanelEntry
     , activePlotEntry : Maybe String
+    , rotationSpeed: Float
+    , defaultRotationSpeed: Float
     }
 
 
@@ -139,6 +143,8 @@ init _ =
             , variables = Dict.empty
             , panelEntries = []
             , activePlotEntry = Nothing
+            , rotationSpeed = rotationMs
+            , defaultRotationSpeed = rotationMs
             }
     in
     ( inital_model, Cmd.none )
