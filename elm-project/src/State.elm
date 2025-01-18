@@ -181,40 +181,25 @@ update msg model =
 
         DecrementXAxisRotation panelEntry ->
             let
-                newValue = max panelEntry.xAxis.minMaxIncrement.min (panelEntry.xAxis.rotationAngle - panelEntry.xAxis.minMaxIncrement.increment)
-                axis = panelEntry.xAxis
-                newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | xAxis = newAxis } |> recomputeFunctionValuesForAPanel
 
-                m =
-                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeFunctionValuesForAPanelAndModel newPanelEntry m
+                m = rotateXDown model panelEntry
+                m2 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m
             in
-                ( m2, Cmd.none ) -- |> stateLog "Returned from IncrementXAxisRotation"
+                (m2, Cmd.none)
     
         DecrementYAxisRotation panelEntry ->
             let
-                newValue = max panelEntry.yAxis.minMaxIncrement.min (panelEntry.yAxis.rotationAngle - panelEntry.yAxis.minMaxIncrement.increment)
-                axis = panelEntry.yAxis
-                newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | yAxis = newAxis } |> recomputeFunctionValuesForAPanel
-                m =
-                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeFunctionValuesForAPanelAndModel newPanelEntry m
+                m = rotateYDown model panelEntry
+                m2 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m
             in
-                ( m2, Cmd.none )
+                (m2, Cmd.none)
 
         DecrementZAxisRotation panelEntry ->
             let
-                newValue = max panelEntry.zAxis.minMaxIncrement.min (panelEntry.zAxis.rotationAngle - panelEntry.zAxis.minMaxIncrement.increment)
-                axis = panelEntry.zAxis
-                newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | zAxis = newAxis } |> recomputeFunctionValuesForAPanel
-                m =
-                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeFunctionValuesForAPanelAndModel newPanelEntry m
+                m = rotateZDown model panelEntry
+                m2 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m
             in
-                ( m2, Cmd.none )
+                (m2, Cmd.none)
 
         UpdatePanelEntryAutoRotate panelEntry autoRotateType ->
             let
@@ -273,12 +258,37 @@ rotateZUp: Model -> PanelEntry -> Model
 rotateZUp model panelEntry =
     rotateAxisUp model panelEntry (\pe -> pe.zAxis) (\newAxis pe -> { pe | zAxis = newAxis})
 
+rotateXDown: Model -> PanelEntry -> Model
+rotateXDown model panelEntry =
+    rotateAxisDown model panelEntry (\pe -> pe.xAxis) (\newAxis pe -> { pe | xAxis = newAxis})
+
+rotateYDown: Model -> PanelEntry -> Model
+rotateYDown model panelEntry =
+    rotateAxisDown model panelEntry (\pe -> pe.yAxis) (\newAxis pe -> { pe | yAxis = newAxis})
+
+rotateZDown: Model -> PanelEntry -> Model
+rotateZDown model panelEntry =
+    rotateAxisDown model panelEntry (\pe -> pe.zAxis) (\newAxis pe -> { pe | zAxis = newAxis})
+
 rotateAxisUp: Model -> PanelEntry -> (PanelEntry -> Axis) -> (Axis -> PanelEntry -> PanelEntry) -> Model
 rotateAxisUp model panelEntry getter setter  =
     let
         axis = getter panelEntry
         addedValue = axis.rotationAngle + axis.minMaxIncrement.increment
         newValue = if addedValue > axis.minMaxIncrement.max then axis.minMaxIncrement.min else addedValue
+        newAxis = ({ axis | rotationAngle = newValue })
+        newPanelEntry = setter newAxis panelEntry --{ panelEntry | xAxis = newAxis }
+        m =
+            Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+    in
+        m
+
+rotateAxisDown: Model -> PanelEntry -> (PanelEntry -> Axis) -> (Axis -> PanelEntry -> PanelEntry) -> Model
+rotateAxisDown model panelEntry getter setter  =
+    let
+        axis = getter panelEntry
+        addedValue = axis.rotationAngle - axis.minMaxIncrement.increment
+        newValue = if addedValue < axis.minMaxIncrement.min then axis.minMaxIncrement.max else addedValue
         newAxis = ({ axis | rotationAngle = newValue })
         newPanelEntry = setter newAxis panelEntry --{ panelEntry | xAxis = newAxis }
         m =
