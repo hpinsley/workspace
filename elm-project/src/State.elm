@@ -167,26 +167,17 @@ update msg model =
                 
         IncrementYAxisRotation panelEntry ->
             let
-                newValue = min panelEntry.yAxis.minMaxIncrement.max (panelEntry.yAxis.rotationAngle + panelEntry.yAxis.minMaxIncrement.increment)
-                axis = panelEntry.yAxis
-                newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | yAxis = newAxis } |> recomputeFunctionValuesForAPanel
-                m =
-                    Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeFunctionValuesForAPanelAndModel newPanelEntry m
+                m = rotateYUp model panelEntry
+                m2 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m
             in
-                ( m2, Cmd.none )
+                (m2, Cmd.none)
 
         IncrementZAxisRotation panelEntry ->
             let
-                newValue = min panelEntry.zAxis.minMaxIncrement.max (panelEntry.zAxis.rotationAngle + panelEntry.zAxis.minMaxIncrement.increment)
-                axis = panelEntry.zAxis
-                newAxis = ({ axis | rotationAngle = newValue })
-                newPanelEntry = { panelEntry | zAxis = newAxis } |> recomputeFunctionValuesForAPanel
-                m = Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeFunctionValuesForAPanelAndModel newPanelEntry m
+                m = rotateZUp model panelEntry
+                m2 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m
             in
-                ( m2, Cmd.none )
+                (m2, Cmd.none)
 
         DecrementXAxisRotation panelEntry ->
             let
@@ -273,6 +264,14 @@ createUpdatedInstructions model panelEntry =
 rotateXUp: Model -> PanelEntry -> Model
 rotateXUp model panelEntry =
     rotateAxisUp model panelEntry (\pe -> pe.xAxis) (\newAxis pe -> { pe | xAxis = newAxis})
+
+rotateYUp: Model -> PanelEntry -> Model
+rotateYUp model panelEntry =
+    rotateAxisUp model panelEntry (\pe -> pe.yAxis) (\newAxis pe -> { pe | yAxis = newAxis})
+
+rotateZUp: Model -> PanelEntry -> Model
+rotateZUp model panelEntry =
+    rotateAxisUp model panelEntry (\pe -> pe.zAxis) (\newAxis pe -> { pe | zAxis = newAxis})
 
 rotateAxisUp: Model -> PanelEntry -> (PanelEntry -> Axis) -> (Axis -> PanelEntry -> PanelEntry) -> Model
 rotateAxisUp model panelEntry getter setter  =
