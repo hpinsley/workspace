@@ -75,59 +75,31 @@ displayAxisInfo panelEntry =
 
                 , fieldset [] [
                                 legend [] [ text "Auto Rotation Setting" ]
-                                , div []
-                                        [ input
-                                            [ Html.Attributes.id "set-x-rotate"
-                                            , Html.Attributes.type_ "radio"
-                                            , Html.Attributes.name "auto-rotate"
-                                            -- , Html.Attributes.value "X"
-                                            , Html.Attributes.selected False
-                                            , Html.Events.onClick (UpdatePanelEntryAutoRotate panelEntry RotateX)
-                                            ]
-                                            []
-                                        , label [ Html.Attributes.for "set-x-rotate" ] [ text "X" ]
-                                        ]
-                                , div []
-                                        [ input
-                                            [ Html.Attributes.id "set-y-rotate"
-                                            , Html.Attributes.type_ "radio"
-                                            , Html.Attributes.name "auto-rotate"
-                                            -- , Html.Attributes.value "Y"
-                                            , Html.Attributes.selected False
-                                            , Html.Events.onClick (UpdatePanelEntryAutoRotate panelEntry RotateY)
-                                            ]
-                                            []
-                                        , label [ Html.Attributes.for "set-y-rotate" ] [ text "Y" ]
-                                        ]
-                                , div []
-                                        [ input
-                                            [ Html.Attributes.id "set-z-rotate"
-                                            , Html.Attributes.type_ "radio"
-                                            , Html.Attributes.name "auto-rotate"
-                                            -- , Html.Attributes.value "Z"
-                                            , Html.Attributes.selected False
-                                            , Html.Events.onClick (UpdatePanelEntryAutoRotate panelEntry RotateZ)
-                                            ]
-                                            []
-                                        , label [ Html.Attributes.for "set-x-rotate" ] [ text "Z" ]
-                                        ]
-                                , div []
-                                        [ input
-                                            [ Html.Attributes.id "set-no-rotate"
-                                            , Html.Attributes.type_ "radio"
-                                            , Html.Attributes.name "auto-rotate"
-                                            -- , Html.Attributes.value "No"
-                                            , Html.Attributes.selected False
-                                            , Html.Events.onClick (UpdatePanelEntryAutoRotate panelEntry NoAutoRotate)
-                                            ]
-                                            []
-                                        , label [ Html.Attributes.for "set-x-rotate" ] [ text "No" ]
-                                        ]
-
-                    ]
+                                , div [] [ createAutoRotateRadioButton panelEntry "X" RotateX ]
+                                , div [] [ createAutoRotateRadioButton panelEntry "Y" RotateY ]
+                                , div [] [ createAutoRotateRadioButton panelEntry "Z" RotateZ ]
+                                , div [] [ createAutoRotateRadioButton panelEntry "None" NoAutoRotate ]
+                   ]
                 ]
         ]
 
+createAutoRotateRadioButton : PanelEntry -> String -> AutoRotate -> Html Msg
+createAutoRotateRadioButton panelEntry axisLetter autoRotate =
+    let
+        elementId = "set-" ++ axisLetter ++ "-rotate"
+    in
+        label [][
+                    input
+                        [ Html.Attributes.id elementId
+                        , Html.Attributes.type_ "radio"
+                        , Html.Attributes.name "auto-rotate"
+                        -- , Html.Attributes.value axisLetter
+                        , Html.Attributes.selected False
+                        , Html.Events.onClick (UpdatePanelEntryAutoRotate panelEntry autoRotate)
+                        ]
+                        []
+                    , text axisLetter
+        ]
 
 panelEntrySingleAxisView : Axis -> Msg -> Msg -> Html Msg
 panelEntrySingleAxisView axis incrementMessage decrementMessage =
