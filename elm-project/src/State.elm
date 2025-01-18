@@ -19,7 +19,7 @@ import Graphing.Plotter exposing (plot)
 
 logEnabled = True
 
-defaultIncrementValue = 0.06 -- Low values can cause stack overflow in Elm debugger if you have it enabled
+defaultIncrementValue = 0.10 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
 -- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
 
@@ -212,6 +212,11 @@ update msg model =
         DecreaseRotationSpeed ->
             ({ model | rotationSpeed = 1.1 * model.rotationSpeed}, Cmd.none)
 
+        SmootherRotations ->
+            ({ model | rotations = 1.1 * model.rotations}, Cmd.none)
+        
+        CoarserRotations ->
+            ({ model | rotations = 0.9 * model.rotations}, Cmd.none)
 
 updatePanelEntryAutoRotate : Model -> PanelEntry -> AutoRotate -> Model
 updatePanelEntryAutoRotate model panelEntry autoRotateType =
