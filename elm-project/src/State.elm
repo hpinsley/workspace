@@ -17,7 +17,7 @@ import Parser exposing (variable)
 import Html exposing (..)
 import Graphing.Plotter exposing (plot)
 
-rotationMs = 15000.0
+rotationMs = 1000.0
 defaultIncrementValue = 1.0 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
 -- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
@@ -163,7 +163,7 @@ update msg model =
                 newPanelEntry = { panelEntry | yAxis = newAxis } |> calculateEnumerateValues
                 m =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = updatePlotModel newPanelEntry m
+                m2 = recomputeValuesAndSetActivePanel newPanelEntry m
             in
                 ( m2, Cmd.none )
 
@@ -174,7 +174,7 @@ update msg model =
                 newAxis = ({ axis | rotationAngle = newValue })
                 newPanelEntry = { panelEntry | zAxis = newAxis } |> calculateEnumerateValues
                 m = Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = updatePlotModel newPanelEntry m
+                m2 = recomputeValuesAndSetActivePanel newPanelEntry m
             in
                 ( m2, Cmd.none )
 
@@ -187,7 +187,7 @@ update msg model =
 
                 m =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = updatePlotModel newPanelEntry m
+                m2 = recomputeValuesAndSetActivePanel newPanelEntry m
             in
                 ( m2, Cmd.none ) -- |> Debug.log "Returned from IncrementXAxisRotation"
     
@@ -199,7 +199,7 @@ update msg model =
                 newPanelEntry = { panelEntry | yAxis = newAxis } |> calculateEnumerateValues
                 m =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = updatePlotModel newPanelEntry m
+                m2 = recomputeValuesAndSetActivePanel newPanelEntry m
             in
                 ( m2, Cmd.none )
 
@@ -211,7 +211,7 @@ update msg model =
                 newPanelEntry = { panelEntry | zAxis = newAxis } |> calculateEnumerateValues
                 m =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = updatePlotModel newPanelEntry m
+                m2 = recomputeValuesAndSetActivePanel newPanelEntry m
             in
                 ( m2, Cmd.none )
 
@@ -233,18 +233,24 @@ autoRotateActivePanel model =
         Nothing -> model
         Just panelEntry -> 
             let
-                updatedModel = case panelEntry.autoRotate of
+                m = case panelEntry.autoRotate of
                                     NoAutoRotate -> model
-                                    RotateX -> rotateXUp model panelEntry
+                                    
+                                    RotateX -> 
+                                        let
+                                            rotatedModel = rotateXUp model panelEntry
+                                        in
+                                            processPlotPanelEntry rotatedModel panelEntry
+
                                     _ -> model
             in
-                updatedModel
+                m
 
 processPlotPanelEntry: Model -> PanelEntry -> Model
 processPlotPanelEntry model panelEntry =
     let
-        m2 = updatePlotModel panelEntry model
-        newPlot = plot model panelEntry
+        m2 = recomputeValuesAndSetActivePanel panelEntry model
+        newPlot = plot m2 panelEntry
         m3 = Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | currentPlot = newPlot }) m2
     in
         m3
@@ -259,11 +265,12 @@ rotateXUp model panelEntry =
         newPanelEntry = { panelEntry | xAxis = newAxis } |> calculateEnumerateValues
         m =
             Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
+        m2 = processPlotPanelEntry m panelEntry
     in
-        m
+        m2
 
-updatePlotModel: PanelEntry -> Model -> Model
-updatePlotModel panelEntry model =
+recomputeValuesAndSetActivePanel: PanelEntry -> Model -> Model
+recomputeValuesAndSetActivePanel panelEntry model =
             let
                 _ = Debug.log "Plotting" panelEntry.expression
                 m =
