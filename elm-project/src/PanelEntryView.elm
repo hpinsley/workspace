@@ -63,7 +63,6 @@ displayViewportScaling panelEntry =
         , panelEntryAlignmentBehaviorView (SetAlignmentBehavior panelEntry)
         ]
 
-
 displayAxisInfo : PanelEntry -> Html Msg
 displayAxisInfo panelEntry =
     div [ id "axes-info" ]
@@ -87,6 +86,30 @@ displayAxisInfo panelEntry =
                                             ]
                                             []
                                         , label [ Html.Attributes.for "set-x-rotate" ] [ text "X" ]
+                                        ]
+                                , div []
+                                        [ input
+                                            [ Html.Attributes.id "set-y-rotate"
+                                            , Html.Attributes.type_ "radio"
+                                            , Html.Attributes.name "auto-rotate"
+                                            -- , Html.Attributes.value "Y"
+                                            , Html.Attributes.selected False
+                                            , Html.Events.onClick (UpdatePanelEntryAutoRotate panelEntry RotateY)
+                                            ]
+                                            []
+                                        , label [ Html.Attributes.for "set-y-rotate" ] [ text "Y" ]
+                                        ]
+                                , div []
+                                        [ input
+                                            [ Html.Attributes.id "set-z-rotate"
+                                            , Html.Attributes.type_ "radio"
+                                            , Html.Attributes.name "auto-rotate"
+                                            -- , Html.Attributes.value "Z"
+                                            , Html.Attributes.selected False
+                                            , Html.Events.onClick (UpdatePanelEntryAutoRotate panelEntry RotateZ)
+                                            ]
+                                            []
+                                        , label [ Html.Attributes.for "set-x-rotate" ] [ text "Z" ]
                                         ]
                                 , div []
                                         [ input

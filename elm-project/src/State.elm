@@ -23,7 +23,7 @@ rotationMs = 10.0
 defaultIncrementValue = 0.08 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
 -- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
-defaultRotations = 500.0
+defaultRotations = 50.0
 
 defaultXAxisRotation = pi / 4.0
 defaultYAxisRotation = 0.0
