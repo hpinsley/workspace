@@ -31,9 +31,9 @@ defaultConstantValue = 1.0
 defaultStartValue = -pi
 defaultEndValue = pi
 
-defaultRotationMinValue = 0.0
-defaultRotationMaxValue = 2*pi
-defaultRotationIncrement = (defaultRotationMaxValue - defaultRotationMinValue) / defaultRotations
+rotationMinValue = 0.0
+rotationMaxValue = 2*pi
+defaultRotationIncrement = (rotationMaxValue - rotationMinValue) / defaultRotations
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -561,9 +561,9 @@ addCurrentExpressionToPanel model =
                     , alignmentX = AlignMid
                     , alignmentY = AlignMid
                     , meetOrSlice = Meet
-                    , xAxis = { axisName = "X", rotationAngle = defaultXAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement } }
-                    , yAxis = { axisName = "Y", rotationAngle = defaultYAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement} }
-                    , zAxis = { axisName = "Z", rotationAngle = defaultZAxisRotation, minMaxIncrement = { min=defaultRotationMinValue, max=defaultRotationMaxValue, increment=defaultRotationIncrement }}
+                    , xAxis = { axisName = "X", rotationAngle = defaultXAxisRotation, minMaxIncrement = { min=rotationMinValue, max=rotationMaxValue, increment=defaultRotationIncrement } }
+                    , yAxis = { axisName = "Y", rotationAngle = defaultYAxisRotation, minMaxIncrement = { min=rotationMinValue, max=rotationMaxValue, increment=defaultRotationIncrement} }
+                    , zAxis = { axisName = "Z", rotationAngle = defaultZAxisRotation, minMaxIncrement = { min=rotationMinValue, max=rotationMaxValue, increment=defaultRotationIncrement }}
                     , autoRotate = NoAutoRotate
                     , currentPlot = div [] [text "no plot"] }
             in
