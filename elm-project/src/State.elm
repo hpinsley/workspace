@@ -272,12 +272,16 @@ createUpdatedInstructions model panelEntry =
 
 rotateXUp: Model -> PanelEntry -> Model
 rotateXUp model panelEntry =
+    rotateAxisUp model panelEntry (\pe -> pe.xAxis) (\newAxis pe -> { pe | xAxis = newAxis})
+
+rotateAxisUp: Model -> PanelEntry -> (PanelEntry -> Axis) -> (Axis -> PanelEntry -> PanelEntry) -> Model
+rotateAxisUp model panelEntry getter setter  =
     let
-        addedValue = panelEntry.xAxis.rotationAngle + panelEntry.xAxis.minMaxIncrement.increment
-        newValue = if addedValue > panelEntry.xAxis.minMaxIncrement.max then panelEntry.xAxis.minMaxIncrement.min else addedValue
-        axis = panelEntry.xAxis
+        axis = getter panelEntry
+        addedValue = axis.rotationAngle + axis.minMaxIncrement.increment
+        newValue = if addedValue > axis.minMaxIncrement.max then axis.minMaxIncrement.min else addedValue
         newAxis = ({ axis | rotationAngle = newValue })
-        newPanelEntry = { panelEntry | xAxis = newAxis } -- |> recomputeFunctionValuesForAPanel
+        newPanelEntry = setter newAxis panelEntry --{ panelEntry | xAxis = newAxis }
         m =
             Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
     in
