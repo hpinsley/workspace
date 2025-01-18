@@ -55,10 +55,10 @@ rightSide model =
         [ h1 []
             [ case Utils.findActivePanelEntry model of
                 Just activePanelEntry ->
-                    plot model activePanelEntry
+                    activePanelEntry.currentPlot
 
                 Nothing ->
-                    text ""
+                    text "No active plot"
             ]
         ]
 
