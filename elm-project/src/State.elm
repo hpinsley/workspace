@@ -208,6 +208,12 @@ update msg model =
                                 
                 (m2, Cmd.none)
 
+        IncreaseRotationSpeed ->
+            ({ model | rotationSpeed = 0.9 * model.rotationSpeed}, Cmd.none)
+
+        DecreaseRotationSpeed ->
+            ({ model | rotationSpeed = 1.1 * model.rotationSpeed}, Cmd.none)
+
 
 updatePanelEntryAutoRotate : Model -> PanelEntry -> AutoRotate -> Model
 updatePanelEntryAutoRotate model panelEntry autoRotateType =

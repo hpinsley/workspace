@@ -158,9 +158,12 @@ button.inc-button {
     margin-left: 10px;
 }
 
-div#rotation-speed {
-    font-size: 10pt;
-    margin-left: 10px;
+fieldset#rotation-speed {
+    font-size: 8pt;
+    margin-top: 8px;
+    button {
+        margin-left: 10px;
+    }
 }
 
 fieldset#auto-rotate-fieldset div {

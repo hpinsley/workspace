@@ -6,7 +6,7 @@ import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
 import Html exposing (..)
 
-rotationMs = 100.0
+rotationMs = 1000.0
 
 -- General vector is of unspecified length
 type alias GeneralVector =
@@ -62,6 +62,8 @@ type Msg
     | DecrementZAxisRotation PanelEntry 
     | AutoRotateActivePanel
     | UpdatePanelEntryAutoRotate PanelEntry AutoRotate
+    | IncreaseRotationSpeed
+    | DecreaseRotationSpeed
 
 type alias SymbolTableEntry =
     { variable : Variable

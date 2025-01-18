@@ -51,16 +51,19 @@ viewPanelEntry model panelEntry =
         , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         , Button.text (Button.config |> Button.setOnClick (Plot panelEntry)) "Plot"
         , displayAxisInfo model panelEntry
+        , displayRotationSpeed model
         , displayViewportScaling panelEntry
         ]
 
 displayRotationSpeed: Model -> Html Msg
 displayRotationSpeed model =
-    div 
-        [id "rotation-speed"]
-        [
-            text "Speed:"
-            , model.rotationSpeed |> Utils.roundFloat 4 |> String.fromFloat |> text
+    fieldset [id "rotation-speed"]
+        [   
+              legend [][text "Rotation Speed"] 
+            , text "Milliseconds:"
+            , model.rotationSpeed |> Utils.roundFloat 2 |> String.fromFloat |> text
+            , button [onClick IncreaseRotationSpeed] [text "Faster"]
+            , button [onClick DecreaseRotationSpeed] [text "Slower"]
         ]
 
 
@@ -88,7 +91,6 @@ displayAxisInfo model panelEntry =
                                 , div [] [ createAutoRotateRadioButton panelEntry "Y" RotateY ]
                                 , div [] [ createAutoRotateRadioButton panelEntry "Z" RotateZ ]
                                 , div [] [ createAutoRotateRadioButton panelEntry "None" NoAutoRotate ]
-                                , displayRotationSpeed model
                    ]
                 ]
         ]
