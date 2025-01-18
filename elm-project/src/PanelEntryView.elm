@@ -73,7 +73,7 @@ displayAxisInfo panelEntry =
                 , panelEntrySingleAxisView panelEntry.yAxis (IncrementYAxisRotation panelEntry) (DecrementYAxisRotation panelEntry)
                 , panelEntrySingleAxisView panelEntry.zAxis (IncrementZAxisRotation panelEntry) (DecrementZAxisRotation panelEntry)
 
-                , fieldset [] [
+                , fieldset [id "auto-rotate-fieldset"] [
                                 legend [] [ text "Auto Rotation Setting" ]
                                 , div [] [ createAutoRotateRadioButton panelEntry "X" RotateX ]
                                 , div [] [ createAutoRotateRadioButton panelEntry "Y" RotateY ]
