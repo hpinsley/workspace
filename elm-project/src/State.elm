@@ -129,9 +129,11 @@ update msg model =
 
         Plot panelEntry ->
             let
-                m2 = { model | activePlotEntry = Just panelEntry.expression }
+                m1 = { model | activePlotEntry = Just panelEntry.expression }
+                m2 = recomputeFunctionValuesForAPanelAndModel panelEntry m1
+                m3 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m2
             in
-                ( processPlotPanelEntry m2 panelEntry, Cmd.none )
+                ( m3, Cmd.none )
 
         SetXAlignment panelEntry alignment ->
             let
@@ -159,7 +161,7 @@ update msg model =
             let
 
                 m = rotateXUp model panelEntry
-                m2 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression processPlotPanelEntry m
+                m2 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m
             in
                 (m2, Cmd.none)
                 
@@ -226,7 +228,7 @@ update msg model =
         UpdatePanelEntryAutoRotate panelEntry autoRotateType ->
             let
                 m = updatePanelEntryAutoRotate model panelEntry autoRotateType
-                m2 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression processPlotPanelEntry m
+                m2 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m
             in
                                 
                 (m2, Cmd.none)
@@ -253,20 +255,20 @@ autoRotateActivePanel model =
                                         let
                                             rotatedModel = rotateXUp model panelEntry
                                         in
-                                            processPlotPanelEntry rotatedModel panelEntry
+                                            createUpdatedInstructions rotatedModel panelEntry
 
                                     _ -> model
             in
                 m
 
-processPlotPanelEntry: Model -> PanelEntry -> Model
-processPlotPanelEntry model panelEntry =
+createUpdatedInstructions: Model -> PanelEntry -> Model
+createUpdatedInstructions model panelEntry =
     let
-        m2 = recomputeFunctionValuesForAPanelAndModel panelEntry model
-        newPlot = plot m2 panelEntry
-        m3 = Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | currentPlot = newPlot }) m2
+        _ = Debug.log "Recomputing SVG" ""
+        newPlottingHtml = plot model panelEntry
+        m2 = Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | currentPlot = newPlottingHtml }) model
     in
-        m3
+        m2
 
 rotateXUp: Model -> PanelEntry -> Model
 rotateXUp model panelEntry =
