@@ -19,11 +19,11 @@ import Graphing.Plotter exposing (plot)
 
 logEnabled = True
 
-rotationMs = 1000.0
+rotationMs = 10.0
 defaultIncrementValue = 0.08 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
 -- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
-defaultRotations = 16.0
+defaultRotations = 500.0
 
 defaultXAxisRotation = pi / 4.0
 defaultYAxisRotation = 0.0
@@ -132,7 +132,7 @@ update msg model =
                 m1 = { model | activePlotEntry = Just panelEntry.expression }
                 m2 = recomputeFunctionValuesForAPanelAndModel panelEntry m1
                 m3 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m2
-            in
+            in      
                 ( m3, Cmd.none )
 
         SetXAlignment panelEntry alignment ->
