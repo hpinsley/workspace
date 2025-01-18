@@ -28,6 +28,7 @@ type Function1
     = Sin Expression
     | Cos Expression
     | Tan Expression
+    | Abs Expression
 
 
 type Factor

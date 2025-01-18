@@ -215,7 +215,7 @@ update msg model =
         SmootherRotations ->
             ({ model | rotations = 1.1 * model.rotations}, Cmd.none)
         
-        CoarserRotations ->
+        JumpierRotations ->
             ({ model | rotations = 0.9 * model.rotations}, Cmd.none)
 
 updatePanelEntryAutoRotate : Model -> PanelEntry -> AutoRotate -> Model

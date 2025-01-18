@@ -65,6 +65,9 @@ evaluateFactor factor symbolLookup =
                 Tan expr ->
                     evaluateExpression expr symbolLookup |> Result.map tan
 
+                Abs expr ->
+                    evaluateExpression expr symbolLookup |> Result.map abs
+
         VariableFactor variable ->
             symbolLookup variable
 

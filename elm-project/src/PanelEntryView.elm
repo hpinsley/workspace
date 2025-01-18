@@ -67,7 +67,7 @@ displayRotationSpeed model =
             , text " Rotations:"
             , model.rotations |> Utils.roundFloat 2 |> String.fromFloat |> text
             , button [onClick SmootherRotations] [text "Smoother"]
-            , button [onClick CoarserRotations] [text "Coarser"]
+            , button [onClick JumpierRotations] [text "Jumpier"]
 
         ]
 

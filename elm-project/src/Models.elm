@@ -66,7 +66,7 @@ type Msg
     | IncreaseRotationSpeed
     | DecreaseRotationSpeed
     | SmootherRotations
-    | CoarserRotations
+    | JumpierRotations
 
 type alias SymbolTableEntry =
     { variable : Variable

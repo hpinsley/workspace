@@ -22,6 +22,10 @@ extractVariableListFromFunction1 f =
 
         Tan expr ->
             extractVariableListFromExpression expr
+        
+        Abs expr ->
+            extractVariableListFromExpression expr
+
 
 
 extractVariableListFromFactor : Factor -> List Variable
