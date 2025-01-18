@@ -18,19 +18,17 @@ import Html exposing (..)
 import Graphing.Plotter exposing (plot)
 
 rotationMs = 1000.0
-defaultIncrementValue = 1.0 -- Low values can cause stack overflow in Elm debugger if you have it enabled
+defaultIncrementValue = 0.08 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
 -- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
-defaultRotations = 3.0
+defaultRotations = 16.0
 
 defaultXAxisRotation = pi / 4.0
 defaultYAxisRotation = 0.0
 defaultZAxisRotation = pi / 4.0
 defaultConstantValue = 1.0
--- defaultStartValue = -pi
--- defaultEndValue = pi
-defaultStartValue = 1
-defaultEndValue = 2
+defaultStartValue = -pi
+defaultEndValue = pi
 
 defaultRotationMinValue = 0.0
 defaultRotationMaxValue = 2*pi
@@ -128,7 +126,10 @@ update msg model =
             ( m, Cmd.none )
 
         Plot panelEntry ->
-            ( processPlotPanelEntry model panelEntry, Cmd.none )
+            let
+                m2 = { model | activePlotEntry = Just panelEntry.expression }
+            in
+                ( processPlotPanelEntry m2 panelEntry, Cmd.none )
 
         SetXAlignment panelEntry alignment ->
             let
@@ -163,7 +164,7 @@ update msg model =
                 newPanelEntry = { panelEntry | yAxis = newAxis } |> calculateEnumerateValues
                 m =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeValuesAndSetActivePanel newPanelEntry m
+                m2 = recomputeFunctionValues newPanelEntry m
             in
                 ( m2, Cmd.none )
 
@@ -174,7 +175,7 @@ update msg model =
                 newAxis = ({ axis | rotationAngle = newValue })
                 newPanelEntry = { panelEntry | zAxis = newAxis } |> calculateEnumerateValues
                 m = Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeValuesAndSetActivePanel newPanelEntry m
+                m2 = recomputeFunctionValues newPanelEntry m
             in
                 ( m2, Cmd.none )
 
@@ -187,7 +188,7 @@ update msg model =
 
                 m =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeValuesAndSetActivePanel newPanelEntry m
+                m2 = recomputeFunctionValues newPanelEntry m
             in
                 ( m2, Cmd.none ) -- |> Debug.log "Returned from IncrementXAxisRotation"
     
@@ -199,7 +200,7 @@ update msg model =
                 newPanelEntry = { panelEntry | yAxis = newAxis } |> calculateEnumerateValues
                 m =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeValuesAndSetActivePanel newPanelEntry m
+                m2 = recomputeFunctionValues newPanelEntry m
             in
                 ( m2, Cmd.none )
 
@@ -211,7 +212,7 @@ update msg model =
                 newPanelEntry = { panelEntry | zAxis = newAxis } |> calculateEnumerateValues
                 m =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
-                m2 = recomputeValuesAndSetActivePanel newPanelEntry m
+                m2 = recomputeFunctionValues newPanelEntry m
             in
                 ( m2, Cmd.none )
 
@@ -249,7 +250,7 @@ autoRotateActivePanel model =
 processPlotPanelEntry: Model -> PanelEntry -> Model
 processPlotPanelEntry model panelEntry =
     let
-        m2 = recomputeValuesAndSetActivePanel panelEntry model
+        m2 = recomputeFunctionValues panelEntry model
         newPlot = plot m2 panelEntry
         m3 = Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | currentPlot = newPlot }) m2
     in
@@ -269,26 +270,9 @@ rotateXUp model panelEntry =
     in
         m2
 
-recomputeValuesAndSetActivePanel: PanelEntry -> Model -> Model
-recomputeValuesAndSetActivePanel panelEntry model =
-            let
-                _ = Debug.log "Plotting" panelEntry.expression
-                m =
-                    Utils.updatePanelEntry panelEntry.expression calculateEnumerateValues model
-
-                m2 =
-                    case Utils.findPanelEntry m panelEntry.expression of
-                        Just pe ->
-                            if List.length pe.evaluatedPlotValues > 0 then
-                                { m | activePlotEntry = Just pe.expression }
-
-                            else
-                                m
-
-                        Nothing ->
-                            m
-            in
-                m2
+recomputeFunctionValues: PanelEntry -> Model -> Model
+recomputeFunctionValues panelEntry model =
+    Utils.updatePanelEntry panelEntry.expression calculateEnumerateValues model
 
 calculateEnumerateValues : PanelEntry -> PanelEntry
 calculateEnumerateValues panelEntry =
