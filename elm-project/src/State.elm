@@ -17,6 +17,8 @@ import Parser exposing (variable)
 import Html exposing (..)
 import Graphing.Plotter exposing (plot)
 
+logEnabled = True
+
 rotationMs = 1000.0
 defaultIncrementValue = 0.08 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
@@ -190,7 +192,7 @@ update msg model =
                     Utils.updatePanelEntry panelEntry.expression (\_ -> newPanelEntry ) model
                 m2 = recomputeFunctionValues newPanelEntry m
             in
-                ( m2, Cmd.none ) -- |> Debug.log "Returned from IncrementXAxisRotation"
+                ( m2, Cmd.none ) -- |> stateLog "Returned from IncrementXAxisRotation"
     
         DecrementYAxisRotation panelEntry ->
             let
@@ -223,7 +225,7 @@ update msg model =
 updatePanelEntryAutoRotate : Model -> PanelEntry -> AutoRotate -> Model
 updatePanelEntryAutoRotate model panelEntry autoRotateType =
     let
-        _ = Debug.log "updatePanelEntryAutoRotate called with" autoRotateType
+        _ = stateLog "updatePanelEntryAutoRotate called with" autoRotateType
         m2 = Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | autoRotate = autoRotateType }) model
     in
         m2
@@ -287,9 +289,9 @@ calculateEnumerateValues panelEntry =
                     |> List.filter (\v -> not v.mayVary)
                     |> List.map (\e -> ( e.variable, e.currentValue ))
                     |> Dict.fromList
-                    -- |> Debug.log "Constant lookup dict"
+                    -- |> stateLog "Constant lookup dict"
 
-            fromToVaryingDicts = iterateSymbolTable panelEntry -- |> Debug.log "FromToVaryingDicts"
+            fromToVaryingDicts = iterateSymbolTable panelEntry -- |> stateLog "FromToVaryingDicts"
 
             evaluated =
                 fromToVaryingDicts
@@ -320,7 +322,7 @@ evaluateExpressionWithVariableDictionaries expression constantsLookup variableLo
 
         functionValue = case computedResult of
                             Ok v -> v
-                            Err msg -> 0.0 |> Debug.log ("ERROR: " ++ msg)
+                            Err msg -> 0.0 |> stateLog ("ERROR: " ++ msg)
         indepentVariableValues = Dict.values variableLookup
     in
         List.append indepentVariableValues [functionValue]
@@ -337,7 +339,7 @@ iterateSymbolTable panelEntry =
         case varying of
             firstVariable :: secondVariable :: [] -> iterateSymbolTableTwoVariables firstVariable secondVariable
             singleVariable :: [] -> iterateSymbolTableSingleVariable singleVariable
-            _ -> [] |> Debug.log ("ERROR: Unable to iterate " ++ String.fromInt varyingCount ++ "variables.")
+            _ -> [] |> stateLog ("ERROR: Unable to iterate " ++ String.fromInt varyingCount ++ "variables.")
 
 iterateSymbolTableSingleVariable : SymbolTableEntry -> List (VariableLookup, VariableLookup)
 iterateSymbolTableSingleVariable variable =
@@ -350,17 +352,17 @@ iterateSymbolTableSingleVariable variable =
         pairs = startStop |> List.map (\(from, to ) -> (variable.startValue + variable.incrementValue * from,  variable.startValue + variable.incrementValue * to))
         lookups = pairs |> List.map (\(p1, p2) -> (Dict.fromList [(variable.variable, p1)], Dict.fromList [(variable.variable, p2)]))
     in
-        lookups -- |> Debug.log "Lookups"
+        lookups -- |> stateLog "Lookups"
 
 iterateSymbolTableTwoVariables : SymbolTableEntry -> SymbolTableEntry -> List (VariableLookup, VariableLookup)
 iterateSymbolTableTwoVariables v1 v2 =
     let
-        v1Points = generateVariableRange v1 -- |> Debug.log "v1Points"
-        v2Points = generateVariableRange v2 -- |> Debug.log "v2Points"
+        v1Points = generateVariableRange v1 -- |> stateLog "v1Points"
+        v2Points = generateVariableRange v2 -- |> stateLog "v2Points"
         v1ToPoints = v1Points |> List.drop 1
         v2ToPoints = v2Points |> List.drop 1
-        v1LineSegs = List.map2 (\from to -> Vec2D from to) v1Points v1ToPoints -- |> Debug.log "v1LineSegs"
-        v2LineSegs = List.map2 (\from to -> Vec2D from to) v2Points v2ToPoints -- |> Debug.log "v2LineSegs"
+        v1LineSegs = List.map2 (\from to -> Vec2D from to) v1Points v1ToPoints -- |> stateLog "v1LineSegs"
+        v2LineSegs = List.map2 (\from to -> Vec2D from to) v2Points v2ToPoints -- |> stateLog "v2LineSegs"
 
         path1 = v1LineSegs
                     |> List.map (\(Vec2D x1 x2) -> 
@@ -391,7 +393,7 @@ iterateSymbolTableTwoVariables v1 v2 =
         -- lookups = v1Points |> List.map (\(p1, p2) -> (Dict.fromList [(v1.variable, p1)], Dict.fromList [(v1.variable, p2)]))
     in
         -- List.append v1Values v2Values
-        lookups -- |> Debug.log "iterateSymbolTableTwoVariables Result"
+        lookups -- |> stateLog "iterateSymbolTableTwoVariables Result"
 
 generateVariableRange : SymbolTableEntry -> List (Float)
 generateVariableRange v1 =
@@ -551,6 +553,11 @@ parseModelExpression model =
 
                 Err errmsg ->
                     ( { model | parseErrors = errmsg, variables = Dict.empty, parsedExpression = Nothing }, Cmd.none )
+
+stateLog : String -> a -> a
+stateLog msg obj =
+    if logEnabled then (Debug.log msg obj) else obj
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
