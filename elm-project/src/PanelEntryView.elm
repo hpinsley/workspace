@@ -50,8 +50,7 @@ viewPanelEntry model panelEntry =
         , Button.text (Button.config |> Button.setOnClick (DeleteExpression panelEntry.expression)) "Delete"
         , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         , Button.text (Button.config |> Button.setOnClick (Plot panelEntry)) "Plot"
-        , displayAxisInfo panelEntry
-        , displayRotationSpeed model
+        , displayAxisInfo model panelEntry
         , displayViewportScaling panelEntry
         ]
 
@@ -60,12 +59,8 @@ displayRotationSpeed model =
     div 
         [id "rotation-speed"]
         [
-            fieldset 
-                []
-                [
-                      legend [] [ text "Rotation Speed"]
-                    , model.rotationSpeed |> Utils.roundFloat 4 |> String.fromFloat |> (++) "Current: " |> text
-                ]
+            text "Speed:"
+            , model.rotationSpeed |> Utils.roundFloat 4 |> String.fromFloat |> text
         ]
 
 
@@ -77,8 +72,8 @@ displayViewportScaling panelEntry =
         , panelEntryAlignmentBehaviorView (SetAlignmentBehavior panelEntry)
         ]
 
-displayAxisInfo : PanelEntry -> Html Msg
-displayAxisInfo panelEntry =
+displayAxisInfo : Model -> PanelEntry -> Html Msg
+displayAxisInfo model panelEntry =
     div [ id "axes-info" ]
         [ 
             fieldset []
@@ -93,6 +88,7 @@ displayAxisInfo panelEntry =
                                 , div [] [ createAutoRotateRadioButton panelEntry "Y" RotateY ]
                                 , div [] [ createAutoRotateRadioButton panelEntry "Z" RotateZ ]
                                 , div [] [ createAutoRotateRadioButton panelEntry "None" NoAutoRotate ]
+                                , displayRotationSpeed model
                    ]
                 ]
         ]
