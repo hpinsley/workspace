@@ -20,7 +20,7 @@ import Graphing.Plotter exposing (plot)
 logEnabled = True
 
 rotationMs = 10.0
-defaultIncrementValue = 0.08 -- Low values can cause stack overflow in Elm debugger if you have it enabled
+defaultIncrementValue = 0.06 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
 -- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
 defaultRotations = 50.0
