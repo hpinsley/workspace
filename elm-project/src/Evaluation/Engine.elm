@@ -68,6 +68,9 @@ evaluateFactor factor symbolLookup =
                 Abs expr ->
                     evaluateExpression expr symbolLookup |> Result.map abs
 
+                Ln expr ->
+                    evaluateExpression expr symbolLookup |> Result.map (logBase e)
+
         VariableFactor variable ->
             symbolLookup variable
 

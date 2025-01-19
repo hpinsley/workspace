@@ -26,6 +26,9 @@ extractVariableListFromFunction1 f =
         Abs expr ->
             extractVariableListFromExpression expr
 
+        Ln expr ->
+            extractVariableListFromExpression expr
+
 
 
 extractVariableListFromFactor : Factor -> List Variable

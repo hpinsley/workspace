@@ -29,6 +29,7 @@ type Function1
     | Cos Expression
     | Tan Expression
     | Abs Expression
+    | Ln Expression
 
 
 type Factor

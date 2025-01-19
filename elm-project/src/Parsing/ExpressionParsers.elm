@@ -130,6 +130,12 @@ function1Parser =
             |= lazy (\_ -> expressionParser)
             |. symbol ")"
             |> Parser.backtrackable
+        , succeed Ln
+            |. symbol "ln"
+            |. symbol "("
+            |= lazy (\_ -> expressionParser)
+            |. symbol ")"
+            |> Parser.backtrackable
         ]
 
 
