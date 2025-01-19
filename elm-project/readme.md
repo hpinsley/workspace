@@ -5,6 +5,7 @@
     sin(W*cos(V*(x+y)))    
     cos(e^(sin(x^2+y^2)))
     (x^2+3*y^2)*e^(-1)*(x^2-y^2)
+    abs(x)*cos(y)
     sin(A*x+B*y)*cos(C*x-D*y)
     sin(W*x)*M*e^(cos(V*y))
 For debugging the grid:

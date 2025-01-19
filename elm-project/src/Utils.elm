@@ -321,3 +321,7 @@ applyFunctionToPanelEntryWithExpression expression func model =
                 _ = Debug.log "ERROR: Cannot find panel with expression" expression
             in
                 model
+
+getRotationIncrement : Model -> Float
+getRotationIncrement model =
+    (rotationMaxValue - rotationMinValue) / model.rotations

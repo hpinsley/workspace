@@ -6,8 +6,11 @@ import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
 import Html exposing (..)
 
+rotationMinValue = 0.0
+rotationMaxValue = 2*pi
 defaultRotationMs = 10.0
 defaultRotations = 500.0
+
 
 -- General vector is of unspecified length
 type alias GeneralVector =
@@ -67,7 +70,10 @@ type Msg
     | DecreaseRotationSpeed
     | SmootherRotations
     | JumpierRotations
-
+    | SetXAxisRotationValue PanelEntry String
+    | SetYAxisRotationValue PanelEntry String
+    | SetZAxisRotationValue PanelEntry String
+ 
 type alias SymbolTableEntry =
     { variable : Variable
     , currentValue : Float

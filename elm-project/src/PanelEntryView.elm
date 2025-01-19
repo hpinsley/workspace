@@ -86,9 +86,9 @@ displayAxisInfo model panelEntry =
         [ 
             fieldset []
                 [ legend [] [ text "Axis Rotation" ]
-                , panelEntrySingleAxisView panelEntry.xAxis (IncrementXAxisRotation panelEntry) (DecrementXAxisRotation panelEntry)
-                , panelEntrySingleAxisView panelEntry.yAxis (IncrementYAxisRotation panelEntry) (DecrementYAxisRotation panelEntry)
-                , panelEntrySingleAxisView panelEntry.zAxis (IncrementZAxisRotation panelEntry) (DecrementZAxisRotation panelEntry)
+                , panelEntrySingleAxisView model panelEntry panelEntry.xAxis (IncrementXAxisRotation panelEntry) (DecrementXAxisRotation panelEntry) (SetXAxisRotationValue panelEntry)
+                , panelEntrySingleAxisView model panelEntry panelEntry.yAxis (IncrementYAxisRotation panelEntry) (DecrementYAxisRotation panelEntry) (SetYAxisRotationValue panelEntry)
+                , panelEntrySingleAxisView model panelEntry panelEntry.zAxis (IncrementZAxisRotation panelEntry) (DecrementZAxisRotation panelEntry) (SetZAxisRotationValue panelEntry)
 
                 , fieldset [id "auto-rotate-fieldset"] [
                                 legend [] [ text "Auto Rotation Setting" ]
@@ -118,8 +118,8 @@ createAutoRotateRadioButton panelEntry axisLetter autoRotate =
                     , text axisLetter
         ]
 
-panelEntrySingleAxisView : Axis -> Msg -> Msg -> Html Msg
-panelEntrySingleAxisView axis incrementMessage decrementMessage =
+panelEntrySingleAxisView : Model -> PanelEntry -> Axis -> Msg -> Msg -> (String -> Msg) -> Html Msg
+panelEntrySingleAxisView model panelEntry axis incrementMessage decrementMessage rangeValueChangeMessage  =
     div [ class "axis-info" ]
         [ 
             div [
@@ -140,6 +140,18 @@ panelEntrySingleAxisView axis incrementMessage decrementMessage =
                                             , onClick decrementMessage
                                     ]
                                     [text "-"]
+                            , input 
+                                [
+                                    type_ "range"
+                                    , value (axis.rotationAngle |> String.fromFloat)
+                                    , disabled (panelEntry.autoRotate /= NoAutoRotate)
+                                    , Html.Attributes.min "0"
+                                    , 2*pi |> String.fromFloat |> Html.Attributes.max
+                                    , model |> Utils.getRotationIncrement |> String.fromFloat |> Html.Attributes.step
+                                    , Html.Events.onInput rangeValueChangeMessage
+                                ]
+                                [
+                                ]
                         ]
                 ]
         ]

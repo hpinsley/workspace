@@ -30,10 +30,6 @@ defaultConstantValue = 1.0
 defaultStartValue = -pi
 defaultEndValue = pi
 
-rotationMinValue = 0.0
-rotationMaxValue = 2*pi
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg  of
@@ -218,6 +214,30 @@ update msg model =
         JumpierRotations ->
             ({ model | rotations = 0.9 * model.rotations}, Cmd.none)
 
+        SetXAxisRotationValue panelEntry value ->
+            let
+                m = case String.toFloat value of
+                        Just v -> 
+                            let
+                                axis = panelEntry.xAxis
+                                updatedAxis = { axis | rotationAngle = v }
+                                updatedPanelEntry = { panelEntry | xAxis = updatedAxis }
+                                m2 = Utils.updatePanelEntry panelEntry.expression (\_ -> updatedPanelEntry) model
+                                m3 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m2
+                            in
+                                m3
+                                
+                        Nothing ->
+                            model
+            in
+                ( m, Cmd.none)
+        
+        SetYAxisRotationValue panelEntry value ->
+            ( model, Cmd.none)
+        
+        SetZAxisRotationValue panelEntry value ->
+            ( model, Cmd.none)
+
 updatePanelEntryAutoRotate : Model -> PanelEntry -> AutoRotate -> Model
 updatePanelEntryAutoRotate model panelEntry autoRotateType =
     let
@@ -225,6 +245,25 @@ updatePanelEntryAutoRotate model panelEntry autoRotateType =
         m2 = Utils.updatePanelEntry panelEntry.expression (\pe -> { pe | autoRotate = autoRotateType }) model
     in
         m2
+
+-- setAxisRotationValue : Model -> PanelEntry -> Axis -> String -> Model
+-- setAxisRotationValue model panelEntry axisToUpdate value  =
+--             let
+--                 m = case String.toFloat value of
+--                         Just v -> 
+--                             let
+--                                 axis = panelEntry.xAxis
+--                                 updatedAxis = { axis | rotationAngle = v }
+--                                 updatedPanelEntry = { panelEntry | xAxis = updatedAxis }
+--                                 m2 = Utils.updatePanelEntry panelEntry.expression (\_ -> updatedPanelEntry) model
+--                                 m3 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m2
+--                             in
+--                                 m3
+                                
+--                         Nothing ->
+--                             model
+--             in
+--                 m
 
 autoRotateActivePanel : Model -> Model
 autoRotateActivePanel model =
@@ -291,7 +330,7 @@ rotateZDown model panelEntry =
 rotateAxisUp: Model -> PanelEntry -> (PanelEntry -> Axis) -> (Axis -> PanelEntry -> PanelEntry) -> Model
 rotateAxisUp model panelEntry getter setter  =
     let
-        increment = getRotationIncrement model
+        increment = Utils.getRotationIncrement model
         axis = getter panelEntry
         addedValue = axis.rotationAngle + increment
         newValue = if addedValue > rotationMaxValue then rotationMinValue else addedValue
@@ -305,7 +344,7 @@ rotateAxisUp model panelEntry getter setter  =
 rotateAxisDown: Model -> PanelEntry -> (PanelEntry -> Axis) -> (Axis -> PanelEntry -> PanelEntry) -> Model
 rotateAxisDown model panelEntry getter setter  =
     let
-        increment = getRotationIncrement model
+        increment = Utils.getRotationIncrement model
         axis = getter panelEntry
         addedValue = axis.rotationAngle - increment
         newValue = if addedValue < rotationMinValue then rotationMaxValue else addedValue
@@ -515,10 +554,6 @@ updateSymbolTableEntryIncrementValue entry =
 
         Err msg ->
             { entry | errMsg = Just msg }
-
-getRotationIncrement : Model -> Float
-getRotationIncrement model =
-    (rotationMaxValue - rotationMinValue) / model.rotations
 
 addCurrentExpressionToPanel : Model -> Model
 addCurrentExpressionToPanel model =
