@@ -216,27 +216,21 @@ update msg model =
 
         SetXAxisRotationValue panelEntry value ->
             let
-                m = case String.toFloat value of
-                        Just v -> 
-                            let
-                                axis = panelEntry.xAxis
-                                updatedAxis = { axis | rotationAngle = v }
-                                updatedPanelEntry = { panelEntry | xAxis = updatedAxis }
-                                m2 = Utils.updatePanelEntry panelEntry.expression (\_ -> updatedPanelEntry) model
-                                m3 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m2
-                            in
-                                m3
-                                
-                        Nothing ->
-                            model
+                m = setAxisRotationValue model panelEntry panelEntry.xAxis value (\pe axis -> { pe | xAxis = axis })
             in
                 ( m, Cmd.none)
         
         SetYAxisRotationValue panelEntry value ->
-            ( model, Cmd.none)
+            let
+                m = setAxisRotationValue model panelEntry panelEntry.yAxis value (\pe axis -> { pe | yAxis = axis })
+            in
+                ( m, Cmd.none)
         
         SetZAxisRotationValue panelEntry value ->
-            ( model, Cmd.none)
+            let
+                m = setAxisRotationValue model panelEntry panelEntry.zAxis value (\pe axis -> { pe | zAxis = axis })
+            in
+                ( m, Cmd.none)
 
 updatePanelEntryAutoRotate : Model -> PanelEntry -> AutoRotate -> Model
 updatePanelEntryAutoRotate model panelEntry autoRotateType =
@@ -246,24 +240,23 @@ updatePanelEntryAutoRotate model panelEntry autoRotateType =
     in
         m2
 
--- setAxisRotationValue : Model -> PanelEntry -> Axis -> String -> Model
--- setAxisRotationValue model panelEntry axisToUpdate value  =
---             let
---                 m = case String.toFloat value of
---                         Just v -> 
---                             let
---                                 axis = panelEntry.xAxis
---                                 updatedAxis = { axis | rotationAngle = v }
---                                 updatedPanelEntry = { panelEntry | xAxis = updatedAxis }
---                                 m2 = Utils.updatePanelEntry panelEntry.expression (\_ -> updatedPanelEntry) model
---                                 m3 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m2
---                             in
---                                 m3
+setAxisRotationValue : Model -> PanelEntry -> Axis -> String -> (PanelEntry -> Axis -> PanelEntry) -> Model
+setAxisRotationValue model panelEntry axisToUpdate value setter =
+            let
+                m = case String.toFloat value of
+                        Just v -> 
+                            let
+                                updatedAxis = { axisToUpdate | rotationAngle = v }
+                                updatedPanelEntry = setter panelEntry updatedAxis
+                                m2 = Utils.updatePanelEntry panelEntry.expression (\_ -> updatedPanelEntry) model
+                                m3 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m2
+                            in
+                                m3
                                 
---                         Nothing ->
---                             model
---             in
---                 m
+                        Nothing ->
+                            model
+            in
+                m
 
 autoRotateActivePanel : Model -> Model
 autoRotateActivePanel model =
