@@ -11,7 +11,7 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Utils
 import String exposing (lines)
-
+import Color exposing (Color)
 
 plot : Model -> PanelEntry -> Html Msg
 plot model panelEntry =
@@ -47,3 +47,29 @@ plot model panelEntry =
                         [ Html.text "Cannot plot more than 2 variables" ]
             ]
         ]
+
+-- In plot3d, we want to vary the color by the yDepth.  In that function, we compute a value
+-- (here called colorVaryParam) mapped in the range of 0..1 for the yvalues.  We use that float to vary color.
+
+colorFunc : Model -> (Float -> Color)
+colorFunc model =
+    let
+        helperFunc : Int -> Int -> Float -> Int
+        helperFunc min max f =
+            let
+                range = (max - min) |> toFloat
+                rgbSingle = (toFloat min) + f * range |> round
+            in
+                rgbSingle
+
+        mappingFunc : (Float -> Color)
+        mappingFunc colorVaryParam =
+            let
+                shadingRange = model.shadingRange
+                r = helperFunc shadingRange.minRed shadingRange.maxRed colorVaryParam
+                g = helperFunc shadingRange.minGreen shadingRange.maxGreen colorVaryParam
+                b = helperFunc shadingRange.minBlue shadingRange.maxBlue colorVaryParam
+            in
+                Color.rgb255 r g b
+    in
+        mappingFunc

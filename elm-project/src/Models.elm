@@ -11,6 +11,15 @@ rotationMaxValue = 2*pi
 defaultRotationMs = 10.0
 defaultRotations = 500.0
 
+type alias ShadingRange =
+    {
+          minRed : Int
+        , maxRed: Int
+        , minGreen: Int
+        , maxGreen: Int
+        , minBlue: Int
+        , maxBlue: Int
+    }
 
 -- General vector is of unspecified length
 type alias GeneralVector =
@@ -140,6 +149,7 @@ type alias Model =
     , rotationSpeed: Float
     , defaultRotationSpeed: Float
     , rotations: Float
+    , shadingRange: ShadingRange
     }
 
 
@@ -157,6 +167,14 @@ init _ =
             , rotationSpeed = defaultRotationMs
             , defaultRotationSpeed = defaultRotationMs
             , rotations = defaultRotations
+            , shadingRange = {
+                                  minRed = 0 
+                                , maxRed = 200
+                                , minGreen = 0
+                                , maxGreen = 200
+                                , minBlue = 0
+                                , maxBlue = 200
+                            }
             }
     in
-    ( inital_model, Cmd.none )
+        ( inital_model, Cmd.none )
