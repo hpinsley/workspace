@@ -12,8 +12,8 @@ import Models exposing (..)
 import Utils
 
 
-viewPanelEntry : Model -> PanelEntry -> Html Msg
-viewPanelEntry model panelEntry =
+viewPanelEntry : Model -> Int -> PanelEntry -> Html Msg
+viewPanelEntry model index panelEntry =
     div
         [ class "panel-entry"
         , class
@@ -50,9 +50,9 @@ viewPanelEntry model panelEntry =
         , Button.text (Button.config |> Button.setOnClick (DeleteExpression panelEntry.expression)) "Delete"
         , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         , Button.text (Button.config |> Button.setOnClick (Plot panelEntry)) "Plot"
-        , displayAxisInfo model panelEntry
+        , displayAxisInfo model panelEntry index
         , displayRotationSpeed model
-        , displayViewportScaling panelEntry
+        , displayViewportScaling panelEntry index
         ]
 
 displayRotationSpeed: Model -> Html Msg
@@ -72,16 +72,16 @@ displayRotationSpeed model =
         ]
 
 
-displayViewportScaling : PanelEntry -> Html Msg
-displayViewportScaling panelEntry =
+displayViewportScaling : PanelEntry -> Int -> Html Msg
+displayViewportScaling panelEntry index =
     div [ id "viewport-scaling" ]
-        [ panelEntryAlignmentView panelEntry.alignmentX (SetXAlignment panelEntry) "X"
-        , panelEntryAlignmentView panelEntry.alignmentY (SetYAlignment panelEntry) "Y"
-        , panelEntryAlignmentBehaviorView panelEntry (SetAlignmentBehavior panelEntry)
+        [ panelEntryAlignmentView index panelEntry.alignmentX (SetXAlignment panelEntry) "X"
+        , panelEntryAlignmentView index panelEntry.alignmentY (SetYAlignment panelEntry) "Y"
+        , panelEntryAlignmentBehaviorView panelEntry index (SetAlignmentBehavior panelEntry)
         ]
 
-displayAxisInfo : Model -> PanelEntry -> Html Msg
-displayAxisInfo model panelEntry =
+displayAxisInfo : Model -> PanelEntry -> Int -> Html Msg
+displayAxisInfo model panelEntry index =
     div [ id "axes-info" ]
         [ 
             fieldset []
@@ -92,16 +92,16 @@ displayAxisInfo model panelEntry =
 
                 , fieldset [id "auto-rotate-fieldset"] [
                                 legend [] [ text "Auto Rotation Setting" ]
-                                , div [] [ createAutoRotateRadioButton panelEntry "X" RotateX ]
-                                , div [] [ createAutoRotateRadioButton panelEntry "Y" RotateY ]
-                                , div [] [ createAutoRotateRadioButton panelEntry "Z" RotateZ ]
-                                , div [] [ createAutoRotateRadioButton panelEntry "None" NoAutoRotate ]
+                                , div [] [ createAutoRotateRadioButton panelEntry index "X" RotateX ]
+                                , div [] [ createAutoRotateRadioButton panelEntry index "Y" RotateY ]
+                                , div [] [ createAutoRotateRadioButton panelEntry index "Z" RotateZ ]
+                                , div [] [ createAutoRotateRadioButton panelEntry index "None" NoAutoRotate ]
                    ]
                 ]
         ]
 
-createAutoRotateRadioButton : PanelEntry -> String -> AutoRotate -> Html Msg
-createAutoRotateRadioButton panelEntry axisLetter autoRotate =
+createAutoRotateRadioButton : PanelEntry -> Int -> String -> AutoRotate -> Html Msg
+createAutoRotateRadioButton panelEntry index axisLetter autoRotate =
     let
         elementId = "set-" ++ axisLetter ++ "-rotate"
     in
@@ -109,7 +109,7 @@ createAutoRotateRadioButton panelEntry axisLetter autoRotate =
                     input
                         [ Html.Attributes.id elementId
                         , Html.Attributes.type_ "radio"
-                        , Html.Attributes.name "auto-rotate"
+                        , Html.Attributes.name ("auto-rotate_" ++ (String.fromInt index))
                         -- , Html.Attributes.value axisLetter
                         , Html.Attributes.checked (panelEntry.autoRotate == autoRotate)
                         , Html.Events.onClick (UpdatePanelEntryAutoRotate panelEntry autoRotate)
@@ -156,15 +156,15 @@ panelEntrySingleAxisView model panelEntry axis incrementMessage decrementMessage
                 ]
         ]
 
-panelEntryAlignmentBehaviorView : PanelEntry -> (SvgAlignmentBehavor -> Msg) -> Html Msg
-panelEntryAlignmentBehaviorView panelEntry msgFunc =
+panelEntryAlignmentBehaviorView : PanelEntry -> Int -> (SvgAlignmentBehavor -> Msg) -> Html Msg
+panelEntryAlignmentBehaviorView panelEntry index msgFunc =
     fieldset []
         [ legend [] [ text "Behavior" ]
         , div []
             [ input
                 [ Html.Attributes.id "alignment-behavior-meet"
                 , Html.Attributes.type_ "radio"
-                , Html.Attributes.name "alignment-behavior"
+                , Html.Attributes.name ("alignment-behavior_" ++ (String.fromInt index))
                 , Html.Attributes.value "Meet"
                 , Html.Attributes.checked (panelEntry.meetOrSlice == Meet)
                 , Html.Events.onClick (msgFunc Meet)
@@ -176,7 +176,7 @@ panelEntryAlignmentBehaviorView panelEntry msgFunc =
             [ input
                 [ Html.Attributes.id "alignment-behavior-slice"
                 , Html.Attributes.type_ "radio"
-                , Html.Attributes.name "alignment-behavior"
+                , Html.Attributes.name ("alignment-behavior_" ++ (String.fromInt index))
                 , Html.Attributes.value "Slice"
                 , Html.Attributes.checked (panelEntry.meetOrSlice == Slice)
                 , Html.Events.onClick (msgFunc Slice)
@@ -187,15 +187,15 @@ panelEntryAlignmentBehaviorView panelEntry msgFunc =
         ]
 
 
-panelEntryAlignmentView : SvgAlignment -> (SvgAlignment -> Msg) -> String -> Html Msg
-panelEntryAlignmentView currentAlignmentValue msgFunc axis =
+panelEntryAlignmentView : Int -> SvgAlignment -> (SvgAlignment -> Msg) -> String -> Html Msg
+panelEntryAlignmentView index currentAlignmentValue msgFunc axis =
     fieldset []
         [ legend [] [ text (axis ++ " Alignment") ]
         , div []
             [ input
                 [ Html.Attributes.id (axis ++ "-align-min")
                 , Html.Attributes.type_ "radio"
-                , Html.Attributes.name (axis ++ "-alignment")
+                , Html.Attributes.name (axis ++ "-alignment_" ++ (String.fromInt index))
                 , Html.Attributes.value "Min"
                 , Html.Attributes.checked (currentAlignmentValue == AlignMin)
                 , Html.Events.onClick (msgFunc AlignMin)
@@ -209,7 +209,7 @@ panelEntryAlignmentView currentAlignmentValue msgFunc axis =
             [ input
                 [ Html.Attributes.id (axis ++ "-align-mid")
                 , Html.Attributes.type_ "radio"
-                , Html.Attributes.name (axis ++ "-alignment")
+                , Html.Attributes.name (axis ++ "-alignment_" ++ (String.fromInt index))
                 , Html.Attributes.value "Mid"
                 , Html.Attributes.checked (currentAlignmentValue == AlignMid)
                 , Html.Events.onClick (msgFunc AlignMid)
@@ -221,7 +221,7 @@ panelEntryAlignmentView currentAlignmentValue msgFunc axis =
             [ input
                 [ Html.Attributes.id (axis ++ "-align-max")
                 , Html.Attributes.type_ "radio"
-                , Html.Attributes.name (axis ++ "-alignment")
+                , Html.Attributes.name (axis ++ "-alignment_" ++ (String.fromInt index))
                 , Html.Attributes.value "Max"
                 , Html.Attributes.checked (currentAlignmentValue == AlignMax)
                 , Html.Events.onClick (msgFunc AlignMax)
