@@ -111,7 +111,7 @@ createAutoRotateRadioButton panelEntry axisLetter autoRotate =
                         , Html.Attributes.type_ "radio"
                         , Html.Attributes.name "auto-rotate"
                         -- , Html.Attributes.value axisLetter
-                        , Html.Attributes.selected False
+                        , Html.Attributes.checked (panelEntry.autoRotate == autoRotate)
                         , Html.Events.onClick (UpdatePanelEntryAutoRotate panelEntry autoRotate)
                         ]
                         []
