@@ -84,8 +84,8 @@ type Msg
     | SetXAxisRotationValue PanelEntry String
     | SetYAxisRotationValue PanelEntry String
     | SetZAxisRotationValue PanelEntry String
-    | MouseDown String
-    
+    | MouseDown String Int Int
+
 type alias SymbolTableEntry =
     { variable : Variable
     , currentValue : Float

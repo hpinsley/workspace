@@ -36,9 +36,9 @@ defaultEndValue = pi
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg  of
-        MouseDown id ->
+        MouseDown id offsetX offsetY ->
             let
-                _ = Debug.log "Mouses down id" id
+                _ = Debug.log "Mouses down" (id, offsetX, offsetY)
             in
                 (model, Cmd.none)
 
