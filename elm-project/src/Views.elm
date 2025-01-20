@@ -70,7 +70,7 @@ rightSide model =
                     div [][
                           text "No active plot"
                         , br [][]
-                        , displayMouseInfo model
+                        -- , displayMouseInfo model
                     ]
             ]
         ]
