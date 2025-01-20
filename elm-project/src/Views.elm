@@ -51,7 +51,9 @@ leftSide model =
 
 rightSide : Model -> Html Msg
 rightSide model =
-    div [ id "right-side" ]
+    div [ 
+            id "right-side" 
+        ]
         [ h1 []
             [ case Utils.findActivePanelEntry model of
                 Just activePanelEntry ->

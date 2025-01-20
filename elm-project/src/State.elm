@@ -16,12 +16,15 @@ import Utils
 import Parser exposing (variable)
 import Html exposing (..)
 import Graphing.Plotter exposing (plot)
+import Browser.Events
+import Json.Decode as Decode
+import Decoders.MouseDecoders as MouseDecoders
 
 logEnabled = True
 
-defaultIncrementValue = 0.10 -- Low values can cause stack overflow in Elm debugger if you have it enabled
+-- defaultIncrementValue = 0.10 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
--- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
+defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
 
 defaultXAxisRotation = pi / 4.0
 defaultYAxisRotation = 0.0
@@ -33,7 +36,12 @@ defaultEndValue = pi
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg  of
-        
+        MouseDown id ->
+            let
+                _ = Debug.log "Mouses down id" id
+            in
+                (model, Cmd.none)
+
         AutoRotateActivePanel ->
             (autoRotateActivePanel model, Cmd.none)
 
@@ -642,9 +650,15 @@ stateLog msg obj =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
+    -- let
+    --     sub1 = every model.rotationSpeed (\_ -> AutoRotateActivePanel)
+    -- in
+    --     sub1
+
     let
-        sub1 = every model.rotationSpeed (\_ -> AutoRotateActivePanel)
+        sub2 = Browser.Events.onMouseDown MouseDecoders.mouseDownDecoder
+        allEvents = [sub2]
     in
-        sub1
+        Sub.batch allEvents
 
     -- Sub.none
