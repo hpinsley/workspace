@@ -5,8 +5,12 @@ import Json.Decode as Decode
 
 mouseEventDecoder: Decode.Decoder MouseEvent
 mouseEventDecoder =
-    Decode.map3 MouseEvent 
+    Decode.map7 MouseEvent 
                     (Decode.field "target" targetDecoder)
+                    (Decode.field "screenX" Decode.int)
+                    (Decode.field "screenY" Decode.int)
+                    (Decode.field "clientX" Decode.int)
+                    (Decode.field "clientY" Decode.int)
                     (Decode.field "offsetX" Decode.int)
                     (Decode.field "offsetY" Decode.int)
 
