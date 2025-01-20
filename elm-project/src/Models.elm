@@ -51,6 +51,19 @@ type alias MinMaxIncrement =
         , increment: Float
     }
 
+type alias EventTarget =
+    {
+          id: String
+        , nodeName: String
+    }
+
+type alias MouseEvent = 
+    {
+            target: EventTarget
+          , offsetX: Int
+          , offsetY: Int
+    }
+
 type Msg
     = Tick Time.Posix
     | UpdateExpression String
@@ -84,7 +97,8 @@ type Msg
     | SetXAxisRotationValue PanelEntry String
     | SetYAxisRotationValue PanelEntry String
     | SetZAxisRotationValue PanelEntry String
-    | MouseDown String Int Int
+    | MouseDown MouseEvent
+    | MouseUp MouseEvent
 
 type alias SymbolTableEntry =
     { variable : Variable

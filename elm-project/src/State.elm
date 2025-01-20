@@ -4,7 +4,6 @@ import Debug exposing (toString)
 import Dict
 import Evaluation.Engine exposing (..)
 import List exposing (reverse)
-import List.Cartesian
 import Models exposing (..)
 import Parser exposing (float)
 import Parsing.ExpressionModels exposing (..)
@@ -22,9 +21,9 @@ import Decoders.MouseDecoders as MouseDecoders
 
 logEnabled = True
 
--- defaultIncrementValue = 0.10 -- Low values can cause stack overflow in Elm debugger if you have it enabled
+defaultIncrementValue = 0.10 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
-defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
+-- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
 
 defaultXAxisRotation = pi / 4.0
 defaultYAxisRotation = 0.0
@@ -36,9 +35,15 @@ defaultEndValue = pi
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg  of
-        MouseDown id offsetX offsetY ->
+        MouseDown mouseEvent ->
             let
-                _ = Debug.log "Mouses down" (id, offsetX, offsetY)
+                _ = Debug.log "Mouses down" mouseEvent
+            in
+                (model, Cmd.none)
+
+        MouseUp mouseEvent ->
+            let
+                _ = Debug.log "Mouses up" mouseEvent
             in
                 (model, Cmd.none)
 
@@ -650,15 +655,14 @@ stateLog msg obj =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    -- let
-    --     sub1 = every model.rotationSpeed (\_ -> AutoRotateActivePanel)
-    -- in
-    --     sub1
-
     let
-        sub2 = Browser.Events.onMouseDown MouseDecoders.mouseDownDecoder
-        allEvents = [sub2]
+        -- TODO: If there is no active panel, skip the clock tick
+        subs = [
+                every model.rotationSpeed (\_ -> AutoRotateActivePanel)
+                , Browser.Events.onMouseDown MouseDecoders.mouseDownDecoder
+                , Browser.Events.onMouseUp MouseDecoders.mouseUpDecoder
+                ]
     in
-        Sub.batch allEvents
+        Sub.batch subs
 
     -- Sub.none
