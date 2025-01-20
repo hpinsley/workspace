@@ -78,7 +78,7 @@ rightSide model =
 displayMouseInfo : Model -> Html Msg
 displayMouseInfo model =
     case model.mouseDownEventInfo of
-        Nothing -> text ""
+        Nothing -> text "No mouse info"
         Just mdInfo ->
             div [][
                   text "Mouse is down"

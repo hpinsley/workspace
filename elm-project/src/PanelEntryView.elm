@@ -21,14 +21,6 @@ viewPanelEntry model index panelEntry =
         ]
         [ div [ id "expression" ] [ text panelEntry.expression ]
 
-        -- , IconToggle.iconToggle
-        --         (IconToggle.config
-        --             |> IconToggle.setOn panelEntry.isCollapsed
-        --             |> IconToggle.setOnChange (TogglePanelEntry panelEntry)
-        --         )
-        --         { offIcon = IconToggle.icon "favorite_border"
-        --         , onIcon = IconToggle.icon "favorite"
-        --         }
         , Checkbox.checkbox
             (Checkbox.config
                 |> Checkbox.setState

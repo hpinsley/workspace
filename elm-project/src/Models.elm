@@ -9,7 +9,7 @@ import Color exposing (Color)
 
 rotationMinValue = 0.0
 rotationMaxValue = 2*pi
-defaultRotationMs = 10.0
+defaultRotationMs = 1000 / 60.0     -- Approximating 60 frames per second
 defaultRotations = 500.0
 
 type alias ShadingRange =
