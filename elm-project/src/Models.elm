@@ -5,12 +5,22 @@ import Matrix exposing (..)
 import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
 import Html exposing (..)
+import Color exposing (Color)
 
 rotationMinValue = 0.0
 rotationMaxValue = 2*pi
 defaultRotationMs = 10.0
 defaultRotations = 500.0
 
+type alias ShadingRange =
+    {
+          minRed : Int
+        , maxRed: Int
+        , minGreen: Int
+        , maxGreen: Int
+        , minBlue: Int
+        , maxBlue: Int
+    }
 
 -- General vector is of unspecified length
 type alias GeneralVector =
@@ -22,6 +32,7 @@ type Vector3D = Vec3D Float Float Float
 type alias GeneralLineSegment = (GeneralVector, GeneralVector)
 type ThreeDLineSegment = LineSeg3D Vector3D Vector3D
 type TwoDLineSegment = LineSeg2D Vector2D Vector2D
+type TwoDColoredLineSegment = ColoredLineSeg2D TwoDLineSegment Color
 
 type alias FloatMatrix =
     Matrix Float
@@ -38,6 +49,23 @@ type alias MinMaxIncrement =
           min: Float
         , max: Float
         , increment: Float
+    }
+
+type alias EventTarget =
+    {
+          id: String
+        , nodeName: String
+    }
+
+type alias MouseEvent = 
+    {
+            target: EventTarget
+          , screenX: Int
+          , screenY: Int
+          , clientX: Int
+          , clientY: Int
+          , offsetX: Int
+          , offsetY: Int
     }
 
 type Msg
@@ -73,7 +101,10 @@ type Msg
     | SetXAxisRotationValue PanelEntry String
     | SetYAxisRotationValue PanelEntry String
     | SetZAxisRotationValue PanelEntry String
- 
+    | MouseDown MouseEvent
+    | MouseUp MouseEvent
+    | MouseMove MouseEvent
+
 type alias SymbolTableEntry =
     { variable : Variable
     , currentValue : Float
@@ -140,6 +171,8 @@ type alias Model =
     , rotationSpeed: Float
     , defaultRotationSpeed: Float
     , rotations: Float
+    , shadingRange: ShadingRange
+    , mouseDownEventInfo: Maybe MouseEvent
     }
 
 
@@ -157,6 +190,15 @@ init _ =
             , rotationSpeed = defaultRotationMs
             , defaultRotationSpeed = defaultRotationMs
             , rotations = defaultRotations
+            , shadingRange = {
+                                  minRed = 0 
+                                , maxRed = 240
+                                , minGreen = 0
+                                , maxGreen = 240
+                                , minBlue = 0
+                                , maxBlue = 240
+                            }
+            , mouseDownEventInfo = Nothing
             }
     in
-    ( inital_model, Cmd.none )
+        ( inital_model, Cmd.none )

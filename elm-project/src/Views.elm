@@ -14,6 +14,13 @@ import PanelView exposing (viewPanel)
 import Time
 import Utils
 
+view : Model -> Html Msg
+view model =
+    div [ id "screen" ]
+        [ leftSide model
+        , rightSide model
+        ]
+
 getFormattedTime : Maybe Time.Posix -> String
 getFormattedTime timeInfo =
     case timeInfo of
@@ -51,21 +58,30 @@ leftSide model =
 
 rightSide : Model -> Html Msg
 rightSide model =
-    div [ id "right-side" ]
+    div [ 
+            id "right-side" 
+        ]
         [ h1 []
             [ case Utils.findActivePanelEntry model of
                 Just activePanelEntry ->
                     activePanelEntry.currentPlot
 
                 Nothing ->
-                    text "No active plot"
+                    div [][
+                          text "No active plot"
+                        , br [][]
+                        , displayMouseInfo model
+                    ]
             ]
         ]
 
-
-view : Model -> Html Msg
-view model =
-    div [ id "screen" ]
-        [ leftSide model
-        , rightSide model
-        ]
+displayMouseInfo : Model -> Html Msg
+displayMouseInfo model =
+    case model.mouseDownEventInfo of
+        Nothing -> text ""
+        Just mdInfo ->
+            div [][
+                  text "Mouse is down"
+                , br [][]
+                , text (Debug.toString mdInfo)
+            ]

@@ -4,7 +4,6 @@ import Debug exposing (toString)
 import Dict
 import Evaluation.Engine exposing (..)
 import List exposing (reverse)
-import List.Cartesian
 import Models exposing (..)
 import Parser exposing (float)
 import Parsing.ExpressionModels exposing (..)
@@ -16,6 +15,9 @@ import Utils
 import Parser exposing (variable)
 import Html exposing (..)
 import Graphing.Plotter exposing (plot)
+import Browser.Events
+import Json.Decode as Decode
+import Decoders.MouseDecoders as MouseDecoders
 
 logEnabled = True
 
@@ -33,7 +35,24 @@ defaultEndValue = pi
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg  of
-        
+        MouseDown mouseEvent ->
+            let
+                _ = Debug.log "Mouse down" mouseEvent
+            in
+                ( {model | mouseDownEventInfo = Just mouseEvent }, Cmd.none)
+
+        MouseUp mouseEvent ->
+            let
+                _ = Debug.log "Mouse up" mouseEvent
+            in
+                ( {model | mouseDownEventInfo = Nothing } , Cmd.none)
+
+        MouseMove mouseEvent ->
+            let
+                _ = Debug.log "Mouse move" mouseEvent
+            in
+                ( model, Cmd.none)
+
         AutoRotateActivePanel ->
             (autoRotateActivePanel model, Cmd.none)
 
@@ -643,8 +662,29 @@ stateLog msg obj =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     let
-        sub1 = every model.rotationSpeed (\_ -> AutoRotateActivePanel)
+        -- Only subscribe if the mouse button is down as if a drag while we are plotting and not auto-rotating
+        mouseMoveSub = case Utils.findActivePanelEntry model of 
+                        Nothing -> 
+                            Sub.none
+                        Just pe -> 
+                            case pe.autoRotate of
+                                NoAutoRotate ->
+                                    case model.mouseDownEventInfo of
+                                        Just eventInfo ->
+                                            Browser.Events.onMouseMove MouseDecoders.mouseMoveDecoder
+                                        Nothing ->
+                                            Sub.none
+                                _-> Sub.none
+
+
+        -- TODO: If there is no active panel, skip the clock tick
+        subs = [
+                every model.rotationSpeed (\_ -> AutoRotateActivePanel)
+                , Browser.Events.onMouseDown MouseDecoders.mouseDownDecoder
+                , Browser.Events.onMouseUp MouseDecoders.mouseUpDecoder
+                , mouseMoveSub
+                ]
     in
-        sub1
+        Sub.batch subs
 
     -- Sub.none

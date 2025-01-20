@@ -12,5 +12,5 @@ viewPanel : Model -> Html Msg
 viewPanel model =
     div [ id "panel" ]
         [ div [ id "panel-entries" ]
-            (model.panelEntries |> List.map (viewPanelEntry model))
+            (model.panelEntries |> List.indexedMap (viewPanelEntry model))
         ]
