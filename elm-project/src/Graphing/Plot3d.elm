@@ -33,7 +33,7 @@ plot3d model panelEntry colorMapper lineSegments =
     div
         [ Html.Attributes.id "plot-3d" ]
         [ 
-            div [] [ 
+            div [Html.Attributes.id "projected-points"] [ 
                         projectAndPlotPoints model panelEntry rotatedData rotatedAxes colorMapper
                 ]
         ]

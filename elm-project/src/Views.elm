@@ -14,6 +14,13 @@ import PanelView exposing (viewPanel)
 import Time
 import Utils
 
+view : Model -> Html Msg
+view model =
+    div [ id "screen" ]
+        [ leftSide model
+        , rightSide model
+        ]
+
 getFormattedTime : Maybe Time.Posix -> String
 getFormattedTime timeInfo =
     case timeInfo of
@@ -62,12 +69,4 @@ rightSide model =
                 Nothing ->
                     text "No active plot"
             ]
-        ]
-
-
-view : Model -> Html Msg
-view model =
-    div [ id "screen" ]
-        [ leftSide model
-        , rightSide model
         ]
