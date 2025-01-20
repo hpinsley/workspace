@@ -31,3 +31,7 @@ mouseDownDecoder =
 mouseUpDecoder : Decode.Decoder Msg
 mouseUpDecoder =
     mouseMessageDecoder MouseUp
+
+mouseMoveDecoder : Decode.Decoder Msg
+mouseMoveDecoder =
+    mouseMessageDecoder MouseMove

@@ -103,6 +103,7 @@ type Msg
     | SetZAxisRotationValue PanelEntry String
     | MouseDown MouseEvent
     | MouseUp MouseEvent
+    | MouseMove MouseEvent
 
 type alias SymbolTableEntry =
     { variable : Variable
@@ -171,6 +172,7 @@ type alias Model =
     , defaultRotationSpeed: Float
     , rotations: Float
     , shadingRange: ShadingRange
+    , isMouseButtonDown: Bool
     }
 
 
@@ -196,6 +198,7 @@ init _ =
                                 , minBlue = 0
                                 , maxBlue = 240
                             }
+            , isMouseButtonDown = False
             }
     in
         ( inital_model, Cmd.none )

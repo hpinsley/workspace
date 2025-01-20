@@ -37,15 +37,21 @@ update msg model =
     case msg  of
         MouseDown mouseEvent ->
             let
-                _ = Debug.log "Mouses down" mouseEvent
+                _ = Debug.log "Mouse down" mouseEvent
             in
-                (model, Cmd.none)
+                ( {model | isMouseButtonDown = True }, Cmd.none)
 
         MouseUp mouseEvent ->
             let
-                _ = Debug.log "Mouses up" mouseEvent
+                _ = Debug.log "Mouse up" mouseEvent
             in
-                (model, Cmd.none)
+                ( {model | isMouseButtonDown = False} , Cmd.none)
+
+        MouseMove mouseEvent ->
+            let
+                _ = Debug.log "Mouse move" mouseEvent
+            in
+                ( {model | isMouseButtonDown = True }, Cmd.none)
 
         AutoRotateActivePanel ->
             (autoRotateActivePanel model, Cmd.none)
@@ -656,11 +662,18 @@ stateLog msg obj =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     let
+        -- Only subscribe if the mouse button is down as if a drag
+        mouseMoveSub = if model.isMouseButtonDown
+                        then Browser.Events.onMouseMove MouseDecoders.mouseMoveDecoder
+                        else Sub.none
+
+
         -- TODO: If there is no active panel, skip the clock tick
         subs = [
                 every model.rotationSpeed (\_ -> AutoRotateActivePanel)
                 , Browser.Events.onMouseDown MouseDecoders.mouseDownDecoder
                 , Browser.Events.onMouseUp MouseDecoders.mouseUpDecoder
+                , mouseMoveSub
                 ]
     in
         Sub.batch subs

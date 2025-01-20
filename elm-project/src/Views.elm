@@ -67,6 +67,10 @@ rightSide model =
                     activePanelEntry.currentPlot
 
                 Nothing ->
-                    text "No active plot"
+                    div [][
+                          text "No active plot"
+                        , br [][]
+                        , text (if model.isMouseButtonDown then "Down" else "Up")
+                    ]
             ]
         ]
