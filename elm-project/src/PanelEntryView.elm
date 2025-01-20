@@ -75,9 +75,9 @@ displayRotationSpeed model =
 displayViewportScaling : PanelEntry -> Html Msg
 displayViewportScaling panelEntry =
     div [ id "viewport-scaling" ]
-        [ panelEntryAlignmentView (SetXAlignment panelEntry) "X"
-        , panelEntryAlignmentView (SetYAlignment panelEntry) "Y"
-        , panelEntryAlignmentBehaviorView (SetAlignmentBehavior panelEntry)
+        [ panelEntryAlignmentView panelEntry.alignmentX (SetXAlignment panelEntry) "X"
+        , panelEntryAlignmentView panelEntry.alignmentY (SetYAlignment panelEntry) "Y"
+        , panelEntryAlignmentBehaviorView panelEntry (SetAlignmentBehavior panelEntry)
         ]
 
 displayAxisInfo : Model -> PanelEntry -> Html Msg
@@ -156,8 +156,8 @@ panelEntrySingleAxisView model panelEntry axis incrementMessage decrementMessage
                 ]
         ]
 
-panelEntryAlignmentBehaviorView : (SvgAlignmentBehavor -> Msg) -> Html Msg
-panelEntryAlignmentBehaviorView msgFunc =
+panelEntryAlignmentBehaviorView : PanelEntry -> (SvgAlignmentBehavor -> Msg) -> Html Msg
+panelEntryAlignmentBehaviorView panelEntry msgFunc =
     fieldset []
         [ legend [] [ text "Behavior" ]
         , div []
@@ -166,7 +166,7 @@ panelEntryAlignmentBehaviorView msgFunc =
                 , Html.Attributes.type_ "radio"
                 , Html.Attributes.name "alignment-behavior"
                 , Html.Attributes.value "Meet"
-                , Html.Attributes.selected False
+                , Html.Attributes.checked (panelEntry.meetOrSlice == Meet)
                 , Html.Events.onClick (msgFunc Meet)
                 ]
                 []
@@ -178,7 +178,7 @@ panelEntryAlignmentBehaviorView msgFunc =
                 , Html.Attributes.type_ "radio"
                 , Html.Attributes.name "alignment-behavior"
                 , Html.Attributes.value "Slice"
-                , Html.Attributes.selected False
+                , Html.Attributes.checked (panelEntry.meetOrSlice == Slice)
                 , Html.Events.onClick (msgFunc Slice)
                 ]
                 []
@@ -187,8 +187,8 @@ panelEntryAlignmentBehaviorView msgFunc =
         ]
 
 
-panelEntryAlignmentView : (SvgAlignment -> Msg) -> String -> Html Msg
-panelEntryAlignmentView msgFunc axis =
+panelEntryAlignmentView : SvgAlignment -> (SvgAlignment -> Msg) -> String -> Html Msg
+panelEntryAlignmentView currentAlignmentValue msgFunc axis =
     fieldset []
         [ legend [] [ text (axis ++ " Alignment") ]
         , div []
@@ -197,7 +197,7 @@ panelEntryAlignmentView msgFunc axis =
                 , Html.Attributes.type_ "radio"
                 , Html.Attributes.name (axis ++ "-alignment")
                 , Html.Attributes.value "Min"
-                , Html.Attributes.selected False
+                , Html.Attributes.checked (currentAlignmentValue == AlignMin)
                 , Html.Events.onClick (msgFunc AlignMin)
                 ]
                 []
@@ -211,7 +211,7 @@ panelEntryAlignmentView msgFunc axis =
                 , Html.Attributes.type_ "radio"
                 , Html.Attributes.name (axis ++ "-alignment")
                 , Html.Attributes.value "Mid"
-                , Html.Attributes.selected True
+                , Html.Attributes.checked (currentAlignmentValue == AlignMid)
                 , Html.Events.onClick (msgFunc AlignMid)
                 ]
                 []
@@ -223,7 +223,7 @@ panelEntryAlignmentView msgFunc axis =
                 , Html.Attributes.type_ "radio"
                 , Html.Attributes.name (axis ++ "-alignment")
                 , Html.Attributes.value "Max"
-                , Html.Attributes.selected False
+                , Html.Attributes.checked (currentAlignmentValue == AlignMax)
                 , Html.Events.onClick (msgFunc AlignMax)
                 ]
                 []
