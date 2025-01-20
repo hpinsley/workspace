@@ -39,19 +39,19 @@ update msg model =
             let
                 _ = Debug.log "Mouse down" mouseEvent
             in
-                ( {model | isMouseButtonDown = True }, Cmd.none)
+                ( {model | mouseDownEventInfo = Just mouseEvent }, Cmd.none)
 
         MouseUp mouseEvent ->
             let
                 _ = Debug.log "Mouse up" mouseEvent
             in
-                ( {model | isMouseButtonDown = False} , Cmd.none)
+                ( {model | mouseDownEventInfo = Nothing } , Cmd.none)
 
         MouseMove mouseEvent ->
             let
                 _ = Debug.log "Mouse move" mouseEvent
             in
-                ( {model | isMouseButtonDown = True }, Cmd.none)
+                ( model, Cmd.none)
 
         AutoRotateActivePanel ->
             (autoRotateActivePanel model, Cmd.none)
@@ -662,10 +662,19 @@ stateLog msg obj =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     let
-        -- Only subscribe if the mouse button is down as if a drag
-        mouseMoveSub = if model.isMouseButtonDown
-                        then Browser.Events.onMouseMove MouseDecoders.mouseMoveDecoder
-                        else Sub.none
+        -- Only subscribe if the mouse button is down as if a drag while we are plotting and not auto-rotating
+        mouseMoveSub = case Utils.findActivePanelEntry model of 
+                        Nothing -> 
+                            Sub.none
+                        Just pe -> 
+                            case pe.autoRotate of
+                                NoAutoRotate ->
+                                    case model.mouseDownEventInfo of
+                                        Just eventInfo ->
+                                            Browser.Events.onMouseMove MouseDecoders.mouseMoveDecoder
+                                        Nothing ->
+                                            Sub.none
+                                _-> Sub.none
 
 
         -- TODO: If there is no active panel, skip the clock tick

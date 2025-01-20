@@ -172,7 +172,7 @@ type alias Model =
     , defaultRotationSpeed: Float
     , rotations: Float
     , shadingRange: ShadingRange
-    , isMouseButtonDown: Bool
+    , mouseDownEventInfo: Maybe MouseEvent
     }
 
 
@@ -198,7 +198,7 @@ init _ =
                                 , minBlue = 0
                                 , maxBlue = 240
                             }
-            , isMouseButtonDown = False
+            , mouseDownEventInfo = Nothing
             }
     in
         ( inital_model, Cmd.none )

@@ -70,7 +70,18 @@ rightSide model =
                     div [][
                           text "No active plot"
                         , br [][]
-                        , text (if model.isMouseButtonDown then "Down" else "Up")
+                        , displayMouseInfo model
                     ]
             ]
         ]
+
+displayMouseInfo : Model -> Html Msg
+displayMouseInfo model =
+    case model.mouseDownEventInfo of
+        Nothing -> text ""
+        Just mdInfo ->
+            div [][
+                  text "Mouse is down"
+                , br [][]
+                , text (Debug.toString mdInfo)
+            ]
