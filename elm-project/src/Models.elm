@@ -5,6 +5,7 @@ import Matrix exposing (..)
 import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
 import Html exposing (..)
+import Color exposing (Color)
 
 rotationMinValue = 0.0
 rotationMaxValue = 2*pi
@@ -31,6 +32,7 @@ type Vector3D = Vec3D Float Float Float
 type alias GeneralLineSegment = (GeneralVector, GeneralVector)
 type ThreeDLineSegment = LineSeg3D Vector3D Vector3D
 type TwoDLineSegment = LineSeg2D Vector2D Vector2D
+type TwoDColoredLineSegment = ColoredLineSeg2D TwoDLineSegment Color
 
 type alias FloatMatrix =
     Matrix Float
@@ -169,11 +171,11 @@ init _ =
             , rotations = defaultRotations
             , shadingRange = {
                                   minRed = 0 
-                                , maxRed = 200
+                                , maxRed = 240
                                 , minGreen = 0
-                                , maxGreen = 200
+                                , maxGreen = 240
                                 , minBlue = 0
-                                , maxBlue = 200
+                                , maxBlue = 240
                             }
             }
     in

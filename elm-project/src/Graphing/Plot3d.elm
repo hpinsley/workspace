@@ -8,6 +8,7 @@ import Models exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Utils
+import Color exposing (Color)
 
 logEnabled = False
 
@@ -16,8 +17,8 @@ strokeWidth =
 
 axisScalar = 1.0
 
-plot3d : Model -> PanelEntry -> List ThreeDLineSegment -> Html Msg
-plot3d model panelEntry lineSegments =
+plot3d : Model -> PanelEntry -> (Float -> Color) -> List ThreeDLineSegment -> Html Msg
+plot3d model panelEntry colorMapper lineSegments =
     let
         _ =
             log3D "Plot3D points to plot" (List.length lineSegments)
@@ -33,7 +34,7 @@ plot3d model panelEntry lineSegments =
         [ Html.Attributes.id "plot-3d" ]
         [ 
             div [] [ 
-                        projectAndPlotPoints model panelEntry rotatedData rotatedAxes 
+                        projectAndPlotPoints model panelEntry rotatedData rotatedAxes colorMapper
                 ]
         ]
 
@@ -80,10 +81,11 @@ getPercentOfY lineSegments =
     in
         pctOfRange
 
-projectAndPlotPoints : Model -> PanelEntry -> List ThreeDLineSegment -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment) -> Html Msg
-projectAndPlotPoints model panelEntry lineSegments3d (xAxis, yAxis, zAxis) =
+projectAndPlotPoints : Model -> PanelEntry -> List ThreeDLineSegment -> (ThreeDLineSegment, ThreeDLineSegment, ThreeDLineSegment) -> (Float -> Color) -> Html Msg
+projectAndPlotPoints model panelEntry lineSegments3d (xAxis, yAxis, zAxis) colorMapper =
     let
-        computeYPcts = getPercentOfY lineSegments3d |> Debug.log "yPcts"
+        computeYPcts = getPercentOfY lineSegments3d -- |> Debug.log "yPcts"
+        lineSegmentColors = computeYPcts |> List.map colorMapper
 
         -- We will be dropping the Y.  We want to adjust color based on yValue before we
         -- drop it
@@ -91,6 +93,8 @@ projectAndPlotPoints model panelEntry lineSegments3d (xAxis, yAxis, zAxis) =
 
         -- Project down to 2D by dropping the y values
         lineSegments = lineSegments3d |> List.map Utils.dropYFrom3DLineSegment
+        coloredLineSegments = List.map2 (\lineSeg c -> ColoredLineSeg2D lineSeg c) lineSegments lineSegmentColors
+
         projectedXAxis = Utils.dropYFrom3DLineSegment xAxis  
         projectedYAxis = Utils.dropYFrom3DLineSegment yAxis  
         projectedZAxis = Utils.dropYFrom3DLineSegment zAxis  
@@ -140,7 +144,7 @@ projectAndPlotPoints model panelEntry lineSegments3d (xAxis, yAxis, zAxis) =
             adjustYValue maxY minY
 
         svgPathList =
-            build2DPathFromLineSegments yTransform lineSegments -- |> log3D "Function Path"
+            build2DPathFromLineSegments yTransform coloredLineSegments -- |> log3D "Function Path"
 
         xAxisPath = buildStrokeFromLineSegment yTransform projectedXAxis
         yAxisPath = buildStrokeFromLineSegment yTransform projectedYAxis
@@ -231,7 +235,7 @@ adjustYValue maxY minY y =
 
 -- This method takes a list of 2D line segments to plot and adjusts the y component using the
 -- given method
-build2DPathFromLineSegments : (Float -> Float) -> List TwoDLineSegment -> List (Svg Msg)
+build2DPathFromLineSegments : (Float -> Float) -> List TwoDColoredLineSegment -> List (Svg Msg)
 build2DPathFromLineSegments yAdjust lineSegments =
     lineSegments 
         |> List.map (buildSvgPathPathFromLineSegment yAdjust)
@@ -249,14 +253,15 @@ buildStrokeFromLineSegment yAdjust lineSegment =
     in
         stroke
 
-buildSvgPathPathFromLineSegment : (Float -> Float) -> TwoDLineSegment -> Svg Msg
-buildSvgPathPathFromLineSegment yAdjust lineSegment =
+buildSvgPathPathFromLineSegment : (Float -> Float) -> TwoDColoredLineSegment -> Svg Msg
+buildSvgPathPathFromLineSegment yAdjust (ColoredLineSeg2D lineSegment color) =
     let
         stroke = buildStrokeFromLineSegment yAdjust lineSegment
+        rgb = Color.toCssString color 
         svgPath =  Svg.path
                         [ Svg.Attributes.d stroke
                         , Svg.Attributes.fill "none"
-                        , Svg.Attributes.stroke "black"
+                        , Svg.Attributes.stroke rgb
                         , Svg.Attributes.strokeWidth (String.fromFloat strokeWidth)
                         ]
                         []
