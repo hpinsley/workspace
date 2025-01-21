@@ -42,10 +42,7 @@ update msg model =
                 ( {model | mouseDownEventInfo = Just mouseEvent }, Cmd.none)
 
         MouseUp mouseEvent ->
-            let
-                _ = Debug.log "Mouse up" mouseEvent
-            in
-                ( {model | mouseDownEventInfo = Nothing } , Cmd.none)
+            (processMouseUpEvent model mouseEvent, Cmd.none)
 
         MouseMove mouseEvent ->
             let
@@ -250,6 +247,36 @@ update msg model =
                 m = setAxisRotationValue model panelEntry panelEntry.zAxis value (\pe axis -> { pe | zAxis = axis })
             in
                 ( m, Cmd.none)
+
+processMouseUpEvent : Model -> MouseEvent -> Model
+processMouseUpEvent model mouseUpEvent =
+    let
+        _ = Debug.log "Mouse up" mouseUpEvent
+        m1 = {model | mouseDownEventInfo = Nothing }
+        m2 = case model.mouseDownEventInfo of
+                Nothing -> m1
+                Just mouseDownEvent ->
+                    computeMoveInfo m1 mouseDownEvent mouseUpEvent
+    in
+        m2
+
+computeMoveInfo : Model -> MouseEvent -> MouseEvent -> Model
+computeMoveInfo model mouseDown mouseUp =
+    let
+        _ = Debug.log "DOWN:" mouseDown
+        _ = Debug.log "  UP:" mouseUp
+
+        deltaVector = Vec2D 
+                            (toFloat (mouseUp.screenX - mouseDown.screenX))
+                            (toFloat (mouseUp.screenY - mouseDown.screenY))
+        _ = Debug.log "Delta" deltaVector
+        i = Utils.unitVectorI2D
+        radiansFromI = Utils.getAngleBetweenTwo2DVectors i deltaVector |> Debug.log "Radians"
+        degreesFromI = (radiansFromI * 180) / pi |> Debug.log "Degrees"
+        (Vec2D deltaX deltaY) = deltaVector
+        adjustedDegreesFromI = (if deltaY >= 0.0 then degreesFromI else (-1.0 * degreesFromI)) |> Debug.log "Adjsuted"
+    in
+        model
 
 updatePanelEntryAutoRotate : Model -> PanelEntry -> AutoRotate -> Model
 updatePanelEntryAutoRotate model panelEntry autoRotateType =
@@ -682,7 +709,7 @@ subscriptions model =
                 every model.rotationSpeed (\_ -> AutoRotateActivePanel)
                 , Browser.Events.onMouseDown MouseDecoders.mouseDownDecoder
                 , Browser.Events.onMouseUp MouseDecoders.mouseUpDecoder
-                , mouseMoveSub
+                -- , mouseMoveSub
                 ]
     in
         Sub.batch subs

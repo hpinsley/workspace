@@ -7,6 +7,35 @@ import Models exposing (..)
 import Parsing.ExpressionModels exposing (..)
 import Time exposing (..)
 
+
+dotProductV2 : Vector2D -> Vector2D -> Float
+dotProductV2 (Vec2D x1 y1) (Vec2D x2 y2) =
+    x1 * x2 + y1 * y2
+
+magnitudeV2 : Vector2D -> Float
+magnitudeV2 (Vec2D x y) =
+    sqrt(x*x + y*y)
+
+getAngleBetweenTwo2DVectors : Vector2D -> Vector2D -> Float
+getAngleBetweenTwo2DVectors v1 v2 =
+    let
+        dp = dotProductV2 v1 v2 |> Debug.log "dot-product"
+        m1 = magnitudeV2 v1 |> Debug.log "magnitude of v1"
+        m2 = magnitudeV2 v2 |> Debug.log "magnitude of v2"
+        magProduct = m1 * m2
+    in
+        if magProduct == 0
+            then 0.0
+        else
+            acos (dp / magProduct)
+        
+
+unitVectorI2D : Vector2D
+unitVectorI2D = Vec2D 1 0
+
+unitVectorJ2D : Vector2D
+unitVectorJ2D = Vec2D 0 1
+
 findPanelEntry : Model -> String -> Maybe PanelEntry
 findPanelEntry model expression =
     case List.filter (\pe -> pe.expression == expression) model.panelEntries of
