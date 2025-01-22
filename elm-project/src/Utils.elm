@@ -16,6 +16,8 @@ magnitudeV2 : Vector2D -> Float
 magnitudeV2 (Vec2D x y) =
     sqrt(x*x + y*y)
 
+-- Get the angle FROM v1 to v2.  We assume standard math coordinates
+
 getAngleBetweenTwo2DVectors : Vector2D -> Vector2D -> Float
 getAngleBetweenTwo2DVectors v1 v2 =
     let
@@ -23,12 +25,10 @@ getAngleBetweenTwo2DVectors v1 v2 =
         m1 = magnitudeV2 v1 |> Debug.log "magnitude of v1"
         m2 = magnitudeV2 v2 |> Debug.log "magnitude of v2"
         magProduct = m1 * m2
+        cosValue = if magProduct == 0 then 1.0 else (dp / magProduct)
+        radianResult = acos (cosValue)
     in
-        if magProduct == 0
-            then 0.0
-        else
-            acos (dp / magProduct)
-        
+        radianResult 
 
 unitVectorI2D : Vector2D
 unitVectorI2D = Vec2D 1 0

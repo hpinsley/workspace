@@ -266,15 +266,17 @@ computeMoveInfo model mouseDown mouseUp =
         _ = Debug.log "DOWN:" mouseDown
         _ = Debug.log "  UP:" mouseUp
 
+        -- Y values on the screen increase downward, and I want to reverse that
         deltaVector = Vec2D 
                             (toFloat (mouseUp.screenX - mouseDown.screenX))
-                            (toFloat (mouseUp.screenY - mouseDown.screenY))
+                            (toFloat (mouseUp.screenY - mouseDown.screenY) |> negate)
         _ = Debug.log "Delta" deltaVector
         i = Utils.unitVectorI2D
         radiansFromI = Utils.getAngleBetweenTwo2DVectors i deltaVector |> Debug.log "Radians"
-        degreesFromI = (radiansFromI * 180) / pi |> Debug.log "Degrees"
-        (Vec2D deltaX deltaY) = deltaVector
-        adjustedDegreesFromI = (if deltaY >= 0.0 then degreesFromI else (-1.0 * degreesFromI)) |> Debug.log "Adjsuted"
+        
+        -- acos's range is from only from 0 to pi.  We can adjust for this ambiguity here
+        (Vec2D _ deltaY) = deltaVector
+        adjustedRadians = (if deltaY >= 0.0 then radiansFromI else (-1.0 * radiansFromI + 2 * pi)) |> Debug.log "Adjusted"
     in
         model
 
