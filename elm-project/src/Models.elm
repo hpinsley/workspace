@@ -68,6 +68,11 @@ type alias MouseEvent =
           , offsetY: Int
     }
 
+type SectorMovement 
+    = SectorIncrementX Float
+    | SectorIncrementY Float
+    | SectorIncrementZ Float
+
 type Msg
     = Tick Time.Posix
     | UpdateExpression String

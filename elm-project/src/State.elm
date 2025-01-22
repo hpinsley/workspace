@@ -276,7 +276,35 @@ computeMoveInfo model mouseDown mouseUp =
         
         -- acos's range is from only from 0 to pi.  We can adjust for this ambiguity here
         (Vec2D _ deltaY) = deltaVector
-        adjustedRadians = (if deltaY >= 0.0 then radiansFromI else (-1.0 * radiansFromI + 2 * pi)) |> Debug.log "Adjusted"
+        twopi = 2*pi
+        adjustedRadians = (if deltaY >= 0.0 then radiansFromI else (-1.0 * radiansFromI + twopi)) |> Debug.log "Adjusted"
+
+        deltaMagnitude = Utils.magnitudeV2 deltaVector
+
+        -- Now we map the movement into 2pi/6 sectors.
+        sectorSize = twopi / 6.0
+
+        sectorStartStop = List.range 0 5
+                            |> List.map (\secIndex -> (secIndex, (toFloat secIndex) * sectorSize, (toFloat(secIndex+1)) * sectorSize))
+                            |> Debug.log "SectorStartStop"
+        
+        matchingSecIndex = sectorStartStop
+                            |> List.filter (\(secIndex, start, stop) -> adjustedRadians >= start && adjustedRadians < stop)
+                            |> List.head
+                            |> Maybe.map (\(secIndex, _, _) -> secIndex)
+                            |> Debug.log "matchingSectorInfo"
+
+        sectorMovement: SectorMovement
+        sectorMovement = case matchingSecIndex of
+                            Nothing -> SectorIncrementX 0.0
+                            Just sectorIndex ->
+                                if      sectorIndex == 0 then SectorIncrementZ deltaMagnitude
+                                else if sectorIndex == 1 then SectorIncrementX deltaMagnitude
+                                else if sectorIndex == 2 then SectorIncrementY deltaMagnitude
+                                else if sectorIndex == 3 then SectorIncrementZ -deltaMagnitude
+                                else if sectorIndex == 4 then SectorIncrementX -deltaMagnitude
+                                else SectorIncrementY -deltaMagnitude
+        _ = Debug.log "Sector Movement" sectorMovement
     in
         model
 
