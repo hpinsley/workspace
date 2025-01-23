@@ -1,8 +1,16 @@
 module Decoders.MouseDecoders exposing (..)
 
-import Models exposing (..)
+import MouseEventModels exposing (..)
+import RuntimeEnvironmentModels exposing (..)
 import Json.Decode as Decode
+import Models exposing (..)
 
+
+runtimeEnvironmentDecoder: Decode.Decoder RuntimeEnvironment
+runtimeEnvironmentDecoder =
+    Decode.map2 RuntimeEnvironment
+                    (Decode.field "screenX" Decode.int)
+                    (Decode.field "screenY" Decode.int)
 mouseEventDecoder: Decode.Decoder MouseEvent
 mouseEventDecoder =
     Decode.map7 MouseEvent 
@@ -35,3 +43,14 @@ mouseUpDecoder =
 mouseMoveDecoder : Decode.Decoder Msg
 mouseMoveDecoder =
     mouseMessageDecoder MouseMove
+
+decodeRuntimeFlags: Decode.Value -> RuntimeEnvironmentModels.RuntimeEnvironment
+decodeRuntimeFlags runtimeFlags =
+    case Decode.decodeValue runtimeEnvironmentDecoder runtimeFlags of
+        Ok runtimeEnvironment ->
+            runtimeEnvironment
+        Err msg ->
+            let
+                _ = Debug.log "Unable to decode runtime environment" msg
+            in
+                { screenX = 1, screenY = 1 }

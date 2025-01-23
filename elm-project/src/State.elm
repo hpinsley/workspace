@@ -18,6 +18,8 @@ import Graphing.Plotter exposing (plot)
 import Browser.Events
 import Json.Decode as Decode
 import Decoders.MouseDecoders as MouseDecoders
+import MouseEventModels exposing (..)
+import RuntimeEnvironmentModels exposing (..)
 
 logEnabled = True
 
@@ -714,6 +716,47 @@ parseModelExpression model =
 stateLog : String -> a -> a
 stateLog msg obj =
     if logEnabled then (Debug.log msg obj) else obj
+
+init : Decode.Value -> ( Model, Cmd Msg )
+init runtimeFlags =
+    let
+        _ = Debug.log "flags" runtimeFlags
+        runtimeEnv = case Decode.decodeValue MouseDecoders.runtimeEnvironmentDecoder runtimeFlags of
+                Ok runtimeEnvironment ->
+                    runtimeEnvironment
+                Err msg ->
+                    let
+                        _ = Debug.log "Unable to decode runtime environment" msg
+                    in
+                        { screenX = 1, screenY = 1 }
+
+        _ = Debug.log "Decoded" runtimeEnv
+
+        inital_model =
+            { currentTime = Nothing
+            , screenX = runtimeEnv.screenX
+            , screenY = runtimeEnv.screenY
+            , expression = Nothing
+            , parsedExpression = Nothing
+            , parseErrors = ""
+            , variables = Dict.empty
+            , panelEntries = []
+            , activePlotEntry = Nothing
+            , rotationSpeed = defaultRotationMs
+            , defaultRotationSpeed = defaultRotationMs
+            , rotations = defaultRotations
+            , shadingRange = {
+                                  minRed = 0 
+                                , maxRed = 240
+                                , minGreen = 0
+                                , maxGreen = 240
+                                , minBlue = 0
+                                , maxBlue = 240
+                            }
+            , mouseDownEventInfo = Nothing
+            }
+    in
+        ( inital_model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

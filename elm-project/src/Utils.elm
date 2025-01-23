@@ -6,7 +6,7 @@ import Matrix exposing (..)
 import Models exposing (..)
 import Parsing.ExpressionModels exposing (..)
 import Time exposing (..)
-
+import RuntimeEnvironmentModels exposing (..)
 
 dotProductV2 : Vector2D -> Vector2D -> Float
 dotProductV2 (Vec2D x1 y1) (Vec2D x2 y2) =
