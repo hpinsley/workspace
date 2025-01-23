@@ -8,12 +8,13 @@ import Html exposing (..)
 import Models exposing (..)
 import State
 import Views
+import Json.Decode as Decode
 
 
-main : Program () Model Msg
+main : Program Decode.Value Model Msg
 main =
     Browser.element
-        { init = Models.init
+        { init = State.init
         , update = State.update
         , subscriptions = State.subscriptions
         , view = Views.view

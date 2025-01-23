@@ -23,6 +23,11 @@ const cssContent = styles[0][1];
 console.log(cssContent);
 addInlineCSS(cssContent)
 
+const flags = {
+      screenX: window.screen.width
+    , screenY: window.screen.height
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     var Elm = require('./Main.elm');
     var mountNode = document.getElementById('main');
@@ -30,5 +35,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // .embed() can take an optional second argument. This would be an object describing the data we need to start a program, i.e. a userID or some token
     var app = Elm.Elm.Main.init({
         node: mountNode
+        , flags: flags
     });
 });

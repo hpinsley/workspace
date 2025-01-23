@@ -6,6 +6,7 @@ import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
 import Html exposing (..)
 import Color exposing (Color)
+import MouseEventModels exposing (..)
 
 rotationMinValue = 0.0
 rotationMaxValue = 2*pi
@@ -49,23 +50,6 @@ type alias MinMaxIncrement =
           min: Float
         , max: Float
         , increment: Float
-    }
-
-type alias EventTarget =
-    {
-          id: String
-        , nodeName: String
-    }
-
-type alias MouseEvent = 
-    {
-            target: EventTarget
-          , screenX: Int
-          , screenY: Int
-          , clientX: Int
-          , clientY: Int
-          , offsetX: Int
-          , offsetY: Int
     }
 
 type SectorMovement 
@@ -164,9 +148,10 @@ type SvgAlignmentBehavor
     = Meet
     | Slice
 
-
 type alias Model =
     { currentTime : Maybe Time.Posix
+    , screenX: Int
+    , screenY: Int
     , expression : Maybe String
     , parsedExpression : Maybe Expression
     , parseErrors : String
@@ -179,31 +164,3 @@ type alias Model =
     , shadingRange: ShadingRange
     , mouseDownEventInfo: Maybe MouseEvent
     }
-
-
-init : flags -> ( Model, Cmd Msg )
-init _ =
-    let
-        inital_model =
-            { currentTime = Nothing
-            , expression = Nothing
-            , parsedExpression = Nothing
-            , parseErrors = ""
-            , variables = Dict.empty
-            , panelEntries = []
-            , activePlotEntry = Nothing
-            , rotationSpeed = defaultRotationMs
-            , defaultRotationSpeed = defaultRotationMs
-            , rotations = defaultRotations
-            , shadingRange = {
-                                  minRed = 0 
-                                , maxRed = 240
-                                , minGreen = 0
-                                , maxGreen = 240
-                                , minBlue = 0
-                                , maxBlue = 240
-                            }
-            , mouseDownEventInfo = Nothing
-            }
-    in
-        ( inital_model, Cmd.none )
