@@ -1,14 +1,10 @@
 module Views exposing (view)
 
-import Dict
-import Graphing.Plotter exposing (plot)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Iso8601
 import Material.Button as Button
-import Material.Tab
-import Material.TextField as TextField
 import Models exposing (..)
 import PanelView exposing (viewPanel)
 import Time

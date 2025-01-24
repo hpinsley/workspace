@@ -56,6 +56,7 @@ type SectorMovement
     = SectorIncrementX Float
     | SectorIncrementY Float
     | SectorIncrementZ Float
+    | NoSectorMovement      
 
 type Msg
     = Tick Time.Posix

@@ -20,7 +20,7 @@ function addInlineCSS(cssContent) {
 }
 
 const cssContent = styles[0][1];
-console.log(cssContent);
+// console.log(cssContent);
 addInlineCSS(cssContent)
 
 const flags = {

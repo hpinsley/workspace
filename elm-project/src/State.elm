@@ -44,13 +44,10 @@ update msg model =
                 ( {model | mouseDownEventInfo = Just mouseEvent }, Cmd.none)
 
         MouseUp mouseEvent ->
-            (processMouseUpEvent model mouseEvent, Cmd.none)
+            (processMouseTrackingEvent msg model mouseEvent, Cmd.none)
 
         MouseMove mouseEvent ->
-            let
-                _ = Debug.log "Mouse move" mouseEvent
-            in
-                ( model, Cmd.none)
+            (processMouseTrackingEvent msg model mouseEvent, Cmd.none)
 
         AutoRotateActivePanel ->
             (autoRotateActivePanel model, Cmd.none)
@@ -250,19 +247,70 @@ update msg model =
             in
                 ( m, Cmd.none)
 
-processMouseUpEvent : Model -> MouseEvent -> Model
-processMouseUpEvent model mouseUpEvent =
-    let
-        _ = Debug.log "Mouse up" mouseUpEvent
-        m1 = {model | mouseDownEventInfo = Nothing }
-        m2 = case model.mouseDownEventInfo of
-                Nothing -> m1
-                Just mouseDownEvent ->
-                    computeMoveInfo m1 mouseDownEvent mouseUpEvent
-    in
-        m2
+-- We call this when the mouse is down when the mouse up or move event happens.  We clear mouseDownEventInfo only on the MouseUp message
+processMouseTrackingEvent : Msg -> Model -> MouseEvent -> Model
+processMouseTrackingEvent msg model mouseUpEvent =
+    case Utils.findActivePanelEntry model of
+        Nothing ->
+            -- If we get mouse down we stop tracking
+            case msg of
+                MouseUp _ ->
+                    {model | mouseDownEventInfo = Nothing }
+                _ -> model
+        
+        Just activePanelEntry ->
+            let
+                sectorMovement = case model.mouseDownEventInfo of
+                                    Nothing -> NoSectorMovement
+                                    Just mouseDownEvent ->
+                                            computeMoveInfo m1 mouseDownEvent mouseUpEvent
 
-computeMoveInfo : Model -> MouseEvent -> MouseEvent -> Model
+                m1 = case msg of
+                        MouseUp _ ->
+                            {model | mouseDownEventInfo = Nothing }
+                        _ -> model
+                
+                fudge_factor = 1.4
+                rotationIncrement = case sectorMovement of
+                                        SectorIncrementX amount -> (fudge_factor * amount / toFloat model.screenY) * 2*pi
+                                        SectorIncrementY amount -> (fudge_factor * amount / toFloat model.screenY) * 2*pi
+                                        SectorIncrementZ amount -> (fudge_factor * amount / toFloat model.screenY) * 2*pi
+                                        NoSectorMovement -> 0.0
+                m3 =    let
+                            updatedPanel = case sectorMovement of
+                                                SectorIncrementX _ ->
+                                                    let
+                                                        axis = activePanelEntry.xAxis
+                                                        rotatedValue = axis.rotationAngle + rotationIncrement |> max 0.0 |> min (2*pi)
+                                                        newAxis = { axis | rotationAngle = rotatedValue}
+                                                    in
+                                                        { activePanelEntry | xAxis = newAxis }
+                                                
+                                                SectorIncrementY _ ->
+                                                    let
+                                                        axis = activePanelEntry.yAxis
+                                                        rotatedValue = axis.rotationAngle + rotationIncrement |> max 0.0 |> min (2*pi)
+                                                        newAxis = { axis | rotationAngle = rotatedValue}
+                                                    in
+                                                        { activePanelEntry | yAxis = newAxis }
+
+                                                SectorIncrementZ _ ->
+                                                    let
+                                                        axis = activePanelEntry.zAxis
+                                                        rotatedValue = axis.rotationAngle + rotationIncrement |> max 0.0 |> min (2*pi)
+                                                        newAxis = { axis | rotationAngle = rotatedValue}
+                                                    in
+                                                        { activePanelEntry | zAxis = newAxis }
+
+                                                NoSectorMovement ->
+                                                        activePanelEntry
+                            m2 = Utils.updatePanelEntry activePanelEntry.expression (\_->updatedPanel) model
+                        in
+                            Utils.applyFunctionToPanelEntryWithExpression activePanelEntry.expression createUpdatedInstructions m2
+            in
+                m3
+
+computeMoveInfo : Model -> MouseEvent -> MouseEvent -> SectorMovement
 computeMoveInfo model mouseDown mouseUp =
     let
         _ = Debug.log "DOWN:" mouseDown
@@ -308,7 +356,7 @@ computeMoveInfo model mouseDown mouseUp =
                                 else SectorIncrementY -deltaMagnitude
         _ = Debug.log "Sector Movement" sectorMovement
     in
-        model
+        sectorMovement
 
 updatePanelEntryAutoRotate : Model -> PanelEntry -> AutoRotate -> Model
 updatePanelEntryAutoRotate model panelEntry autoRotateType =
@@ -782,7 +830,7 @@ subscriptions model =
                 every model.rotationSpeed (\_ -> AutoRotateActivePanel)
                 , Browser.Events.onMouseDown MouseDecoders.mouseDownDecoder
                 , Browser.Events.onMouseUp MouseDecoders.mouseUpDecoder
-                -- , mouseMoveSub
+                , mouseMoveSub
                 ]
     in
         Sub.batch subs
