@@ -305,7 +305,7 @@ processMouseTrackingEvent msg model mouseUpEvent =
 
                                                 NoSectorMovement ->
                                                         activePanelEntry
-                            m2 = Utils.updatePanelEntry activePanelEntry.expression (\_->updatedPanel) model
+                            m2 = Utils.updatePanelEntry activePanelEntry.expression (\_->updatedPanel) m1
                         in
                             Utils.applyFunctionToPanelEntryWithExpression activePanelEntry.expression createUpdatedInstructions m2
             in
@@ -825,10 +825,21 @@ subscriptions model =
                                             Sub.none
                                 _-> Sub.none
 
+        -- Only generate frequent auto-rotate messages if we are auto-rotating
+        autoRotateSub = case Utils.findActivePanelEntry model of
+                            Nothing ->
+                                Sub.none
+                            Just pe ->
+                                case pe.autoRotate of
+                                    NoAutoRotate -> 
+                                        Sub.none
+                                    _ ->
+                                        every model.rotationSpeed (\_ -> AutoRotateActivePanel)
+                                    
 
         -- TODO: If there is no active panel, skip the clock tick
         subs = [
-                every model.rotationSpeed (\_ -> AutoRotateActivePanel)
+                  autoRotateSub
                 , Browser.Events.onMouseDown MouseDecoders.mouseDownDecoder
                 , Browser.Events.onMouseUp MouseDecoders.mouseUpDecoder
                 , mouseMoveSub
