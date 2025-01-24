@@ -11,9 +11,8 @@ import Utils
 import Color exposing (Color)
 
 logEnabled = False
-
-strokeWidth =
-    0.006
+-- strokeWidth = 0.006
+strokeWidth = 0.06
 
 axisScalar = 1.0
 
@@ -179,7 +178,8 @@ projectAndPlotPoints model panelEntry lineSegments3d (xAxis, yAxis, zAxis) color
         [ 
             div [ Html.Attributes.class "svg-container" ]
                 [ svg
-                    [ Svg.Attributes.width "100%"
+                    [ Svg.Attributes.id "svg-parent"
+                    , Svg.Attributes.width "100%"
                     , Svg.Attributes.height "100%"
                     , viewBox viewboxAttribte
 

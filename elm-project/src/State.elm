@@ -20,10 +20,13 @@ import Json.Decode as Decode
 import Decoders.MouseDecoders as MouseDecoders
 import MouseEventModels exposing (..)
 import RuntimeEnvironmentModels exposing (..)
+import Browser.Dom
+import Task
 
 logEnabled = True
 
-defaultIncrementValue = 0.10 -- Low values can cause stack overflow in Elm debugger if you have it enabled
+-- defaultIncrementValue = 0.10 -- Low values can cause stack overflow in Elm debugger if you have it enabled
+defaultIncrementValue = 1.0 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
 -- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
 
@@ -37,6 +40,12 @@ defaultEndValue = pi
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg  of
+        ExamineElement id result ->
+            let
+                _ = Debug.log ("Element: " ++ id) result
+            in
+                (model, Cmd.none)
+
         MouseDown mouseEvent ->
             let
                 _ = Debug.log "Mouse down" mouseEvent
@@ -140,8 +149,12 @@ update msg model =
                 m1 = { model | activePlotEntry = Just panelEntry.expression }
                 m2 = recomputeFunctionValuesForAPanelAndModel panelEntry m1
                 m3 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m2
+
+                idToExamime = "right-size"
+                tsk = Browser.Dom.getElement idToExamime
+                examineCmd = Task.attempt (ExamineElement idToExamime) tsk
             in      
-                ( m3, Cmd.none )
+                ( m3, examineCmd )
 
         SetXAlignment panelEntry alignment ->
             let

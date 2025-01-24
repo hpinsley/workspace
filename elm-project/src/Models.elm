@@ -7,6 +7,7 @@ import Time
 import Html exposing (..)
 import Color exposing (Color)
 import MouseEventModels exposing (..)
+import Browser.Dom
 
 rotationMinValue = 0.0
 rotationMaxValue = 2*pi
@@ -94,6 +95,7 @@ type Msg
     | MouseDown MouseEvent
     | MouseUp MouseEvent
     | MouseMove MouseEvent
+    | ExamineElement String (Result Browser.Dom.Error Browser.Dom.Element)
 
 type alias SymbolTableEntry =
     { variable : Variable
