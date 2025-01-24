@@ -260,15 +260,16 @@ processMouseTrackingEvent msg model mouseUpEvent =
         
         Just activePanelEntry ->
             let
-                sectorMovement = case model.mouseDownEventInfo of
-                                    Nothing -> NoSectorMovement
-                                    Just mouseDownEvent ->
-                                            computeMoveInfo m1 mouseDownEvent mouseUpEvent
-
                 m1 = case msg of
                         MouseUp _ ->
                             {model | mouseDownEventInfo = Nothing }
                         _ -> model
+
+                sectorMovement = case m1.mouseDownEventInfo of
+                                    Nothing -> NoSectorMovement
+                                    Just mouseDownEvent ->
+                                            computeMoveInfo m1 mouseDownEvent mouseUpEvent
+
                 
                 fudge_factor = 1.4
                 rotationIncrement = case sectorMovement of
