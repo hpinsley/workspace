@@ -11,8 +11,7 @@ import Utils
 import Color exposing (Color)
 
 logEnabled = False
--- strokeWidth = 0.006
-strokeWidth = 0.06
+strokeWidth = 0.006
 
 axisScalar = 1.0
 

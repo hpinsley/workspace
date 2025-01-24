@@ -22,6 +22,7 @@ import MouseEventModels exposing (..)
 import RuntimeEnvironmentModels exposing (..)
 import Browser.Dom
 import Task
+import Browser exposing (element)
 
 logEnabled = True
 
@@ -37,14 +38,29 @@ defaultConstantValue = 1.0
 defaultStartValue = -pi
 defaultEndValue = pi
 
+right_side_id = "right-side"
+svg_parent_id = "svg-parent"
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg  of
         ExamineElement id result ->
             let
                 _ = Debug.log ("Element: " ++ id) result
+                m1 = case result of
+                        Ok element ->
+                            if (id == svg_parent_id)
+                                then
+                                    { model | svgParentElementInfo = Just element}
+                                else
+                                    model
+                        Err domError ->
+                            let
+                                _ = Debug.log "DOM ERROR" domError
+                            in
+                                model
             in
-                (model, Cmd.none)
+                (m1, Cmd.none)
 
         MouseDown mouseEvent ->
             let
@@ -150,7 +166,7 @@ update msg model =
                 m2 = recomputeFunctionValuesForAPanelAndModel panelEntry m1
                 m3 = Utils.applyFunctionToPanelEntryWithExpression panelEntry.expression createUpdatedInstructions m2
 
-                idToExamime = "right-size"
+                idToExamime = svg_parent_id -- I didn't think I would be able to find this in the DOM as it hasn't technically been rendered yet.  But it seems to work.  If it does not work, try instead right_side_id
                 tsk = Browser.Dom.getElement idToExamime
                 examineCmd = Task.attempt (ExamineElement idToExamime) tsk
             in      
@@ -816,6 +832,7 @@ init runtimeFlags =
                                 , maxBlue = 240
                             }
             , mouseDownEventInfo = Nothing
+            , svgParentElementInfo = Nothing
             }
     in
         ( inital_model, Cmd.none )
@@ -855,7 +872,7 @@ subscriptions model =
                   autoRotateSub
                 , Browser.Events.onMouseDown MouseDecoders.mouseDownDecoder
                 , Browser.Events.onMouseUp MouseDecoders.mouseUpDecoder
-                , mouseMoveSub
+                -- , mouseMoveSub
                 ]
     in
         Sub.batch subs

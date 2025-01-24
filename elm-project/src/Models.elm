@@ -166,4 +166,5 @@ type alias Model =
     , rotations: Float
     , shadingRange: ShadingRange
     , mouseDownEventInfo: Maybe MouseEvent
+    , svgParentElementInfo: Maybe Browser.Dom.Element
     }
