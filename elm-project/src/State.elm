@@ -60,8 +60,9 @@ update msg model =
         MouseDown mouseEvent ->
             let
                 _ = Debug.log "Mouse down" mouseEvent
+                maybeDownMouseEvent = if mouseEvent.target.id == svg_parent_id then Just mouseEvent else Nothing
             in
-                ( {model | mouseDownEventInfo = Just mouseEvent }, Cmd.none)
+                ( {model | mouseDownEventInfo = maybeDownMouseEvent }, Cmd.none)
 
         MouseUp mouseEvent ->
             (processMouseTrackingEvent msg model mouseEvent, Cmd.none)
