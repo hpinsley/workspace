@@ -21,8 +21,8 @@ import Browser exposing (element)
 
 logEnabled = True
 
--- defaultIncrementValue = 0.10 -- Low values can cause stack overflow in Elm debugger if you have it enabled
-defaultIncrementValue = 1.0 -- Low values can cause stack overflow in Elm debugger if you have it enabled
+defaultIncrementValue = 0.10 -- Low values can cause stack overflow in Elm debugger if you have it enabled
+-- defaultIncrementValue = 1.0 -- Low values can cause stack overflow in Elm debugger if you have it enabled
 
 -- defaultIncrementValue = 0.2 -- When you set webpack to include elm debugging
 
@@ -307,7 +307,7 @@ processMouseTrackingEventWithActivePanel activePanelEntry msg model mouseUpEvent
         moveAsPercentOfScreen = moveAmount / screenY
 
         rotationIncrement = (fudge_factor * moveAsPercentOfScreen) * (2*pi) + pi
-        
+
         _ = Debug.log "(moveAmount, screenY, moveAsPercentOfScreen)" (moveAmount, screenY, moveAsPercentOfScreen)
 
         m3 = let
