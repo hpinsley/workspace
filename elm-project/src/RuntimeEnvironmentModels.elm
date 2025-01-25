@@ -1,3 +1,5 @@
 module RuntimeEnvironmentModels exposing (..)
 
-type alias RuntimeEnvironment = { screenX: Int, screenY: Int }
+
+type alias RuntimeEnvironment =
+    { screenX : Int, screenY : Int }

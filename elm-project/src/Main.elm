@@ -5,10 +5,10 @@ module Main exposing (..)
 
 import Browser
 import Html exposing (..)
+import Json.Decode as Decode
 import Models exposing (..)
 import State
 import Views
-import Json.Decode as Decode
 
 
 main : Program Decode.Value Model Msg

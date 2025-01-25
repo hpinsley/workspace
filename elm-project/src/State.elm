@@ -1,15 +1,11 @@
 module State exposing (..)
 
-import Debug exposing (toString)
 import Dict
 import Evaluation.Engine exposing (..)
-import List exposing (reverse)
 import Models exposing (..)
-import Parser exposing (float)
 import Parsing.ExpressionModels exposing (..)
 import Parsing.ExpressionParsers as ExpressionParsers
 import Parsing.VariableExtraction exposing (extractVariablesFromExpression)
-import Set exposing (Set)
 import Time exposing (..)
 import Utils
 import Parser exposing (variable)
@@ -18,8 +14,7 @@ import Graphing.Plotter exposing (plot)
 import Browser.Events
 import Json.Decode as Decode
 import Decoders.MouseDecoders as MouseDecoders
-import MouseEventModels exposing (..)
-import RuntimeEnvironmentModels exposing (..)
+import MouseEventModels exposing (MouseEvent)
 import Browser.Dom
 import Task
 import Browser exposing (element)
@@ -277,68 +272,89 @@ update msg model =
                 ( m, Cmd.none)
 
 -- We call this when the mouse is down when the mouse up or move event happens.  We clear mouseDownEventInfo only on the MouseUp message
+processMouseTrackingEventWithActivePanel : PanelEntry -> Msg -> Model -> MouseEvent -> Model
+processMouseTrackingEventWithActivePanel activePanelEntry msg model mouseUpEvent =
+    let
+        m1 = case msg of
+                MouseUp _ ->
+                    {model | mouseDownEventInfo = Nothing }
+                _ -> model
+
+        movement = case m1.mouseDownEventInfo of
+                                    Nothing -> 
+                                        NoSectorMovement
+                                    Just mouseDownEvent ->
+                                        computeMoveInfo model mouseDownEvent mouseUpEvent
+        
+        _ = Debug.log "Movement" movement
+       
+        fudge_factor = 1.0
+        _ = Debug.log "(model.ScreenY, svgElementInfo)" (model.screenY, model.svgParentElementInfo)
+        
+        screenY = case model.svgParentElementInfo of
+                                    Just svgElementInfo -> 
+                                        svgElementInfo.element.height
+                                    Nothing -> 
+                                        toFloat model.screenY
+
+        _ = Debug.log "(msg, sectorMovement, screenY)" (msg, movement, screenY)
+        moveAmount = case movement of
+                                SectorIncrementX amount -> amount
+                                SectorIncrementY amount -> amount
+                                SectorIncrementZ amount -> amount
+                                NoSectorMovement -> 0.0
+
+        moveAsPercentOfScreen = moveAmount / screenY
+
+        rotationIncrement = (fudge_factor * moveAsPercentOfScreen) * (2*pi) + pi
+        
+        _ = Debug.log "(moveAmount, screenY, moveAsPercentOfScreen)" (moveAmount, screenY, moveAsPercentOfScreen)
+
+        m3 = let
+                    updatedPanel = case movement of
+                                        SectorIncrementX _ ->
+                                            let
+                                                axis = activePanelEntry.xAxis
+                                                rotatedValue = rotationIncrement |> max 0.0 |> min (2*pi)
+                                                newAxis = { axis | rotationAngle = rotatedValue}
+                                            in
+                                                { activePanelEntry | xAxis = newAxis }
+                                        
+                                        SectorIncrementY _ ->
+                                            let
+                                                axis = activePanelEntry.yAxis
+                                                rotatedValue = rotationIncrement |> max 0.0 |> min (2*pi)
+                                                newAxis = { axis | rotationAngle = rotatedValue}
+                                            in
+                                                { activePanelEntry | yAxis = newAxis }
+
+                                        SectorIncrementZ _ ->
+                                            let
+                                                axis = activePanelEntry.zAxis
+                                                rotatedValue = rotationIncrement |> max 0.0 |> min (2*pi)
+                                                newAxis = { axis | rotationAngle = rotatedValue}
+                                            in
+                                                { activePanelEntry | zAxis = newAxis }
+
+                                        NoSectorMovement ->
+                                                activePanelEntry
+                    m2 = Utils.updatePanelEntry activePanelEntry.expression (\_->updatedPanel) m1
+             in
+                    Utils.applyFunctionToPanelEntryWithExpression activePanelEntry.expression createUpdatedInstructions m2
+    in
+        m3
+
 processMouseTrackingEvent : Msg -> Model -> MouseEvent -> Model
-processMouseTrackingEvent msg model mouseUpEvent =
+processMouseTrackingEvent msg model mouseEvent =
     case Utils.findActivePanelEntry model of
         Nothing ->
-            -- If we get mouse down we stop tracking
             case msg of
                 MouseUp _ ->
                     {model | mouseDownEventInfo = Nothing }
                 _ -> model
         
         Just activePanelEntry ->
-            let
-                m1 = case msg of
-                        MouseUp _ ->
-                            {model | mouseDownEventInfo = Nothing }
-                        _ -> model
-
-                sectorMovement = case m1.mouseDownEventInfo of
-                                    Nothing -> NoSectorMovement
-                                    Just mouseDownEvent ->
-                                            computeMoveInfo m1 mouseDownEvent mouseUpEvent
-
-                
-                fudge_factor = 1.4
-                rotationIncrement = case sectorMovement of
-                                        SectorIncrementX amount -> (fudge_factor * amount / toFloat model.screenY) * 2*pi
-                                        SectorIncrementY amount -> (fudge_factor * amount / toFloat model.screenY) * 2*pi
-                                        SectorIncrementZ amount -> (fudge_factor * amount / toFloat model.screenY) * 2*pi
-                                        NoSectorMovement -> 0.0
-                m3 =    let
-                            updatedPanel = case sectorMovement of
-                                                SectorIncrementX _ ->
-                                                    let
-                                                        axis = activePanelEntry.xAxis
-                                                        rotatedValue = axis.rotationAngle + rotationIncrement |> max 0.0 |> min (2*pi)
-                                                        newAxis = { axis | rotationAngle = rotatedValue}
-                                                    in
-                                                        { activePanelEntry | xAxis = newAxis }
-                                                
-                                                SectorIncrementY _ ->
-                                                    let
-                                                        axis = activePanelEntry.yAxis
-                                                        rotatedValue = axis.rotationAngle + rotationIncrement |> max 0.0 |> min (2*pi)
-                                                        newAxis = { axis | rotationAngle = rotatedValue}
-                                                    in
-                                                        { activePanelEntry | yAxis = newAxis }
-
-                                                SectorIncrementZ _ ->
-                                                    let
-                                                        axis = activePanelEntry.zAxis
-                                                        rotatedValue = axis.rotationAngle + rotationIncrement |> max 0.0 |> min (2*pi)
-                                                        newAxis = { axis | rotationAngle = rotatedValue}
-                                                    in
-                                                        { activePanelEntry | zAxis = newAxis }
-
-                                                NoSectorMovement ->
-                                                        activePanelEntry
-                            m2 = Utils.updatePanelEntry activePanelEntry.expression (\_->updatedPanel) m1
-                        in
-                            Utils.applyFunctionToPanelEntryWithExpression activePanelEntry.expression createUpdatedInstructions m2
-            in
-                m3
+            processMouseTrackingEventWithActivePanel activePanelEntry msg model mouseEvent
 
 computeMoveInfo : Model -> MouseEvent -> MouseEvent -> SectorMovement
 computeMoveInfo model mouseDown mouseUp =
@@ -348,8 +364,8 @@ computeMoveInfo model mouseDown mouseUp =
 
         -- Y values on the screen increase downward, and I want to reverse that
         deltaVector = Vec2D 
-                            (toFloat (mouseUp.screenX - mouseDown.screenX))
-                            (toFloat (mouseUp.screenY - mouseDown.screenY) |> negate)
+                            (toFloat (mouseUp.offsetX - mouseDown.offsetX))
+                            (toFloat (mouseUp.offsetY - mouseDown.offsetY) |> negate)
         _ = Debug.log "Delta" deltaVector
         i = Utils.unitVectorI2D
         radiansFromI = Utils.getAngleBetweenTwo2DVectors i deltaVector |> Debug.log "Radians"
@@ -359,7 +375,7 @@ computeMoveInfo model mouseDown mouseUp =
         twopi = 2*pi
         adjustedRadians = (if deltaY >= 0.0 then radiansFromI else (-1.0 * radiansFromI + twopi)) |> Debug.log "Adjusted"
 
-        deltaMagnitude = Utils.magnitudeV2 deltaVector
+        deltaMagnitude = Utils.magnitudeV2 deltaVector |> Debug.log "Magnitude"
 
         -- Now we map the movement into 2pi/6 sectors.
         sectorSize = twopi / 6.0
@@ -374,7 +390,6 @@ computeMoveInfo model mouseDown mouseUp =
                             |> Maybe.map (\(secIndex, _, _) -> secIndex)
                             |> Debug.log "matchingSectorInfo"
 
-        sectorMovement: SectorMovement
         sectorMovement = case matchingSecIndex of
                             Nothing -> SectorIncrementX 0.0
                             Just sectorIndex ->
@@ -872,7 +887,7 @@ subscriptions model =
                   autoRotateSub
                 , Browser.Events.onMouseDown MouseDecoders.mouseDownDecoder
                 , Browser.Events.onMouseUp MouseDecoders.mouseUpDecoder
-                -- , mouseMoveSub
+                , mouseMoveSub
                 ]
     in
         Sub.batch subs

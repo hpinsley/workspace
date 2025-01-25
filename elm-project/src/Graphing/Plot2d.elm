@@ -32,17 +32,22 @@ plot2d model panelEntry lineSegments =
     let
         _ =
             Debug.log "Plot2D number of segments to plot" (List.length lineSegments)
-        _ = Debug.log "Segments to plot" lineSegments
 
-        (v1Points, v2Points) = lineSegments 
-                                    |> List.map (\(LineSeg2D from to) -> (from, to))
-                                    |> List.unzip
+        _ =
+            Debug.log "Segments to plot" lineSegments
+
+        ( v1Points, v2Points ) =
+            lineSegments
+                |> List.map (\(LineSeg2D from to) -> ( from, to ))
+                |> List.unzip
 
         -- (v1Points, v2Points) = lineSegments |> List.unzip
-        allPoints = List.append v1Points v2Points |> Debug.log "all points"
+        allPoints =
+            List.append v1Points v2Points |> Debug.log "all points"
 
         minX =
             List.minimum (List.map (\(Vec2D x _) -> x) allPoints) |> Maybe.withDefault 0.0
+
         maxX =
             List.maximum (List.map (\(Vec2D x _) -> x) allPoints) |> Maybe.withDefault 0.0
 
@@ -51,6 +56,7 @@ plot2d model panelEntry lineSegments =
 
         maxY =
             List.maximum (List.map (\(Vec2D _ y) -> y) allPoints) |> Maybe.withDefault 0.0
+
         xWidth =
             maxX - minX |> Debug.log "xWidth"
 
@@ -163,7 +169,7 @@ buildXAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> ( Strin
 buildXAxisPath minX maxX minY maxY yTransform =
     let
         points =
-            [ LineSeg2D (Vec2D minX 0.0) (Vec2D maxX 0.0)  ] |> Debug.log "x-axis-points"
+            [ LineSeg2D (Vec2D minX 0.0) (Vec2D maxX 0.0) ] |> Debug.log "x-axis-points"
 
         axisLine =
             build2DPathFromLineSegments yTransform points
@@ -178,7 +184,7 @@ buildYAxisPath : Float -> Float -> Float -> Float -> (Float -> Float) -> ( Strin
 buildYAxisPath minX maxX minY maxY yTransform =
     let
         points =
-            [ LineSeg2D (Vec2D 0.0 minY) (Vec2D 0.0 maxY)  ] |> Debug.log "y-axis-points"
+            [ LineSeg2D (Vec2D 0.0 minY) (Vec2D 0.0 maxY) ] |> Debug.log "y-axis-points"
 
         axisLine =
             build2DPathFromLineSegments yTransform points
@@ -323,20 +329,36 @@ adjustYValue : Float -> Float -> Float -> Float
 adjustYValue maxY minY y =
     (maxY + minY) - y
 
+
 build2DPathFromLineSegments : (Float -> Float) -> List TwoDLineSegment -> String
 build2DPathFromLineSegments yAdjust lineSegments =
-    lineSegments 
+    lineSegments
         |> List.map (build2DPathFromLineSegment yAdjust)
         |> String.join " "
-        -- |> Debug.log "2D Path"
+
+
+
+-- |> Debug.log "2D Path"
+
 
 build2DPathFromLineSegment : (Float -> Float) -> TwoDLineSegment -> String
 build2DPathFromLineSegment yAdjust lineSegment =
     let
-        (LineSeg2D from to) = lineSegment
-        (Vec2D xFrom yFrom) = from
-        (Vec2D xTo yTo) = to
+        (LineSeg2D from to) =
+            lineSegment
+
+        (Vec2D xFrom yFrom) =
+            from
+
+        (Vec2D xTo yTo) =
+            to
     in
-        "M " ++ String.fromFloat xFrom ++ "," ++ String.fromFloat (yAdjust yFrom) ++
-            " " ++ 
-        "L" ++ String.fromFloat xTo ++ "," ++ String.fromFloat (yAdjust yTo)
+    "M "
+        ++ String.fromFloat xFrom
+        ++ ","
+        ++ String.fromFloat (yAdjust yFrom)
+        ++ " "
+        ++ "L"
+        ++ String.fromFloat xTo
+        ++ ","
+        ++ String.fromFloat (yAdjust yTo)
