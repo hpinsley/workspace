@@ -4,7 +4,9 @@ $defaultPadding: 5px;
 $labelRightPadding: 5px;
 $tableHeaderColor: darkblue;
 $equationColor: darkgreen;
-$insetColor: tan;
+$insetColor: rgb(210, 180, 140);
+$activePanelColor: rgb(172, 172, 172, 0.5);
+$inactivePanelColor: rgba(172, 172, 172, 0.25);
 
 body {
     background-color: default;
@@ -47,11 +49,11 @@ div#parseErrors {
 }
 
 div#panel {
-    $backgroundColor: rgb(241, 238, 232);
+    $backgroundColor: $inactivePanelColor;
     font-size: 12pt;
     padding: $defaultPadding;
     background-color: $backgroundColor; // Changed background color to light gray
-    border: 5px inset $insetColor;
+    // border: 5px inset $insetColor;
     width: 25vw;
     height: 87vh;
     overflow-y: scroll;
@@ -68,6 +70,8 @@ div#panel {
 div.panel-entry {
     margin-top: 10px;
     padding: $defaultPadding;
+    border-radius: 5px;
+    border: 1px solid black;
 
     div#expression {
         font-weight: bold;
@@ -78,7 +82,7 @@ div.panel-entry {
         color: red;
     }
     &.active {
-        background-color: lightblue;
+        background-color: $activePanelColor;
     }
 }
 
@@ -124,7 +128,7 @@ div#plot {
     font-size: 10pt;
 
     div.svg-container {
-        border: 1px solid black;
+        // border: 1px solid black;
         height: 90vh;
         width: 70vw;
     }
