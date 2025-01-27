@@ -1,6 +1,8 @@
 # Some Sample Expressions #
 
     A*sin(W*x)*B*cos(V*y)
+    sin(A*x+B*y)
+    A*sin(V*x)+B*cos(W*x)
     cos(abs(W*x)+abs(V*y))*M*(abs(x)+abs(y))
     sin(W*cos(V*(x+y)))    
     cos(e^(sin(x^2+y^2)))
