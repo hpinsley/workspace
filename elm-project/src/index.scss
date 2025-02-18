@@ -1,6 +1,6 @@
 @use 'buttons';
 $backgroundColor: white;
-$defaultPadding: 1px;
+$defaultPadding: 0px;
 $labelRightPadding: 5px;
 $tableHeaderColor: darkblue;
 $equationColor: darkgreen;
@@ -8,7 +8,7 @@ $insetColor: rgb(210, 180, 140);
 $activePanelColor: rgb(172, 172, 172, 0.5);
 $inactivePanelColor: rgba(172, 172, 172, 0.25);
 
-$screenWidth: 100vw;
+$screenWidth: 96vw;
 $screenHeight: 96vh;
 $screenPadding: 0px;
 $screenMargin: 0px;
@@ -164,7 +164,7 @@ div#axes-info {
     div.axis-info {
         // float: left;
         display: block;
-        width: 120px;
+        // width: 120px;
 
         input[type=range] {
             width: 200px;
