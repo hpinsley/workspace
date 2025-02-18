@@ -44,8 +44,8 @@ viewPanelEntry model index panelEntry =
         , div [ id "panel-errors" ] [ getPanelEntryErrors panelEntry |> text ]
         , Button.text (Button.config |> Button.setOnClick (EvaluateExpression panelEntry.expression)) "Evaluate"
         , Button.text (Button.config |> Button.setOnClick (DeleteExpression panelEntry.expression)) "Delete"
-        , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         , Button.text (Button.config |> Button.setOnClick (Plot panelEntry)) "Plot"
+        , div [ id "evaluation" ] [ panelEntry.evaluation |> Maybe.map String.fromFloat |> Maybe.withDefault "" |> text ]
         , displayAxisInfo model panelEntry index
         , displayRotationSpeed model
         , displayViewportScaling panelEntry index
@@ -86,10 +86,10 @@ displayAxisInfo model panelEntry index =
             , panelEntrySingleAxisView model panelEntry panelEntry.zAxis (IncrementZAxisRotation panelEntry) (DecrementZAxisRotation panelEntry) (SetZAxisRotationValue panelEntry)
             , fieldset [ id "auto-rotate-fieldset" ]
                 [ legend [] [ text "Auto Rotation Setting" ]
-                , div [] [ createAutoRotateRadioButton panelEntry index "X" RotateX ]
-                , div [] [ createAutoRotateRadioButton panelEntry index "Y" RotateY ]
-                , div [] [ createAutoRotateRadioButton panelEntry index "Z" RotateZ ]
-                , div [] [ createAutoRotateRadioButton panelEntry index "None" NoAutoRotate ]
+                , createAutoRotateRadioButton panelEntry index "X" RotateX
+                , createAutoRotateRadioButton panelEntry index "Y" RotateY
+                , createAutoRotateRadioButton panelEntry index "Z" RotateZ
+                , createAutoRotateRadioButton panelEntry index "None" NoAutoRotate
                 ]
             ]
         ]

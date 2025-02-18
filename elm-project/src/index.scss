@@ -8,15 +8,16 @@ $insetColor: rgb(210, 180, 140);
 $activePanelColor: rgb(172, 172, 172, 0.5);
 $inactivePanelColor: rgba(172, 172, 172, 0.25);
 
-$screenWidth: 98vw;
+$screenWidth: 100vw;
 $screenHeight: 96vh;
 $screenPadding: 0px;
+$screenMargin: 0px;
 
-$viewPortScalingWidth: 24vw;
+$viewPortScalingWidth: 90%;
 $viewPortScalingHeight: 85px;
 
 $rightSideHeight: 95vh;
-$rightSideWidth: 60vw;
+$rightSideWidth: 68vw;
 $leftSideWidth: $screenWidth - $rightSideWidth;
 $panelHeight: 87vh;
 $panelWidth: $leftSideWidth;
@@ -35,6 +36,7 @@ div#screen {
     width: $screenWidth;
     height: $screenHeight;
     padding: $screenPadding;
+    margin: $screenMargin;
 }
 
 div#left-side {
@@ -84,7 +86,7 @@ div#panel {
 
 div.panel-entry {
     margin-bottom: 1px;
-    padding: $defaultPadding;
+    padding: 0px;
     border-radius: 5px;
     border: 1px solid black;
 
@@ -150,13 +152,9 @@ div#plot {
 }
 
 div#viewport-scaling {
-    width: $viewPortScalingWidth;
+    // width: $viewPortScalingWidth;
     height: $viewPortScalingHeight;
     display: flex;
-    fieldset {
-        display: block;
-        width: 100px;
-    }
     font-size: 8pt;
 }
 
@@ -189,8 +187,8 @@ fieldset#rotation-speed {
     }
 }
 
-fieldset#auto-rotate-fieldset div {
-    float: left;
+fieldset#auto-rotate-fieldset {
+    display: flex;
 }
 
 fieldset#rotation-speed {
