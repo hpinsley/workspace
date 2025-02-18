@@ -71,7 +71,7 @@ div#panel {
     padding: $defaultPadding;
     background-color: $backgroundColor; // Changed background color to light gray
     // border: 5px inset $insetColor;
-    width: $panelWidth;
+    // width: $panelWidth;
     height: $panelHeight;
     overflow-y: auto;
 
@@ -104,7 +104,7 @@ div.panel-entry {
 }
 
 div#variables {
-    width: 500px;
+    // width: 500px;
     margin-top: 10px;
     font-size: 8pt;
 
@@ -160,7 +160,7 @@ div#viewport-scaling {
 
 div#axes-info {
     font-size: 8pt;
-    width: 400px;
+    // width: 400px;
     div.axis-info {
         // float: left;
         display: block;
@@ -194,7 +194,6 @@ fieldset#auto-rotate-fieldset {
 fieldset#rotation-speed {
     margin-top: 6px;
     font-size: 8pt;
-    width: 88%;
 }
 
 svg path {
