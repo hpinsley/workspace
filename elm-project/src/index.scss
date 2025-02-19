@@ -19,7 +19,7 @@ $viewPortScalingHeight: 85px;
 $rightSideHeight: 95vh;
 $rightSideWidth: 68vw;
 $leftSideWidth: $screenWidth - $rightSideWidth;
-$panelHeight: 87vh;
+$panelHeight: 90vh;
 $panelWidth: $leftSideWidth;
 
 body {
@@ -46,6 +46,11 @@ div#left-side {
     font-family: Arial, Helvetica, sans-serif;
     padding: $defaultPadding;
     background-color: $backgroundColor; // Changed background color to light gray
+
+    div#left-top {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
 }
 
 div#right-side {
@@ -85,8 +90,8 @@ div#panel {
 }
 
 div.panel-entry {
-    margin-bottom: 1px;
-    padding: 0px;
+    margin-bottom: 10px;
+    padding: 3px;
     border-radius: 5px;
     border: 1px solid black;
 
