@@ -43,10 +43,13 @@ leftSide : Model -> Html Msg
 leftSide model =
     div
         [ id "left-side" ]
-        [ label [] [ text "Expression" ]
-        , input [ id "expression-input", title "Expression", onInput UpdateExpression, value (Maybe.withDefault "" model.expression) ] []
-        , Button.text (Button.config |> Button.setOnClick AddToPanel |> Button.setDisabled (isValidExpression model |> not)) "Add to Panel"
-        , div [ id "parseErrors" ] [ text model.parseErrors ]
+        [ div [id "left-top"] 
+            [
+                  label [] [ text "Expression" ]
+                , input [ id "expression-input", title "Expression", onInput UpdateExpression, value (Maybe.withDefault "" model.expression) ] []
+                , Button.text (Button.config |> Button.setOnClick AddToPanel |> Button.setDisabled (isValidExpression model |> not)) "Add to Panel"
+                , div [ id "parseErrors" ] [ text model.parseErrors ]
+            ]
         , viewPanel model
         , div [ id "time" ]
             [ getFormattedTime model.currentTime |> text
