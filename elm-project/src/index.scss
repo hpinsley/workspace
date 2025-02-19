@@ -179,6 +179,11 @@ button.inc-button {
 }
 
 fieldset#rotation-speed {
+    display: inline-grid;
+    grid-template-columns: auto;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    grid-template-rows: auto; /* Rows will adjust based on content */
+    gap: 0px; /* Space between grid items */
     font-size: 8pt;
     margin-top: 8px;
     button {
