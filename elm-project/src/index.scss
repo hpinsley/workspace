@@ -167,19 +167,19 @@ div#plot {
     position: relative; // Position relative for the pseudo-element
     padding: 0px; // Add padding to create space for the frame
 
-    // Create a wooden frame effect using a pseudo-element
-    // &:before {
-    //     content: '';
-    //     position: absolute;
-    //     top: -10px; // Extend above the div
-    //     left: -10px; // Extend to the left
-    //     right: -10px; // Extend to the right
-    //     bottom: -10px; // Extend below the div
-    //     border: 10px solid transparent; // Transparent border for the gradient effect
-    //     background: linear-gradient(to right, #8B4513, #A0522D); // Wood-like gradient
-    //     z-index: -1; // Place behind the main div
-    //     border-radius: 5px; // Optional: rounded corners
-    // }
+    Create a wooden frame effect using a pseudo-element
+    &:before {
+        content: '';
+        position: absolute;
+        top: -10px; // Extend above the div
+        left: -10px; // Extend to the left
+        right: -10px; // Extend to the right
+        bottom: -10px; // Extend below the div
+        border: 10px solid transparent; // Transparent border for the gradient effect
+        background: linear-gradient(to right, #8B4513, #A0522D); // Wood-like gradient
+        z-index: -1; // Place behind the main div
+        border-radius: 5px; // Optional: rounded corners
+    }
 
     div.svg-container {
         height: 90vh;
