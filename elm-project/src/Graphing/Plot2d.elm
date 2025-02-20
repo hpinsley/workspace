@@ -89,7 +89,7 @@ plot2d model panelEntry lineSegments =
             [ Svg.path
                 [ Svg.Attributes.d functionPath
                 , Svg.Attributes.fill "none"
-                , Svg.Attributes.stroke "black"
+                , Svg.Attributes.stroke "white"
                 , Svg.Attributes.strokeWidth "0.01"
                 ]
                 []
@@ -113,8 +113,8 @@ plot2d model panelEntry lineSegments =
     in
     div
         [ Html.Attributes.id "plot-2d" ]
-        [ Html.text "2D Plot"
-        , div [ Html.Attributes.class "svg-container" ]
+        [ 
+          div [ Html.Attributes.class "svg-container" ]
             [ svg
                 [ Svg.Attributes.width "100%"
                 , Svg.Attributes.height "100%"
@@ -249,6 +249,7 @@ buildYAxisTickMarks xMin xMax yMin yMax yTransform =
                             [ Svg.Attributes.x (String.fromFloat xLoc)
                             , Svg.Attributes.y (String.fromFloat yLoc)
                             , Svg.Attributes.fontSize "0.1"
+                            , Svg.Attributes.fill "white"
                             , Svg.Attributes.alignmentBaseline "middle"
                             ]
                             [ Svg.text (String.fromFloat y)
@@ -314,6 +315,7 @@ buildXAxisTickMarks xMin xMax yMin yMax yTransform =
                             [ Svg.Attributes.x (String.fromFloat xLoc)
                             , Svg.Attributes.y (String.fromFloat yLoc)
                             , Svg.Attributes.fontSize "0.1"
+                            , Svg.Attributes.fill "white"
                             , Svg.Attributes.alignmentBaseline "middle"
                             ]
                             [ Svg.text (String.fromFloat x)

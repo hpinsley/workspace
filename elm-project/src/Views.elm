@@ -43,10 +43,13 @@ leftSide : Model -> Html Msg
 leftSide model =
     div
         [ id "left-side" ]
-        [ label [] [ text "Expression" ]
-        , input [ id "expression-input", title "Expression", onInput UpdateExpression, value (Maybe.withDefault "" model.expression) ] []
-        , Button.text (Button.config |> Button.setOnClick AddToPanel |> Button.setDisabled (isValidExpression model |> not)) "Add to Panel"
-        , div [ id "parseErrors" ] [ text model.parseErrors ]
+        [ div [id "left-top"] 
+            [
+                  label [] [ text "Expression" ]
+                , input [ id "expression-input", title "Expression", onInput UpdateExpression, value (Maybe.withDefault "" model.expression) ] []
+                , Button.text (Button.config |> Button.setOnClick AddToPanel |> Button.setDisabled (isValidExpression model |> not)) "Add to Panel"
+                , div [ id "parseErrors" ] [ text model.parseErrors ]
+            ]
         , viewPanel model
         , div [ id "time" ]
             [ getFormattedTime model.currentTime |> text
@@ -59,8 +62,8 @@ rightSide model =
     div
         [ id "right-side"
         ]
-        [ h1 []
-            [ case Utils.findActivePanelEntry model of
+        [ 
+             case Utils.findActivePanelEntry model of
                 Just activePanelEntry ->
                     activePanelEntry.currentPlot
 
@@ -71,7 +74,7 @@ rightSide model =
 
                         -- , displayMouseInfo model
                         ]
-            ]
+            
         ]
 
 

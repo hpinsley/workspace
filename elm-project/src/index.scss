@@ -1,24 +1,35 @@
 @use 'buttons';
 $backgroundColor: white;
-$defaultPadding: 1px;
+$color: black;
+$defaultPadding: 0px;
 $labelRightPadding: 5px;
 $tableHeaderColor: darkblue;
 $equationColor: darkgreen;
-$insetColor: rgb(210, 180, 140);
-$activePanelColor: rgb(172, 172, 172, 0.5);
-$inactivePanelColor: rgba(172, 172, 172, 0.25);
+$panelColor: rgb(219, 233, 234);
+$activePanelColor: #88b7b2;
+$inactivePanelColor: rgb(210, 180, 140);
+$leftBackgroundColor: $activePanelColor;
 
-$screenWidth: 98vw;
+// Light Blue: #ADD8E6 (Light Blue)
+// Sky Blue: #87CEEB (Sky Blue)
+// Teal: #008080 (Teal)
+// Turquoise: #40E0D0 (Turquoise)
+
+$screenWidth: 96vw;
 $screenHeight: 96vh;
-$screenPadding: 5px;
+$screenPadding: 0px;
+$screenMargin: 0px;
 
-$panelHeight: 87vh;
-$panelWidth: 30vw;
-$viewPortScalingWidth: 24vw;
+$viewPortScalingWidth: 90%;
 $viewPortScalingHeight: 85px;
 
-$rightSideHeight: 95vh;
-$rightSideWidth: 60vw;
+$rightSideHeight: $screenHeight;
+$leftSideHeight: $screenHeight;
+
+$rightSideWidth: 68vw;
+$leftSideWidth: $screenWidth - $rightSideWidth;
+$panelHeight: 90vh;
+$panelWidth: $leftSideWidth;
 
 body {
     background-color: default;
@@ -30,27 +41,36 @@ label {
 
 div#screen {
     // border: 1px solid green;
+    position: relative;
+    z-index: 0;
+    display: flex;
     width: $screenWidth;
     height: $screenHeight;
     padding: $screenPadding;
+    margin: $screenMargin;
+    background-color: $backgroundColor;
+    color: $color;
 }
 
 div#left-side {
-    float: left;
-    background-color: blue;
+    width: $leftSideWidth;
+    background-color: $leftBackgroundColor;
     font-family: Arial, Helvetica, sans-serif;
     padding: $defaultPadding;
-    background-color: $backgroundColor; // Changed background color to light gray
+
+    div#left-top {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
 }
 
 div#right-side {
-    // border: 1px solid blue;
+    margin-left: 10px;
     height: $rightSideHeight;
     width: $rightSideWidth;
-    float: left;
     font-family: Arial, Helvetica, sans-serif;
     padding: $defaultPadding;
-    background-color: $backgroundColor; // Changed background color to light gray
+    background-color: transparent; // Changed background color to light gray
 }
 
 input#expression-input {
@@ -62,12 +82,11 @@ div#parseErrors {
 }
 
 div#panel {
-    $backgroundColor: $inactivePanelColor;
+    $backgroundColor: $panelColor;
     font-size: 12pt;
     padding: $defaultPadding;
-    background-color: $backgroundColor; // Changed background color to light gray
-    // border: 5px inset $insetColor;
-    width: $panelWidth;
+    background-color: $panelColor; // Changed background color to light gray
+    color: $color;
     height: $panelHeight;
     overflow-y: auto;
 
@@ -81,10 +100,12 @@ div#panel {
 }
 
 div.panel-entry {
-    margin-bottom: 1px;
-    padding: $defaultPadding;
-    border-radius: 5px;
-    border: 1px solid black;
+    margin-bottom: 10px;
+    padding: 3px;
+    // border-radius: 5px;
+    // border: 1px solid black;
+    background-color: $inactivePanelColor;
+    color: $color;
 
     div#expression {
         font-weight: bold;
@@ -100,7 +121,7 @@ div.panel-entry {
 }
 
 div#variables {
-    width: 500px;
+    // width: 500px;
     margin-top: 10px;
     font-size: 8pt;
 
@@ -139,33 +160,43 @@ div#variables {
 
 div#plot {
     font-size: 10pt;
+    background-color: black; // Keep the background color black
+    position: relative; // Position relative for the pseudo-element
+    padding: 0px; // Add padding to create space for the frame
+
+    // Create a wooden frame effect using a pseudo-element
+    &:before {
+        content: '';
+        position: absolute;
+        top: -10px; // Extend above the div
+        left: -10px; // Extend to the left
+        right: -10px; // Extend to the right
+        bottom: -10px; // Extend below the div
+        border: 10px solid transparent; // Transparent border for the gradient effect
+        background: linear-gradient(to right, #8B4513, #A0522D); // Wood-like gradient
+        z-index: -1; // Place behind the main div
+        border-radius: 5px; // Optional: rounded corners
+    }
 
     div.svg-container {
-        // border: 1px solid black;
         height: 90vh;
-        width: 70vw;
     }
 }
 
 div#viewport-scaling {
-    width: $viewPortScalingWidth;
+    // width: $viewPortScalingWidth;
     height: $viewPortScalingHeight;
-    // border: 1px solid red;
-    fieldset {
-        display: block;
-        float: left;
-        width: 100px;
-    }
+    display: flex;
     font-size: 8pt;
 }
 
 div#axes-info {
     font-size: 8pt;
-    width: 400px;
+    // width: 400px;
     div.axis-info {
         // float: left;
         display: block;
-        width: 120px;
+        // width: 120px;
 
         input[type=range] {
             width: 200px;
@@ -180,22 +211,28 @@ button.inc-button {
 }
 
 fieldset#rotation-speed {
+    display: inline-grid;
+    grid-template-columns: auto;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    grid-template-rows: auto; /* Rows will adjust based on content */
+    gap: 0px; /* Space between grid items */
     font-size: 8pt;
+
     margin-top: 8px;
     button {
         margin-left: 8px;
         font-size: 8pt;
+        height: 20px;
     }
 }
 
-fieldset#auto-rotate-fieldset div {
-    float: left;
+fieldset#auto-rotate-fieldset {
+    display: flex;
 }
 
 fieldset#rotation-speed {
     margin-top: 6px;
     font-size: 8pt;
-    width: 88%;
 }
 
 svg path {
