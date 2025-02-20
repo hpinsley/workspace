@@ -18,6 +18,7 @@ import MouseEventModels exposing (MouseEvent)
 import Browser.Dom
 import Task
 import Browser exposing (element)
+import Platform.Cmd as Cmd
 
 logEnabled = True
 
@@ -271,6 +272,9 @@ update msg model =
                 m = setAxisRotationValue model panelEntry panelEntry.zAxis value (\pe axis -> { pe | zAxis = axis })
             in
                 ( m, Cmd.none)
+
+        ShowHelp displayHelp ->
+            ({ model | displayHelp = displayHelp }, Cmd.none)
 
 -- We call this when the mouse is down when the mouse up or move event happens.  We clear mouseDownEventInfo only on the MouseUp message
 processMouseTrackingEventWithActivePanel : PanelEntry -> Msg -> Model -> MouseEvent -> Model
@@ -849,6 +853,7 @@ init runtimeFlags =
                             }
             , mouseDownEventInfo = Nothing
             , svgParentElementInfo = Nothing
+            , displayHelp = False
             }
     in
         ( inital_model, Cmd.none )

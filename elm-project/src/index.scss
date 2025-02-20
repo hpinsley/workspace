@@ -52,6 +52,10 @@ div#screen {
     color: $color;
 }
 
+div#help-page {
+    font-size: 30pt;
+}
+
 div#left-side {
     width: $leftSideWidth;
     background-color: $leftBackgroundColor;
@@ -62,19 +66,8 @@ div#left-side {
         padding-left: 5px;
         padding-right: 5px;
 
-        span#help {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            font-size:18pt;
+        button#help-btn {
             font-weight: bold;
-            background-color: brown;
-            border: 1px solid black;
-            border-radius: 10px;
-            text-align: center;
-            &:hover {
-                background-color: gray;
-            }
         }
     }
 }

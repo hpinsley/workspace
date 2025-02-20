@@ -8,6 +8,7 @@ import Matrix exposing (..)
 import MouseEventModels exposing (MouseEvent)
 import Parsing.ExpressionModels exposing (Expression, Variable)
 import Time
+import Json.Decode exposing (bool)
 
 
 rotationMinValue =
@@ -135,7 +136,7 @@ type Msg
     | MouseUp MouseEvent
     | MouseMove MouseEvent
     | ExamineElement String (Result Browser.Dom.Error Browser.Dom.Element)
-
+    | ShowHelp Bool
 
 type alias SymbolTableEntry =
     { variable : Variable
@@ -210,4 +211,5 @@ type alias Model =
     , shadingRange : ShadingRange
     , mouseDownEventInfo : Maybe MouseEvent
     , svgParentElementInfo : Maybe Browser.Dom.Element
+    , displayHelp : Bool
     }

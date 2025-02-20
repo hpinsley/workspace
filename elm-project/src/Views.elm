@@ -15,9 +15,18 @@ view : Model -> Html Msg
 view model =
     div [ id "screen" ]
         [ leftSide model
+        , displayHelp model
         , rightSide model
         ]
 
+displayHelp: Model -> Html Msg
+displayHelp model =
+    if model.displayHelp then 
+        div [id "help-page"][
+            text "Enter a mathematical equation.  I can plot functions of either one (e.g of x) or two (e.g. of x and y) independent variables."
+        ]
+    else
+        text ""
 
 getFormattedTime : Maybe Time.Posix -> String
 getFormattedTime timeInfo =
@@ -48,7 +57,7 @@ leftSide model =
                   label [] [ text "Expression" ]
                 , input [ id "expression-input", title "Expression", onInput UpdateExpression, value (Maybe.withDefault "" model.expression) ] []
                 , Button.text (Button.config |> Button.setOnClick AddToPanel |> Button.setDisabled (isValidExpression model |> not)) "Add to Panel"
-                , span [id "help", title getHelp ][text "?"]
+                , button [id "help-btn", onClick (ShowHelp True)] [text "?"]
                 , div [ id "parseErrors" ] [ text model.parseErrors ]
             ]
         , viewPanel model
@@ -57,16 +66,12 @@ leftSide model =
             ]
         ]
 
-getHelp: String
-getHelp = 
-    "Enter a mathematical equation.  I can plot functions of either one (e.g of x) or two (e.g. of x and y) independent variables."
-
 rightSide : Model -> Html Msg
 rightSide model =
     div
         [ id "right-side"
         ]
-        [ 
+        [
              case Utils.findActivePanelEntry model of
                 Just activePanelEntry ->
                     activePanelEntry.currentPlot
