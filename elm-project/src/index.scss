@@ -61,6 +61,21 @@ div#left-side {
     div#left-top {
         padding-left: 5px;
         padding-right: 5px;
+
+        span#help {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            font-size:18pt;
+            font-weight: bold;
+            background-color: brown;
+            border: 1px solid black;
+            border-radius: 10px;
+            text-align: center;
+            &:hover {
+                background-color: gray;
+            }
+        }
     }
 }
 
