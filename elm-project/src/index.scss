@@ -5,11 +5,10 @@ $defaultPadding: 0px;
 $labelRightPadding: 5px;
 $tableHeaderColor: darkblue;
 $equationColor: darkgreen;
-$insetColor: rgb(210, 180, 140);
-$activePanelColor: rgb(172, 172, 172, 0.5);
-$leftBackgroundColor: #ADD9E6;
-$panelColor: #87CEEB;
-$inactivePanelColor: $panelColor;
+$panelColor: rgb(219, 233, 234);
+$activePanelColor: #88b7b2;
+$inactivePanelColor: rgb(210, 180, 140);
+$leftBackgroundColor: $activePanelColor;
 
 // Light Blue: #ADD8E6 (Light Blue)
 // Sky Blue: #87CEEB (Sky Blue)
@@ -83,13 +82,11 @@ div#parseErrors {
 }
 
 div#panel {
-    $backgroundColor: $inactivePanelColor;
+    $backgroundColor: $panelColor;
     font-size: 12pt;
     padding: $defaultPadding;
-    background-color: $backgroundColor; // Changed background color to light gray
+    background-color: $panelColor; // Changed background color to light gray
     color: $color;
-    // border: 5px inset $insetColor;
-    // width: $panelWidth;
     height: $panelHeight;
     overflow-y: auto;
 
@@ -105,9 +102,9 @@ div#panel {
 div.panel-entry {
     margin-bottom: 10px;
     padding: 3px;
-    border-radius: 5px;
-    border: 1px solid black;
-    background-color: $backgroundColor;
+    // border-radius: 5px;
+    // border: 1px solid black;
+    background-color: $inactivePanelColor;
     color: $color;
 
     div#expression {
