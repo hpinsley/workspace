@@ -62,8 +62,8 @@ rightSide model =
     div
         [ id "right-side"
         ]
-        [ h1 []
-            [ case Utils.findActivePanelEntry model of
+        [ 
+             case Utils.findActivePanelEntry model of
                 Just activePanelEntry ->
                     activePanelEntry.currentPlot
 
@@ -74,7 +74,7 @@ rightSide model =
 
                         -- , displayMouseInfo model
                         ]
-            ]
+            
         ]
 
 
