@@ -167,7 +167,7 @@ div#plot {
     position: relative; // Position relative for the pseudo-element
     padding: 0px; // Add padding to create space for the frame
 
-    Create a wooden frame effect using a pseudo-element
+    // Create a wooden frame effect using a pseudo-element
     &:before {
         content: '';
         position: absolute;
@@ -183,7 +183,6 @@ div#plot {
 
     div.svg-container {
         height: 90vh;
-        // width: 70vw;
     }
 }
 
