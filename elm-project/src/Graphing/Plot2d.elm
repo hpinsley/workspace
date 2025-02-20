@@ -249,6 +249,7 @@ buildYAxisTickMarks xMin xMax yMin yMax yTransform =
                             [ Svg.Attributes.x (String.fromFloat xLoc)
                             , Svg.Attributes.y (String.fromFloat yLoc)
                             , Svg.Attributes.fontSize "0.1"
+                            , Svg.Attributes.fill "white"
                             , Svg.Attributes.alignmentBaseline "middle"
                             ]
                             [ Svg.text (String.fromFloat y)
@@ -314,7 +315,7 @@ buildXAxisTickMarks xMin xMax yMin yMax yTransform =
                             [ Svg.Attributes.x (String.fromFloat xLoc)
                             , Svg.Attributes.y (String.fromFloat yLoc)
                             , Svg.Attributes.fontSize "0.1"
-                            , Svg.Attributes.color "white"
+                            , Svg.Attributes.fill "white"
                             , Svg.Attributes.alignmentBaseline "middle"
                             ]
                             [ Svg.text (String.fromFloat x)
