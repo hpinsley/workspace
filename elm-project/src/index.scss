@@ -7,7 +7,14 @@ $tableHeaderColor: darkblue;
 $equationColor: darkgreen;
 $insetColor: rgb(210, 180, 140);
 $activePanelColor: rgb(172, 172, 172, 0.5);
-$inactivePanelColor: $backgroundColor;
+$leftBackgroundColor: #ADD9E6;
+$panelColor: #87CEEB;
+$inactivePanelColor: $panelColor;
+
+// Light Blue: #ADD8E6 (Light Blue)
+// Sky Blue: #87CEEB (Sky Blue)
+// Teal: #008080 (Teal)
+// Turquoise: #40E0D0 (Turquoise)
 
 $screenWidth: 96vw;
 $screenHeight: 96vh;
@@ -48,7 +55,7 @@ div#screen {
 
 div#left-side {
     width: $leftSideWidth;
-    background-color: $backgroundColor;
+    background-color: $leftBackgroundColor;
     font-family: Arial, Helvetica, sans-serif;
     padding: $defaultPadding;
 
