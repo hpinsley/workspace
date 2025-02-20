@@ -66,13 +66,12 @@ div#left-side {
 }
 
 div#right-side {
-    margin-left: 20px;
+    margin-left: 10px;
     height: $rightSideHeight;
     width: $rightSideWidth;
     font-family: Arial, Helvetica, sans-serif;
     padding: $defaultPadding;
     background-color: transparent; // Changed background color to light gray
-    border: 1px solid green;
 }
 
 input#expression-input {
@@ -166,21 +165,21 @@ div#plot {
     font-size: 10pt;
     background-color: black; // Keep the background color black
     position: relative; // Position relative for the pseudo-element
-    padding: 20px; // Add padding to create space for the frame
+    padding: 0px; // Add padding to create space for the frame
 
     // Create a wooden frame effect using a pseudo-element
-    &:before {
-        content: '';
-        position: absolute;
-        top: -10px; // Extend above the div
-        left: -10px; // Extend to the left
-        right: -10px; // Extend to the right
-        bottom: -10px; // Extend below the div
-        border: 10px solid transparent; // Transparent border for the gradient effect
-        background: linear-gradient(to right, #8B4513, #A0522D); // Wood-like gradient
-        z-index: -1; // Place behind the main div
-        border-radius: 5px; // Optional: rounded corners
-    }
+    // &:before {
+    //     content: '';
+    //     position: absolute;
+    //     top: -10px; // Extend above the div
+    //     left: -10px; // Extend to the left
+    //     right: -10px; // Extend to the right
+    //     bottom: -10px; // Extend below the div
+    //     border: 10px solid transparent; // Transparent border for the gradient effect
+    //     background: linear-gradient(to right, #8B4513, #A0522D); // Wood-like gradient
+    //     z-index: -1; // Place behind the main div
+    //     border-radius: 5px; // Optional: rounded corners
+    // }
 
     div.svg-container {
         height: 90vh;
