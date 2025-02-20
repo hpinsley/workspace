@@ -35,6 +35,8 @@ label {
 
 div#screen {
     // border: 1px solid green;
+    position: relative;
+    z-index: 0;
     display: flex;
     width: $screenWidth;
     height: $screenHeight;
@@ -62,7 +64,8 @@ div#right-side {
     width: $rightSideWidth;
     font-family: Arial, Helvetica, sans-serif;
     padding: $defaultPadding;
-    background-color: $backgroundColor; // Changed background color to light gray
+    background-color: transparent; // Changed background color to light gray
+    border: 1px solid green;
 }
 
 input#expression-input {
