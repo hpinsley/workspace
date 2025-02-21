@@ -11,8 +11,8 @@ import Utils
 displayHelp: Model -> Html Msg
 displayHelp model =
     div [id "help-page"][
-          displayHelpText model
-        , displayHelpActions model
+          displayHelpActions model
+        , displayHelpText model
     ]
 
 displayHelpActions: Model -> Html Msg
@@ -25,16 +25,13 @@ displayHelpText: Model -> Html Msg
 displayHelpText model =
     div [id "help-text"]
     [
-        text """
-            This application allows you to enter a mathematical equation and plot the results.
-            Most common math functions are supported (e.g. sin, cos, tan, ln, abs).
-            
-            If you enter
-            a one-variable function (generally with independent variable lowercase x) you will get a
-            2-dimensional plot with an x and y axis.alias.alias
-
-            Sample: You enter sin(x).  This will create a 2-dimensional plot (assuming a y axis as the representation of the dependent variable)
-        ]
-            If you enter
-            """
+          img [src "assets/sample-3d-input.png"][]
+        , p [][text "This application allows you to enter a mathematical equation and plot the results.  Most common math functions are supported."]
+        , div [class "code-block"] [text "(e.g. sin, cos, tan, ln, abs)"]
+        , h2 [][text "One Variable Functions"]
+        , text "If you enter a one-variable function (generally with independent variable lowercase x) you will get a 2-dimensional plot with an x and y axis"
+        , text "Here is an example:"
+        , div [class "code-block"][text "sin(x)"]
+        , text "This will create a 2-dimensional plot (assuming a y axis as the representation of the dependent variable)."
+        , h2 [][text "Two Variable Functions"]
     ]
