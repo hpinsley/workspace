@@ -11,12 +11,30 @@ import Utils
 displayHelp: Model -> Html Msg
 displayHelp model =
     div [id "help-page"][
-        text "Hey! Enter a mathematical equation.  I can plot functions of either one (e.g of x) or two (e.g. of x and y) independent variables."
+          displayHelpText model
         , displayHelpActions model
     ]
 
 displayHelpActions: Model -> Html Msg
 displayHelpActions model =
     div [id "help-actions"][
-        button [onClick (ShowHelp False)][text "Close Help"]
+        Button.text (Button.config |> Button.setOnClick (ShowHelp False)) "Close Help"
+    ]
+
+displayHelpText: Model -> Html Msg
+displayHelpText model =
+    div [id "help-text"]
+    [
+        text """
+            This application allows you to enter a mathematical equation and plot the results.
+            Most common math functions are supported (e.g. sin, cos, tan, ln, abs).
+            
+            If you enter
+            a one-variable function (generally with independent variable lowercase x) you will get a
+            2-dimensional plot with an x and y axis.alias.alias
+
+            Sample: You enter sin(x).  This will create a 2-dimensional plot (assuming a y axis as the representation of the dependent variable)
+        ]
+            If you enter
+            """
     ]
