@@ -25,7 +25,7 @@ displayHelpText: Model -> Html Msg
 displayHelpText model =
     div [id "help-text"]
     [
-          img [src "assets/sample-3d-input.png"][]
+          img [src "assets/images/sample-3d-input.png"][]
         , p [][text "This application allows you to enter a mathematical equation and plot the results.  Most common math functions are supported."]
         , div [class "code-block"] [text "(e.g. sin, cos, tan, ln, abs)"]
         , h2 [][text "One Variable Functions"]

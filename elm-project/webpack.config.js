@@ -70,6 +70,10 @@ module.exports = {
             debug: USE_ELM_DEBUGGER,
           }
         }]
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        type: 'asset/resource',
       }
     ]
   },
