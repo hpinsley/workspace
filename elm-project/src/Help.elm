@@ -12,5 +12,11 @@ displayHelp: Model -> Html Msg
 displayHelp model =
     div [id "help-page"][
         text "Hey! Enter a mathematical equation.  I can plot functions of either one (e.g of x) or two (e.g. of x and y) independent variables."
+        , displayHelpActions model
     ]
 
+displayHelpActions: Model -> Html Msg
+displayHelpActions model =
+    div [id "help-actions"][
+        button [onClick (ShowHelp False)][text "Close Help"]
+    ]
