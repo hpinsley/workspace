@@ -15,18 +15,14 @@ view : Model -> Html Msg
 view model =
     div [ id "screen" ]
         [ leftSide model
-        , displayHelp model
         , rightSide model
         ]
 
 displayHelp: Model -> Html Msg
 displayHelp model =
-    if model.displayHelp then 
-        div [id "help-page"][
-            text "Enter a mathematical equation.  I can plot functions of either one (e.g of x) or two (e.g. of x and y) independent variables."
-        ]
-    else
-        text ""
+    div [id "help-page"][
+        text "Enter a mathematical equation.  I can plot functions of either one (e.g of x) or two (e.g. of x and y) independent variables."
+    ]
 
 getFormattedTime : Maybe Time.Posix -> String
 getFormattedTime timeInfo =
@@ -72,19 +68,27 @@ rightSide model =
         [ id "right-side"
         ]
         [
-             case Utils.findActivePanelEntry model of
-                Just activePanelEntry ->
-                    activePanelEntry.currentPlot
-
-                Nothing ->
-                    div []
-                        [ text "No active plot"
-                        , br [] []
-
-                        -- , displayMouseInfo model
-                        ]
-            
+            if model.displayHelp
+                then 
+                    displayHelp model
+                else
+                    rightSidePlot model            
         ]
+
+rightSidePlot : Model -> Html Msg
+rightSidePlot model =
+    case Utils.findActivePanelEntry model of
+    Just activePanelEntry ->
+        activePanelEntry.currentPlot
+
+    Nothing ->
+        div []
+            [ text "No active plot"
+            , br [] []
+
+            -- , displayMouseInfo model
+            ]
+            
 
 
 displayMouseInfo : Model -> Html Msg
