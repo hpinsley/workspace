@@ -9,6 +9,7 @@ import Models exposing (..)
 import PanelView exposing (viewPanel)
 import Time
 import Utils
+import Help exposing (displayHelp)
 
 
 view : Model -> Html Msg
@@ -17,12 +18,6 @@ view model =
         [ leftSide model
         , rightSide model
         ]
-
-displayHelp: Model -> Html Msg
-displayHelp model =
-    div [id "help-page"][
-        text "Enter a mathematical equation.  I can plot functions of either one (e.g of x) or two (e.g. of x and y) independent variables."
-    ]
 
 getFormattedTime : Maybe Time.Posix -> String
 getFormattedTime timeInfo =
