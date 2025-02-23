@@ -158,6 +158,17 @@ roundFloat n f =
     in
     result
 
+formatFloat : Int -> Float -> String
+formatFloat decimalPlaces number =
+    let
+        rounded = roundFloat decimalPlaces number
+        string = String.fromFloat rounded
+        parts = String.split "." string
+        integerPart = List.head parts |> Maybe.withDefault "0"
+        decimalPart = List.tail parts |> Maybe.withDefault [] |> List.head |> Maybe.withDefault ""
+        paddedDecimalPart = String.padRight decimalPlaces '0' decimalPart
+    in
+    integerPart ++ "." ++ paddedDecimalPart
 
 x3dRotation : Float -> FloatMatrix
 x3dRotation theta =

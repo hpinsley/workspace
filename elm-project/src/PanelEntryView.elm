@@ -57,12 +57,12 @@ displayRotationSpeed model =
     fieldset [ id "rotation-speed" ]
         [ legend [] [ text "Rotation Speed" ]
         , text "Milliseconds:"
-        , model.rotationSpeed |> Utils.roundFloat 2 |> String.fromFloat |> text
+        , model.rotationSpeed |> Utils.formatFloat 2 |> text
         , button [ onClick IncreaseRotationSpeed ] [ text "Faster" ]
         , button [ onClick DecreaseRotationSpeed ] [ text "Slower" ]
         , br [][]
         , text " Rotations:"
-        , model.rotations |> Utils.roundFloat 2 |> String.fromFloat |> text
+        , model.rotations |> Utils.formatFloat 2 |> text
         , button [ onClick SmootherRotations ] [ text "Smoother" ]
         , button [ onClick JumpierRotations ] [ text "Jumpier" ]
         ]
@@ -125,7 +125,7 @@ panelEntrySingleAxisView model panelEntry axis incrementMessage decrementMessage
             ]
             [ fieldset []
                 [ legend [] [ text axis.axisName ]
-                , axis.rotationAngle |> Utils.roundFloat 2 |> String.fromFloat |> text
+                , axis.rotationAngle |> Utils.formatFloat 2 |> text
                 , button
                     [ class "inc-button inc-up"
                     , onClick incrementMessage
@@ -273,8 +273,7 @@ showSymbolTableEntry panelEntry symbolTableEntry =
         , td []
             [ div []
                 [ symbolTableEntry.currentValue
-                    |> Utils.roundFloat 3
-                    |> String.fromFloat
+                    |> Utils.formatFloat 3
                     |> text
                 ]
             ]
