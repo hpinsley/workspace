@@ -28,6 +28,9 @@ extractVariableListFromFunction1 f =
 
         Ln expr ->
             extractVariableListFromExpression expr
+        Sqrt expr ->
+            extractVariableListFromExpression expr
+
 
 
 extractVariableListFromFactor : Factor -> List Variable

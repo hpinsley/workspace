@@ -71,6 +71,9 @@ evaluateFactor factor symbolLookup =
                 Ln expr ->
                     evaluateExpression expr symbolLookup |> Result.map (logBase e)
 
+                Sqrt expr ->
+                    evaluateExpression expr symbolLookup |> Result.map sqrt
+
         VariableFactor variable ->
             symbolLookup variable
 

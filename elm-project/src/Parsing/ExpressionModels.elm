@@ -30,6 +30,7 @@ type Function1
     | Tan Expression
     | Abs Expression
     | Ln Expression
+    | Sqrt Expression
 
 
 type Factor
