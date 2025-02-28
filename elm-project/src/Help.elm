@@ -33,6 +33,7 @@ displayHelpText model =
                 ,li [][text "tan"]
                 ,li [][text "ln"]
                 ,li [][text "abs"]
+                ,li [][text "sqrt"]
             ]
         , h2 [][text "Entering Expressions"]
         , text "Enter expressions without any spaces.  You may specify parenthesis to override the normal precedence laws.  Note that there is an issue with the exponentiation operator (^) so if you use it, be explict with parentheses."

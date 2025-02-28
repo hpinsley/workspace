@@ -1,7 +1,17 @@
 # Some Sample Expressions #
 
     A*sin(W*x)*B*cos(V*y)
+    A*sin(W*x)*B*(e^cos(V*y))
     A*sin(W*x)+B*cos(V*y)
+    sin(W*(x+cos(V*y)))
+    sin(W*(x*cos(V*y)))
+    M1*sin(A*x)*sin(B*y)*cos(C*x)*cos(D*y)
+    M1*sin(A*x)+sin(B*y)+cos(C*x)+cos(D*y)
+    A*sin(W*x)*B*(e^cos(V*y))
+    A*sin(W*x)-B*cos(V*y)
+    cos(x*y)
+    sin(2*pi*cos(x+y))
+    A*(sin(V*x)^2)*B*(cos(W*y)^2)
     sin(A*x+B*y)
     A*sin(V*x)+B*cos(W*x)
     cos(abs(W*x)+abs(V*y))*M*(abs(x)+abs(y))
