@@ -1,5 +1,8 @@
 # Some Sample Expressions #
 
+    Fourier: 
+sin(2*pi*t)+(1/2)*sin(2*pi*2*t)+(1/3)*sin(2*pi*3*t)+(1/4)*sin(2*pi*4*t)+(1/5)*sin(2*pi*5*t)+(1/6)*sin(2*pi*6*t)+(1/7)*sin(2*pi*7*t)
+
     A*sin(W*x)*B*cos(V*y)
     A*sin(W*x)*B*(e^cos(V*y))
     A*sin(W*x)+B*cos(V*y)
